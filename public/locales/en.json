@@ -1,0 +1,186 @@
+{
+    "nav": {
+        "home": "Home",
+        "departments": "Departments",
+        "donate": "Donate Now",
+        "track": "Track Donation",
+        "impact": "Impact Stories",
+        "about": "About",
+        "contact": "Contact",
+        "faq": "FAQ",
+        "admin": "Admin"
+    },
+    "hero": {
+        "title": "Help Transform Lives in Afghanistan",
+        "subtitle": "Your donation provides hope, dignity, and a brighter future for those in need",
+        "cta": "Make a Difference Today"
+    },
+    "stats": {
+        "donated": "Total Donated",
+        "helped": "People Helped",
+        "projects": "Active Projects",
+        "volunteers": "Volunteers"
+    },
+    "departments": {
+        "title": "Our Departments",
+        "subtitle": "Choose where your donation makes the most impact",
+        "viewAll": "View All Departments",
+        "donateNow": "Donate to This Cause"
+    },
+    "donation": {
+        "form": {
+            "title": "Make Your Donation",
+            "fullName": "Full Name",
+            "email": "Email Address",
+            "amount": "Donation Amount",
+            "customAmount": "Custom Amount",
+            "department": "Select Department",
+            "paymentMethod": "Payment Method",
+            "message": "Optional Message",
+            "submit": "Proceed to Payment",
+            "processing": "Processing..."
+        },
+        "methods": {
+            "card": "Credit/Debit Card",
+            "paypal": "PayPal",
+            "crypto": "Cryptocurrency",
+            "bank": "Bank Transfer"
+        }
+    },
+    "track": {
+        "title": "Track Your Donation",
+        "subtitle": "Enter your donation ID or full name to see the impact of your contribution",
+        "searchBy": "Search by",
+        "donationId": "Donation ID",
+        "fullName": "Full Name",
+        "search": "Search",
+        "notFound": "No donation found",
+        "status": {
+            "pending": "Pending",
+            "completed": "Completed",
+            "failed": "Failed",
+            "cancelled": "Cancelled"
+        }
+    },
+    "impact": {
+        "title": "Impact Stories",
+        "subtitle": "See how your donations are changing lives",
+        "cost": "Project Cost",
+        "department": "Department",
+        "noImpacts": "No impact stories yet"
+    },
+    "footer": {
+        "tagline": "Transforming lives across Afghanistan through charitable giving",
+        "quickLinks": "Quick Links",
+        "contact": "Contact Us",
+        "followUs": "Follow Us",
+        "copyright": "© 2024 AFGHANIUM. All rights reserved.",
+        "privacy": "Privacy Policy",
+        "terms": "Terms & Conditions"
+    },
+    "about": {
+        "mission": {
+            "title": "Our Mission",
+            "description": "To empower vulnerable communities in Afghanistan through sustainable humanitarian assistance and development programs"
+        },
+        "vision": {
+            "title": "Our Vision",
+            "description": "A prosperous Afghanistan where every person has access to basic necessities and opportunities for growth"
+        },
+        "values": {
+            "title": "Our Core Values",
+            "subtitle": "The principles that guide every action we take",
+            "transparency": {
+                "title": "Transparency",
+                "description": "Every donation is tracked and documented. We provide full visibility into how funds are used."
+            },
+            "impact": {
+                "title": "Impact-Driven",
+                "description": "We focus on programs that create measurable, sustainable improvements in people's lives."
+            },
+            "community": {
+                "title": "Community-Centered",
+                "description": "We work directly with local communities to understand and address their specific needs."
+            },
+            "accountability": {
+                "title": "Accountability",
+                "description": "We are committed to responsible stewardship of every dollar entrusted to us."
+            }
+        },
+        "goals": {
+            "title": "Our Goals",
+            "subtitle": "What we aim to achieve together",
+            "list": [
+                "Provide food security to 50,000 families annually",
+                "Support 10,000 orphaned children with education and care",
+                "Empower 5,000 widows through vocational training",
+                "Build 100 water wells in underserved areas",
+                "Deliver emergency relief to conflict-affected populations"
+            ]
+        }
+    },
+    "contact": {
+        "title": "Get in Touch",
+        "subtitle": "Have questions? We're here to help",
+        "phone": "Phone",
+        "email": "Email",
+        "address": "Address",
+        "sendMessage": "Send Message",
+        "messageSent": "Message sent successfully!",
+        "formTitle": "Send Us a Message",
+        "namePlaceholder": "Your Name",
+        "emailPlaceholder": "Your Email",
+        "subjectPlaceholder": "Subject",
+        "messagePlaceholder": "Your Message"
+    },
+    "faqPage": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Find answers to common questions",
+        "list": [
+            {
+                "q": "How do I donate?",
+                "a": "Visit our Donate page and follow the simple steps to make your contribution."
+            },
+            {
+                "q": "Is my donation tax-deductible?",
+                "a": "Yes, AFGHANIUM is a registered charity and all donations are tax-deductible."
+            },
+            {
+                "q": "How can I track my donation?",
+                "a": "Use your unique donation ID on the Track Donation page to see where your funds are being used."
+            },
+            {
+                "q": "What payment methods do you accept?",
+                "a": "We accept credit/debit cards, PayPal, cryptocurrency, and bank transfers."
+            },
+            {
+                "q": "How do I know my donation is being used properly?",
+                "a": "We provide full transparency through our tracking system and impact proofs showing exactly how funds are used."
+            }
+        ]
+    },
+    "admin": {
+        "login": "Admin Login",
+        "dashboard": "Dashboard",
+        "donations": "Donations",
+        "impacts": "Impact Proofs",
+        "stats": "Statistics",
+        "logout": "Logout",
+        "addImpact": "Add Impact Proof",
+        "uploadPhoto": "Upload Photo"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success!",
+        "cancel": "Cancel",
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "close": "Close",
+        "readMore": "Read More",
+        "learnMore": "Learn More",
+        "language": "Language"
+    }
+}

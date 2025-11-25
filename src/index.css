@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  html,
+  body,
+  #root {
+    @apply min-h-full;
+  }
+
+  body {
+    @apply font-sans text-gray-900 bg-white antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+
+  /* Afghan-inspired patterns */
+  .afghan-pattern-bg {
+    background-image:
+      linear-gradient(45deg, rgba(58, 157, 88, 0.03) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(58, 157, 88, 0.03) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(58, 157, 88, 0.03) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(58, 157, 88, 0.03) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(135deg, #1F5130 0%, #3A9D58 100%);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary hover:bg-secondary-dark text-primary-dark font-semibold py-3 px-8 rounded-lg transition-all duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+  }
+
+  .section-padding {
+    @apply py-12 sm:py-16 md:py-24;
+  }
+
+  .container-custom {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3A9D58;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #1F5130;
+}
+
+/* Page Transition - Simple fade */
+.page-transition {
+  animation: simpleFadeIn 0.2s ease-in;
+}
+
+@keyframes simpleFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Loading Bar Animation */
+@keyframes loadingBar {
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 70%;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-loading-bar {
+  animation: loadingBar 0.8s ease-out;
+}
+
+/* Toast Notification Animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Donation Ticker Animation */
+.ticker-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ticker-content {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker 30s linear infinite;
+  animation-delay: 0s;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+/* Urgent/Emergency Department Styling */
+.urgent-gradient {
+  background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+}
+
+.urgent-card {
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.urgent-card:hover {
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.35);
+}
+
+.urgent-badge {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.card-glass {
+  @apply bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-gray-200;
+}
