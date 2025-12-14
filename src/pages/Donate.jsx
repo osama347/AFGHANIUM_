@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { DEPARTMENTS, PRESET_AMOUNTS, PAYMENT_METHODS, CRYPTO_CURRENCIES } from '../utils/constants';
+import { DEPARTMENTS, PRESET_AMOUNTS, PAYMENT_METHODS, RECEIVER_INFO } from '../utils/constants';
 import { validateDonationForm } from '../utils/validators';
 import { useDonation } from '../hooks/useDonation';
 import { useEmergencyCampaign } from '../hooks/useEmergencyCampaign';
 import { useLanguage } from '../contexts/LanguageContext';
-import { formatCurrency } from '../utils/formatters';
 import Hero from '../components/Hero';
 import Loader from '../components/Loader';
 import Modal from '../components/Modal';
@@ -32,8 +31,6 @@ const Donate = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [showCryptoModal, setShowCryptoModal] = useState(false);
-    const [showBankModal, setShowBankModal] = useState(false);
 
     useEffect(() => {
         if (emergencyId) {
@@ -86,35 +83,38 @@ const Donate = () => {
         });
 
         if (result.success) {
-            // Redirect to tracking page for all payment methods
-            navigate(`/track?id=${result.donationId}`);
+            // Redirect to success page with donation details
+            navigate(`/donation-success?id=${result.donationId}&amount=${formData.amount}&method=${formData.paymentMethod}`);
+        } else {
+            // Show error to user
+            setErrors({ submit: result.error || 'Failed to submit donation. Please try again.' });
         }
     };
 
     const paymentMethodOptions = [
         {
-            value: PAYMENT_METHODS.STRIPE,
-            label: 'Credit/Debit Card',
-            icon: CreditCard,
-            description: 'Visa, Mastercard',
+            value: PAYMENT_METHODS.HAWALA,
+            label: 'Hawala Transfer',
+            icon: Building2,
+            description: 'Traditional money transfer',
         },
         {
-            value: PAYMENT_METHODS.PAYPAL,
-            label: 'PayPal',
+            value: PAYMENT_METHODS.WESTERN_UNION,
+            label: 'Western Union',
             icon: Smartphone,
-            description: 'PayPal Checkout',
-        },
-        {
-            value: PAYMENT_METHODS.CRYPTO,
-            label: 'Cryptocurrency',
-            icon: Bitcoin,
-            description: 'BTC, ETH, USDT, USDC',
+            description: 'Global money transfer',
         },
         {
             value: PAYMENT_METHODS.BANK_TRANSFER,
             label: 'Bank Transfer',
             icon: Building2,
             description: 'Wire Transfer',
+        },
+        {
+            value: PAYMENT_METHODS.MONEYGRAM,
+            label: 'MoneyGram',
+            icon: Smartphone,
+            description: 'International transfer',
         },
     ];
 
@@ -310,6 +310,26 @@ const Donate = () => {
                                     )}
                                 </div>
 
+                                {/* Receiver Information */}
+                                {formData.paymentMethod && RECEIVER_INFO[formData.paymentMethod] && (
+                                    <div className="mb-8 bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg">
+                                        <h3 className="text-xl font-bold text-blue-800 mb-4">Receiver Information</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            {Object.entries(RECEIVER_INFO[formData.paymentMethod]).map(([key, value]) => (
+                                                <div key={key}>
+                                                    <span className="font-semibold text-blue-700 capitalize">
+                                                        {key.replace(/_/g, ' ')}:
+                                                    </span>
+                                                    <span className="ml-2 text-blue-900">{value}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-4 p-3 bg-blue-100 rounded text-blue-800 text-sm">
+                                            <strong>Important:</strong> Please include your donation ID ({formData.donationId || 'will be generated'}) in the transfer notes for proper tracking.
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Submit Button */}
                                 <button
                                     type="submit"
@@ -325,6 +345,10 @@ const Donate = () => {
                                         t('donation.form.submit')
                                     )}
                                 </button>
+
+                                {errors.submit && (
+                                    <p className="text-red-500 text-sm mt-2 text-center">{errors.submit}</p>
+                                )}
                             </form>
                         )}
                     </div>

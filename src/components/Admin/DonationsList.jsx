@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDonation } from '../../hooks/useDonation';
 import { getAllEmergencyCampaigns } from '../../supabase/emergencyCampaigns';
+import { updateDonationStatus } from '../../supabase/donations';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 import { DollarSign, Plus, Download, Search, AlertTriangle } from 'lucide-react';
 import Loader from '../Loader';
@@ -13,6 +14,7 @@ const DonationsList = () => {
     const [donations, setDonations] = useState([]);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [emergencyCampaigns, setEmergencyCampaigns] = useState({});
 
     useEffect(() => {
@@ -40,6 +42,46 @@ const DonationsList = () => {
         }
     };
 
+    const handleApproveDonation = async (donationId) => {
+        if (window.confirm('Are you sure you want to approve this donation? This will mark it as completed.')) {
+            const result = await updateDonationStatus(donationId, 'completed');
+            if (result.success) {
+                // Refresh the donations list
+                fetchDonations();
+                alert('Donation approved successfully!');
+            } else {
+                alert('Failed to approve donation: ' + result.error);
+            }
+        }
+    };
+
+    const handleRejectDonation = async (donationId) => {
+        const reason = prompt('Please provide a reason for rejecting this donation (optional):');
+        if (reason !== null) { // User didn't cancel
+            const result = await updateDonationStatus(donationId, 'failed');
+            if (result.success) {
+                // Refresh the donations list
+                fetchDonations();
+                alert('Donation rejected successfully!');
+            } else {
+                alert('Failed to reject donation: ' + result.error);
+            }
+        }
+    };
+
+    const handleCancelDonation = async (donationId) => {
+        if (window.confirm('Are you sure you want to cancel this donation? This action cannot be undone.')) {
+            const result = await updateDonationStatus(donationId, 'cancelled');
+            if (result.success) {
+                // Refresh the donations list
+                fetchDonations();
+                alert('Donation cancelled successfully!');
+            } else {
+                alert('Failed to cancel donation: ' + result.error);
+            }
+        }
+    };
+
     const getDepartmentLabel = (deptId) => {
         if (emergencyCampaigns[deptId]) {
             return (
@@ -61,9 +103,11 @@ const DonationsList = () => {
                 Email: d.email,
                 Amount: d.amount,
                 Department: emergencyCampaigns[d.department] || d.department,
+                Payment_Method: d.payment_method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                Transaction_Reference: d.transaction_reference || '',
                 Status: d.status,
                 Date: new Date(d.created_at).toLocaleDateString(),
-                PaymentMethod: d.payment_method
+                Time: new Date(d.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }));
             exportToCSV(exportData, `donations-${new Date().toISOString().split('T')[0]}.csv`);
         }
@@ -73,6 +117,12 @@ const DonationsList = () => {
     const groupedDonations = useMemo(() => {
         // 1. Filter
         const filtered = donations.filter(d => {
+            // Status filter
+            if (statusFilter !== 'all' && d.status !== statusFilter) {
+                return false;
+            }
+
+            // Search filter
             const searchLower = searchTerm.toLowerCase();
             const deptName = emergencyCampaigns[d.department] ? emergencyCampaigns[d.department].toLowerCase() : d.department.toLowerCase();
             return (
@@ -98,7 +148,33 @@ const DonationsList = () => {
         });
 
         return groups;
-    }, [donations, searchTerm, emergencyCampaigns]);
+    }, [donations, searchTerm, statusFilter, emergencyCampaigns]);
+
+    // Calculate donation statistics
+    const donationStats = useMemo(() => {
+        const stats = {
+            total: donations.length,
+            pending: 0,
+            completed: 0,
+            failed: 0,
+            cancelled: 0,
+            pendingManual: 0, // Manual payments waiting for approval
+        };
+
+        donations.forEach(d => {
+            stats[d.status] = (stats[d.status] || 0) + 1;
+
+            // Count manual payments that need approval
+            if (d.status === 'pending' &&
+                (d.payment_method === 'hawala' || d.payment_method === 'western_union' ||
+                 d.payment_method === 'bank_transfer' || d.payment_method === 'moneygram') &&
+                d.transaction_reference) {
+                stats.pendingManual++;
+            }
+        });
+
+        return stats;
+    }, [donations]);
 
     if (loading) {
         return <Loader size="lg" />;
@@ -114,10 +190,54 @@ const DonationsList = () => {
 
     return (
         <div>
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+                    <div className="text-2xl font-bold text-gray-900">{donationStats.total}</div>
+                    <div className="text-sm text-gray-500">Total Donations</div>
+                </div>
+                <div className="bg-yellow-50 rounded-lg shadow-sm border border-yellow-200 p-4">
+                    <div className="text-2xl font-bold text-yellow-700">{donationStats.pending}</div>
+                    <div className="text-sm text-yellow-600">Pending</div>
+                </div>
+                <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-200 p-4">
+                    <div className="text-2xl font-bold text-blue-700">{donationStats.pendingManual}</div>
+                    <div className="text-sm text-blue-600">Need Approval</div>
+                </div>
+                <div className="bg-green-50 rounded-lg shadow-sm border border-green-200 p-4">
+                    <div className="text-2xl font-bold text-green-700">{donationStats.completed}</div>
+                    <div className="text-sm text-green-600">Completed</div>
+                </div>
+                <div className="bg-red-50 rounded-lg shadow-sm border border-red-200 p-4">
+                    <div className="text-2xl font-bold text-red-700">{donationStats.failed + donationStats.cancelled}</div>
+                    <div className="text-sm text-red-600">Rejected</div>
+                </div>
+            </div>
+
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <h2 className="text-3xl font-bold text-gray-900">All Donations</h2>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    {/* Status Filter */}
+                    <div className="relative">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent w-full sm:w-48 appearance-none bg-white"
+                        >
+                            <option value="all">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="failed">Failed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
                     {/* Search Input */}
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -166,6 +286,8 @@ const DonationsList = () => {
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Department</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Transaction Ref</th>
+                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment Method</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Time</th>
                                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
@@ -194,18 +316,64 @@ const DonationsList = () => {
                                                         {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
                                                     </span>
                                                 </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {donation.transaction_reference || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {donation.payment_method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {new Date(donation.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <button
-                                                        onClick={() => navigate(`/admin/impacts?donationId=${donation.donation_id}&donorName=${encodeURIComponent(donation.full_name)}&department=${donation.department}&amount=${donation.amount}`)}
-                                                        className="text-primary hover:text-primary-dark flex items-center gap-1 ml-auto"
-                                                        title="Add Impact Proof"
-                                                    >
-                                                        <Plus className="w-4 h-4" />
-                                                        Add Proof
-                                                    </button>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                                    {donation.status === 'pending' && (
+                                                        <div className="flex justify-end space-x-2">
+                                                            <button
+                                                                onClick={() => handleApproveDonation(donation.donation_id)}
+                                                                className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors"
+                                                                title="Approve this donation"
+                                                            >
+                                                                ✓ Approve
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleRejectDonation(donation.donation_id)}
+                                                                className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors"
+                                                                title="Reject this donation"
+                                                            >
+                                                                ✗ Reject
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {donation.status === 'completed' && (
+                                                        <span className="text-green-600 text-xs bg-green-50 px-2 py-1 rounded">
+                                                            ✓ Completed
+                                                        </span>
+                                                    )}
+
+                                                    {donation.status === 'failed' && (
+                                                        <span className="text-red-600 text-xs bg-red-50 px-2 py-1 rounded">
+                                                            ✗ Failed
+                                                        </span>
+                                                    )}
+
+                                                    {donation.status === 'cancelled' && (
+                                                        <span className="text-gray-600 text-xs bg-gray-50 px-2 py-1 rounded">
+                                                            Cancelled
+                                                        </span>
+                                                    )}
+
+                                                    {/* Add Impact Proof button - available for all completed donations */}
+                                                    {donation.status === 'completed' && (
+                                                        <button
+                                                            onClick={() => navigate(`/admin/impacts?donationId=${donation.donation_id}&donorName=${encodeURIComponent(donation.full_name)}&department=${donation.department}&amount=${donation.amount}`)}
+                                                            className="text-primary hover:text-primary-dark flex items-center gap-1 ml-2 transition-colors"
+                                                            title="Add Impact Proof"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                            Add Proof
+                                                        </button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}

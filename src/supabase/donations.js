@@ -20,6 +20,7 @@ export const createDonation = async (donationData) => {
                     amount: donationData.amount,
                     department: donationData.department,
                     payment_method: donationData.paymentMethod,
+                    transaction_reference: donationData.transactionReference || null,
                     message: donationData.message || null,
                     status: 'pending',
                     created_at: new Date().toISOString(),
@@ -104,6 +105,33 @@ export const updateDonationStatus = async (donationId, status) => {
         return { success: true, data };
     } catch (error) {
         console.error('Error updating donation status:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Update donation transaction reference
+ * @param {string} donationId - Donation ID
+ * @param {string} transactionReference - Transaction reference number
+ * @returns {Promise<object>} Updated donation
+ */
+export const updateDonationTransactionReference = async (donationId, transactionReference) => {
+    try {
+        const { data, error } = await supabase
+            .from(TABLES.DONATIONS)
+            .update({
+                transaction_reference: transactionReference,
+                updated_at: new Date().toISOString(),
+            })
+            .eq('donation_id', donationId)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return { success: true, data };
+    } catch (error) {
+        console.error('Error updating transaction reference:', error);
         return { success: false, error: error.message };
     }
 };

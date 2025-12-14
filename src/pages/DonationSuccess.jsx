@@ -1,72 +1,38 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import confetti from 'canvas-confetti';
-import { generateCertificate } from '../utils/certificateGenerator';
-import { CheckCircle, Twitter, Facebook, Share2, ArrowRight, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import CTAButton from '../components/CTAButton';
+import { updateDonationTransactionReference } from '../supabase/donations';
 import { useToast } from '../contexts/ToastContext';
 
 const DonationSuccess = () => {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
+    const { toast } = useToast();
     const donationId = searchParams.get('id');
     const amount = searchParams.get('amount');
-    const { toast } = useToast();
+    const paymentMethod = searchParams.get('method');
 
-    useEffect(() => {
-        // Trigger confetti animation
-        const duration = 3 * 1000;
-        const animationEnd = Date.now() + duration;
+    const [transactionReference, setTransactionReference] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
-        const randomInRange = (min, max) => Math.random() * (max - min) + min;
-
-        const interval = setInterval(() => {
-            const timeLeft = animationEnd - Date.now();
-
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
-
-            confetti({
-                particleCount: 3,
-                angle: randomInRange(55, 125),
-                spread: randomInRange(50, 70),
-                origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
-                colors: ['#3A9D58', '#F4B223', '#1F5130'],
-            });
-        }, 50);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const shareUrl = `${window.location.origin}/track?id=${donationId}`;
-    const shareText = `I just donated ${amount ? `$${amount}` : ''} to AFGHANIUM! Help make a difference in Afghanistan.`;
-
-    const handleShare = (platform) => {
-        const urls = {
-            twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-        };
-
-        if (urls[platform]) {
-            window.open(urls[platform], '_blank', 'width=600,height=400');
+    const handleSubmitReference = async (e) => {
+        e.preventDefault();
+        if (!transactionReference.trim()) {
+            toast.error('Please enter your transaction reference number');
+            return;
         }
-    };
 
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(shareUrl);
-        alert('Link copied to clipboard!');
-    };
+        setIsSubmitting(true);
+        const result = await updateDonationTransactionReference(donationId, transactionReference.trim());
+        setIsSubmitting(false);
 
-    const handleDownloadCertificate = () => {
-        generateCertificate({
-            full_name: 'Valued Donor', // In a real app, fetch this or pass via state
-            amount: parseFloat(amount),
-            donation_id: donationId,
-            created_at: new Date().toISOString(),
-            department: 'Humanitarian Aid'
-        });
-        toast.success('Certificate downloaded!');
+        if (result.success) {
+            setIsSubmitted(true);
+            toast.success('Transaction reference submitted successfully! Your donation will be verified by our admin team.');
+        } else {
+            toast.error('Failed to submit transaction reference. Please try again.');
+        }
     };
 
     return (
@@ -81,16 +47,16 @@ const DonationSuccess = () => {
 
                 {/* Thank You Message */}
                 <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-                    Thank You! 🎉
+                    Donation Information Submitted! 📋
                 </h1>
 
                 <p className="text-xl text-gray-600 mb-8">
-                    Your generous donation has been received successfully!
+                    Thank you for your generous donation. Please provide your transaction reference number below so we can verify your payment.
                 </p>
 
                 {/* Donation Details */}
                 <div className="bg-green-50 rounded-lg p-6 mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                         {donationId && (
                             <div>
                                 <p className="text-sm text-gray-600">Donation ID</p>
@@ -103,56 +69,81 @@ const DonationSuccess = () => {
                                 <p className="text-lg font-bold text-primary">${amount}</p>
                             </div>
                         )}
+                        {paymentMethod && (
+                            <div>
+                                <p className="text-sm text-gray-600">Payment Method</p>
+                                <p className="text-lg font-bold text-gray-900 capitalize">{paymentMethod.replace('_', ' ')}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Impact Message */}
+                {/* Transaction Reference Form */}
+                {!isSubmitted ? (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8">
+                        <div className="flex items-start mb-4">
+                            <AlertTriangle className="w-6 h-6 text-yellow-600 mr-3 mt-1 flex-shrink-0" />
+                            <div>
+                                <h3 className="text-xl font-bold text-yellow-800 mb-2">Submit Transaction Reference</h3>
+                                <p className="text-yellow-700 mb-4">
+                                    After sending your donation via {paymentMethod?.replace('_', ' ')}, please enter the transaction reference number below.
+                                </p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleSubmitReference} className="space-y-4">
+                            <div>
+                                <label className="block text-gray-700 font-medium mb-2">
+                                    Transaction Reference Number *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={transactionReference}
+                                    onChange={(e) => setTransactionReference(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    placeholder={`Enter your ${paymentMethod?.replace('_', ' ')} reference number`}
+                                    required
+                                />
+                                <p className="text-sm text-gray-500 mt-1">
+                                    This is usually found on your receipt or transaction confirmation
+                                </p>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? 'Submitting...' : 'Submit Transaction Reference'}
+                            </button>
+                        </form>
+                    </div>
+                ) : (
+                    <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-8">
+                        <div className="flex items-center mb-2">
+                            <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
+                            <h3 className="text-xl font-bold text-green-800">Transaction Reference Submitted</h3>
+                        </div>
+                        <p className="text-green-700">
+                            Thank you! Your transaction reference has been recorded. Our admin team will verify your donation and update the status within 1-3 business days.
+                        </p>
+                    </div>
+                )}
+
+                {/* Important Notes */}
                 <div className="bg-blue-50 rounded-lg p-6 mb-8">
-                    <p className="text-gray-700 leading-relaxed">
-                        Your contribution will help provide essential support to vulnerable communities in Afghanistan.
-                        We'll keep you updated on the impact of your donation through our tracking system.
-                    </p>
-                </div>
-
-                {/* Social Sharing */}
-                <div className="mb-8">
-                    <p className="text-gray-600 mb-4">Share your contribution and inspire others:</p>
-                    <div className="flex justify-center space-x-4">
-                        <button
-                            onClick={() => handleShare('twitter')}
-                            className="bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-full transition-colors"
-                            aria-label="Share on Twitter"
-                        >
-                            <Twitter className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={() => handleShare('facebook')}
-                            className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-colors"
-                            aria-label="Share on Facebook"
-                        >
-                            <Facebook className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={handleCopyLink}
-                            className="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full transition-colors"
-                            aria-label="Copy link"
-                        >
-                            <Share2 className="w-6 h-6" />
-                        </button>
-                    </div>
+                    <h3 className="text-lg font-bold text-blue-800 mb-3">Important Notes:</h3>
+                    <ul className="text-blue-700 text-left space-y-2">
+                        <li>• Submit your transaction reference number above for verification</li>
+                        <li>• Your donation will be confirmed once verified by our admin team</li>
+                        <li>• Processing may take 1-3 business days</li>
+                        <li>• You'll receive email confirmation once approved</li>
+                        <li>• Track your donation status using the button below</li>
+                    </ul>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <CTAButton
-                        onClick={handleDownloadCertificate}
-                        variant="outline"
-                        size="lg"
-                        className="border-accent-gold text-accent-gold hover:bg-accent-gold hover:text-white"
-                    >
-                        <Download className="w-5 h-5 mr-2 inline" /> Download Certificate
-                    </CTAButton>
-
                     <CTAButton
                         to={`/track?id=${donationId}`}
                         variant="primary"

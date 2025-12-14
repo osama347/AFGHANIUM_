@@ -9,6 +9,7 @@ CREATE TABLE public.donations (
   amount numeric NOT NULL CHECK (amount >= 0::numeric),
   department text NOT NULL,
   payment_method text NOT NULL,
+  transaction_reference text,
   message text,
   status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'completed'::text, 'failed'::text, 'cancelled'::text])),
   created_at timestamp with time zone DEFAULT now(),

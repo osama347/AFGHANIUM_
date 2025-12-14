@@ -78,8 +78,9 @@ CREATE TABLE donations (
   amount DECIMAL(10,2) NOT NULL,
   department TEXT NOT NULL,
   payment_method TEXT NOT NULL,
+  transaction_reference TEXT,  -- For manual transfer reference numbers
   message TEXT,
-  status TEXT DEFAULT 'pending',
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'cancelled')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -234,12 +234,12 @@ export const EMERGENCY_DEPARTMENTS = [
     }
 ];
 
-// Payment Methods
+// Payment Methods (Traditional Money Transfer)
 export const PAYMENT_METHODS = {
-    STRIPE: 'stripe',
-    PAYPAL: 'paypal',
-    CRYPTO: 'crypto',
+    HAWALA: 'hawala',
+    WESTERN_UNION: 'western_union',
     BANK_TRANSFER: 'bank_transfer',
+    MONEYGRAM: 'moneygram',
 };
 
 export const CRYPTO_CURRENCIES = [
@@ -284,4 +284,38 @@ export const CONTACT_INFO = {
     email: 'info@afghanium.org',
     phone: '+93 (0) 700 123 456',
     address: 'Kabul, Afghanistan',
+};
+
+// Receiver Information for Money Transfers
+export const RECEIVER_INFO = {
+    bank_transfer: {
+        name: 'AFGHANIUM Charity Organization',
+        account_number: '1234567890',
+        bank_name: 'Da Afghanistan Bank',
+        swift_code: 'DABAAFGX',
+        iban: 'AF12 3456 7890 1234 5678 9012',
+        address: 'Kabul, Afghanistan',
+    },
+    hawala: {
+        name: 'AFGHANIUM Charity',
+        hawala_provider: 'Al-Baraka Exchange',
+        location: 'Kabul Main Branch',
+        agent_name: 'Ahmad Rahmani',
+        phone: '+93 700 123 456',
+        instructions: 'Mention "AFGHANIUM Donation" in the transfer notes',
+    },
+    western_union: {
+        name: 'AFGHANIUM Charity Organization',
+        city: 'Kabul',
+        country: 'Afghanistan',
+        phone: '+93 700 123 456',
+        instructions: 'Send to Kabul, Afghanistan. Include donation ID in message.',
+    },
+    moneygram: {
+        name: 'AFGHANIUM Charity Organization',
+        city: 'Kabul',
+        country: 'Afghanistan',
+        phone: '+93 700 123 456',
+        instructions: 'Send to Kabul, Afghanistan. Include donation ID in message.',
+    },
 };
