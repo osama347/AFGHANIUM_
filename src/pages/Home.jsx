@@ -12,6 +12,7 @@ import { formatCurrency } from '../utils/formatters';
 import { Home as HomeIcon, Heart, Users, TrendingUp } from 'lucide-react';
 import CTAButton from '../components/CTAButton';
 import TestimonialCard from '../components/TestimonialCard';
+import { getTestimonials } from '../supabase/testimonials';
 
 const Home = () => {
     const { t } = useLanguage();
@@ -19,6 +20,7 @@ const Home = () => {
     const { getStats: getImpactStats } = useImpact();
     const [donationStats, setDonationStats] = useState(null);
     const [impactStats, setImpactStats] = useState(null);
+    const [testimonials, setTestimonials] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,54 +33,16 @@ const Home = () => {
             if (impactResult.success) {
                 setImpactStats(impactResult.data);
             }
+
+            const testimonialsResult = await getTestimonials();
+            if (testimonialsResult.success) {
+                setTestimonials(testimonialsResult.data);
+            }
         };
         fetchData();
     }, []);
 
-    // Statistics data
-    const stats = [
-        {
-            icon: HomeIcon,
-            value: donationStats ? formatCurrency(donationStats.totalAmount) : '$0',
-            label: t('stats.donated'),
-            color: 'text-primary'
-        },
-        {
-            icon: Users,
-            value: donationStats ? donationStats.totalDonations.toString() : '0',
-            label: t('stats.helped'),
-            color: 'text-accent-gold'
-        },
-        {
-            icon: Heart,
-            value: impactStats ? impactStats.totalImpacts.toString() : '0',
-            label: t('stats.projects'),
-            color: 'text-primary-dark'
-        },
-        { icon: TrendingUp, value: '50+', label: t('stats.volunteers'), color: 'text-primary' },
-    ];
-
-    // Sample testimonials
-    const testimonials = [
-        {
-            name: 'Ahmad Rashid',
-            location: 'United States',
-            message: 'AFGHANIUM made it easy to help my homeland. I can see exactly where my donation goes and the real impact it makes.',
-            amount: 500,
-        },
-        {
-            name: 'Fatima Karimi',
-            location: 'Germany',
-            message: 'Transparent, trustworthy, and truly making a difference. I donate monthly and receive updates on the projects my contributions support.',
-            amount: 250,
-        },
-        {
-            name: 'Mohammad Ali',
-            location: 'Canada',
-            message: 'The tracking system gives me peace of mind. I know my charity reaches those who need it most in Afghanistan.',
-            amount: 1000,
-        },
-    ];
+    // Statistics data is handled by StatsSection component
 
     return (
         <div>
@@ -88,7 +52,6 @@ const Home = () => {
                 subtitle={t('hero.subtitle')}
                 ctaText={t('hero.cta')}
                 ctaLink="/donate"
-                backgroundImage="/cover-photo.png"
             />
 
             {/* Real-Time Donation Ticker */}

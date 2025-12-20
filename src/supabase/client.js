@@ -30,4 +30,5 @@ export const TABLES = {
 // Storage bucket names
 export const BUCKETS = {
     IMPACT_PHOTOS: 'impact-photos',
+    TESTIMONIALS: 'testimonials',
 };

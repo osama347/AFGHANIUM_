@@ -1,5 +1,6 @@
 import React from 'react';
 import { Quote } from 'lucide-react';
+import { getTestimonialImageUrl } from '../supabase/storage';
 
 const TestimonialCard = ({ testimonial }) => {
     return (
@@ -13,6 +14,15 @@ const TestimonialCard = ({ testimonial }) => {
             </p>
 
             <div className="text-center">
+                {testimonial.image_url && (
+                    <div className="mb-4">
+                        <img
+                            src={getTestimonialImageUrl(testimonial.image_url)}
+                            alt={testimonial.name}
+                            className="w-16 h-16 rounded-full object-cover mx-auto"
+                        />
+                    </div>
+                )}
                 <p className="font-semibold text-gray-900 text-lg">
                     {testimonial.name}
                 </p>

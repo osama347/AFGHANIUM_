@@ -9,11 +9,11 @@ CREATE TABLE public.donations (
   amount numeric NOT NULL CHECK (amount >= 0::numeric),
   department text NOT NULL,
   payment_method text NOT NULL,
-  transaction_reference text,
   message text,
   status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'completed'::text, 'failed'::text, 'cancelled'::text])),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  transaction_reference text,
   CONSTRAINT donations_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.emergency_campaigns (
@@ -28,7 +28,7 @@ CREATE TABLE public.emergency_campaigns (
   impact_message_dari text,
   impact_message_pashto text,
   icon text DEFAULT '🚨'::text,
-  goal_amount numeric NOT NULL,
+  goal_amount numeric NOT NULL CHECK (goal_amount >= 0::numeric),
   is_active boolean DEFAULT false,
   urgent_until timestamp without time zone,
   priority integer DEFAULT 1,
@@ -46,9 +46,9 @@ CREATE TABLE public.impacts (
   image_url text,
   donation_id text,
   admin_comment text,
+  media jsonb DEFAULT '[]'::jsonb,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  media jsonb DEFAULT '[]'::jsonb,
   CONSTRAINT impacts_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.messages (
@@ -61,3 +61,26 @@ CREATE TABLE public.messages (
   read boolean DEFAULT false,
   CONSTRAINT messages_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.site_content (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  key text NOT NULL UNIQUE,
+  value text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT site_content_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.testimonials (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name text NOT NULL,
+  location text,
+  message text NOT NULL,
+  amount numeric,
+  image_url text,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT testimonials_pkey PRIMARY KEY (id)
+);
+
+
+
