@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
-import { LayoutDashboard, Heart, DollarSign, LogOut, Menu, Mail, Settings, FileText, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, Heart, DollarSign, LogOut, Menu, Mail, Settings, FileText, AlertTriangle, BookOpen } from 'lucide-react';
 import Loader from '../Loader';
 import { supabase } from '../../supabase/client';
 import { getUnreadCount } from '../../supabase/messages';
@@ -68,6 +68,7 @@ const AdminDashboard = () => {
             badge: unreadCount > 0 ? unreadCount : null
         },
         { path: '/admin/emergency', icon: AlertTriangle, label: 'Emergency' },
+        { path: '/admin/research', icon: BookOpen, label: 'Research' },
         { path: '/admin/content', icon: FileText, label: 'Content' },
         { path: '/admin/settings', icon: Settings, label: 'Settings' },
     ];

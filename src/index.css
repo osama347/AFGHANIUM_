@@ -202,3 +202,22 @@
 .card-glass {
   @apply bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-gray-200;
 }
+
+/* Shimmer Loading Animation for Hero Images */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.bg-size-200 {
+  background-size: 200% 100%;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}

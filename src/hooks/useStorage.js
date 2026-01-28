@@ -4,6 +4,8 @@ import {
     getImageUrl,
     deleteImage,
     listImages,
+    uploadFile,
+    deleteFile,
 } from '../supabase/storage.js';
 
 /**
@@ -14,12 +16,16 @@ export const useStorage = () => {
     const [error, setError] = useState(null);
     const [progress, setProgress] = useState(0);
 
-    const upload = async (file, folder = 'general') => {
+    const upload = async (file, bucket = 'impact-photos', folder = 'general') => {
         setUploading(true);
         setError(null);
         setProgress(0);
 
-        const result = await uploadImage(file, folder);
+        // Use uploadFile for generic file uploads, uploadImage for images
+        const isImage = file.type.startsWith('image/');
+        const result = isImage 
+            ? await uploadImage(file, folder)
+            : await uploadFile(file, bucket, folder);
 
         setUploading(false);
         setProgress(100);
@@ -35,9 +41,11 @@ export const useStorage = () => {
         return getImageUrl(path);
     };
 
-    const remove = async (path) => {
+    const remove = async (path, bucket = 'impact-photos') => {
         setError(null);
-        const result = await deleteImage(path);
+        const result = bucket === 'impact-photos' 
+            ? await deleteImage(path)
+            : await deleteFile(path, bucket);
 
         if (!result.success) {
             setError(result.error);

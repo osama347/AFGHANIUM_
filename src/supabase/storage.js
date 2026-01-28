@@ -213,3 +213,73 @@ export const deleteSlideshowImage = async (path) => {
         return { success: false, error: error.message };
     }
 };
+
+/**
+ * Upload file to a specific bucket (generic method)
+ * @param {File} file - File to upload
+ * @param {string} bucketName - Bucket name (research-files, etc.)
+ * @param {string} folder - Optional folder name
+ * @returns {Promise<object>} Upload result
+ */
+export const uploadFile = async (file, bucketName = 'research-files', folder = '') => {
+    try {
+        if (!file) {
+            throw new Error('No file provided');
+        }
+
+        // Generate unique filename
+        const fileExt = file.name.split('.').pop();
+        const baseName = file.name.replace(`.${fileExt}`, '');
+        const fileName = folder 
+            ? `${folder}/${Date.now()}_${baseName}.${fileExt}`
+            : `${Date.now()}_${baseName}.${fileExt}`;
+
+        // Upload file
+        const { data, error } = await supabase.storage
+            .from(bucketName)
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: false,
+            });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from(bucketName)
+            .getPublicUrl(fileName);
+
+        return {
+            success: true,
+            data: {
+                path: data.path,
+                publicUrl,
+                fileName: file.name,
+            },
+        };
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Delete file from storage
+ * @param {string} path - File path in storage
+ * @param {string} bucketName - Bucket name
+ * @returns {Promise<object>} Result
+ */
+export const deleteFile = async (path, bucketName = 'research-files') => {
+    try {
+        const { error } = await supabase.storage
+            .from(bucketName)
+            .remove([path]);
+
+        if (error) throw error;
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting file:', error);
+        return { success: false, error: error.message };
+    }
+};

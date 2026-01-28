@@ -4,7 +4,8 @@
         "departments": "Departments",
         "donate": "Donate Now",
         "track": "Track Donation",
-        "impact": "Impact Stories",
+        "impact": "Impact Roadmap",
+        "research": "Research",
         "about": "About",
         "contact": "Contact",
         "faq": "FAQ",
@@ -63,11 +64,51 @@
         }
     },
     "impact": {
-        "title": "Impact Stories",
-        "subtitle": "See how your donations are changing lives",
+        "title": "Impact Roadmap",
+        "subtitle": "Why Afghanium Exists: Building Market Access for Afghan Producers",
         "cost": "Project Cost",
         "department": "Department",
         "noImpacts": "No impact stories yet"
+    },
+    "research": {
+        "title": "Research & Publications",
+        "subtitle": "Evidence-based knowledge for Afghanistan's future",
+        "description": "Afghanium's Research section has two options: Submit Research and View Published Research. We welcome research that can genuinely help Afghanistan—especially work related to the medical sector and women's health—and we may publish selected submissions after review.",
+        "tabs": {
+            "published": "Published Research",
+            "submit": "Submit Research"
+        },
+        "publishedSection": {
+            "title": "Published Research",
+            "subtitle": "Free access to peer-reviewed research supporting evidence-based action",
+            "noResearch": "No published research yet. Check back soon!"
+        },
+        "submitSection": {
+            "title": "Submit Research",
+            "subtitle": "Share your work to help Afghanistan's future",
+            "instructions": "General submission criteria:",
+            "criteria": [
+                "Submissions must be original work authored by you and free from plagiarism",
+                "Must be a proper research piece—clearly written, structured, and supported by credible sources or evidence",
+                "Casual opinion posts or unsubstantiated claims will not be considered",
+                "Work related to medical sector, women's health, and development topics are especially welcome",
+                "All submissions are reviewed before consideration for publication"
+            ],
+            "form": {
+                "title": "Research Title",
+                "author": "Author Name",
+                "email": "Email Address",
+                "topic": "Research Topic",
+                "abstract": "Abstract / Summary",
+                "file": "Upload Research (PDF, DOC, DOCX)",
+                "keywords": "Keywords",
+                "message": "Additional Notes",
+                "submit": "Submit Research",
+                "submitting": "Submitting...",
+                "success": "Research submitted successfully! We will review it and contact you soon.",
+                "error": "Error submitting research. Please try again."
+            }
+        }
     },
     "footer": {
         "tagline": "Transforming lives across Afghanistan through charitable giving",
@@ -81,41 +122,41 @@
     "about": {
         "mission": {
             "title": "Our Mission",
-            "description": "To empower vulnerable communities in Afghanistan through sustainable humanitarian assistance and development programs"
+            "description": "Afghanium is a social enterprise connecting Afghan producers with global customers. We promote authentic Afghan-made products—saffron, leather goods, rugs, and gemstones—helping farmers and artists earn through fair trade, not donations. A portion of our profit supports women-focused healthcare projects in Afghanistan, including women-only clinics staffed by women."
         },
         "vision": {
             "title": "Our Vision",
-            "description": "A prosperous Afghanistan where every person has access to basic necessities and opportunities for growth"
+            "description": "We're building a bridge from Afghan hands to global homes—and from global purchases to real, targeted support for women's healthcare. A sustainable model where dignified work creates both economic opportunity and humanitarian impact."
         },
         "values": {
-            "title": "Our Core Values",
+            "title": "What We Stand For",
             "subtitle": "The principles that guide every action we take",
+            "dignity": {
+                "title": "Dignity Through Work",
+                "description": "Fair opportunities for producers, farmers, and artists. We build market access, not dependency—reliable buyers, fair terms, and long-term relationships."
+            },
+            "womensHealth": {
+                "title": "Women's Health",
+                "description": "Profits reinvested into women-only healthcare initiatives. Healthcare remains one of the few spaces where women can contribute professionally and safely as both patients and professionals."
+            },
             "transparency": {
                 "title": "Transparency",
-                "description": "Every donation is tracked and documented. We provide full visibility into how funds are used."
+                "description": "Clear reporting on what we fund and why. Every transaction is tracked. We provide full visibility into how resources are used and distributed."
             },
-            "impact": {
-                "title": "Impact-Driven",
-                "description": "We focus on programs that create measurable, sustainable improvements in people's lives."
-            },
-            "community": {
-                "title": "Community-Centered",
-                "description": "We work directly with local communities to understand and address their specific needs."
-            },
-            "accountability": {
-                "title": "Accountability",
-                "description": "We are committed to responsible stewardship of every dollar entrusted to us."
+            "quality": {
+                "title": "Quality & Compliance",
+                "description": "Responsible sourcing, documentation, and lawful trade practices. We ensure the highest standards in every product and every partnership."
             }
         },
         "goals": {
-            "title": "Our Goals",
-            "subtitle": "What we aim to achieve together",
+            "title": "Our Initiatives",
+            "subtitle": "How we're creating impact",
             "list": [
-                "Provide food security to 50,000 families annually",
-                "Support 10,000 orphaned children with education and care",
-                "Empower 5,000 widows through vocational training",
-                "Build 100 water wells in underserved areas",
-                "Deliver emergency relief to conflict-affected populations"
+                "Fair trade partnerships with Afghan farmers, artists, and workshops",
+                "Women-only healthcare clinics staffed and managed by women",
+                "Research & Publications hub sharing practical knowledge for Afghanistan's future",
+                "Sustainable supply chains connecting Afghan producers to global markets",
+                "Evidence-based support for healthcare and development sectors"
             ]
         }
     },

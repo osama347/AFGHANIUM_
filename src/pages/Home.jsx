@@ -9,10 +9,11 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useDonation } from '../hooks/useDonation';
 import { useImpact } from '../hooks/useImpact';
 import { formatCurrency } from '../utils/formatters';
-import { Home as HomeIcon, Heart, Users, TrendingUp } from 'lucide-react';
+import { Home as HomeIcon, Heart, Users, TrendingUp, ArrowRight } from 'lucide-react';
 import CTAButton from '../components/CTAButton';
 import TestimonialCard from '../components/TestimonialCard';
 import { getTestimonials } from '../supabase/testimonials';
+import { getContent } from '../supabase/content';
 
 const Home = () => {
     const { t } = useLanguage();
@@ -21,6 +22,7 @@ const Home = () => {
     const [donationStats, setDonationStats] = useState(null);
     const [impactStats, setImpactStats] = useState(null);
     const [testimonials, setTestimonials] = useState([]);
+    const [aboutUsShort, setAboutUsShort] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,6 +39,11 @@ const Home = () => {
             const testimonialsResult = await getTestimonials();
             if (testimonialsResult.success) {
                 setTestimonials(testimonialsResult.data);
+            }
+
+            const aboutUsResult = await getContent('about_us_short');
+            if (aboutUsResult.success && aboutUsResult.data) {
+                setAboutUsShort(aboutUsResult.data);
             }
         };
         fetchData();
@@ -63,6 +70,46 @@ const Home = () => {
             {/* Animated Statistics Section */}
             <StatsSection />
 
+            {/* About Us Section */}
+            {aboutUsShort && (
+                <section className="section-padding bg-white">
+                    <div className="container-custom">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <h2 className="text-4xl font-bold text-gray-900 mb-6">About Afghanium</h2>
+                                <p className="text-lg text-gray-700 leading-relaxed mb-8 whitespace-pre-wrap">
+                                    {aboutUsShort}
+                                </p>
+                                <CTAButton to="/about" variant="outline" size="lg" className="inline-flex items-center gap-2">
+                                    Learn Our Full Story <ArrowRight className="w-4 h-4" />
+                                </CTAButton>
+                            </div>
+                            <div className="hidden lg:block">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-light rounded-lg blur-lg opacity-20" />
+                                    <div className="relative bg-gradient-to-br from-primary to-primary-light rounded-lg p-12 text-white">
+                                        <div className="space-y-8">
+                                            <div>
+                                                <h3 className="text-2xl font-bold mb-2">Fair Trade</h3>
+                                                <p className="opacity-90">Connecting Afghan producers with global customers through dignified work and sustainable relationships.</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-bold mb-2">Women's Healthcare</h3>
+                                                <p className="opacity-90">Reinvesting profits into women-only clinics staffed by women professionals.</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-bold mb-2">Research & Knowledge</h3>
+                                                <p className="opacity-90">Publishing free research to support evidence-based action for Afghanistan's future.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Departments Section */}
             <section className="section-padding bg-white">
                 <div className="container-custom">
@@ -81,8 +128,12 @@ const Home = () => {
             </section>
 
             {/* Testimonials Section */}
-            <section className="section-padding bg-gray-50 afghan-pattern-bg">
-                <div className="container-custom">
+            <section className="section-padding bg-gradient-to-br from-gray-50 via-white to-gray-50 relative overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary opacity-5 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary opacity-5 rounded-full blur-3xl" />
+                
+                <div className="container-custom relative z-10">
                     <SectionTitle
                         title="What Donors Say"
                         subtitle="Real stories from people making a difference"

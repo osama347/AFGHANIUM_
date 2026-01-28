@@ -22,7 +22,7 @@ const About = () => {
 
     const mission = {
         title: t('about.mission.title'),
-        description: missionDescription || t('about.mission.description'),
+        description: t('about.mission.description'),
         icon: Target,
     };
 
@@ -34,23 +34,23 @@ const About = () => {
 
     const values = [
         {
-            title: t('about.values.transparency.title'),
-            description: t('about.values.transparency.description'),
+            title: t('about.values.dignity.title'),
+            description: t('about.values.dignity.description'),
             icon: Users,
         },
         {
-            title: t('about.values.impact.title'),
-            description: t('about.values.impact.description'),
-            icon: TrendingUp,
-        },
-        {
-            title: t('about.values.community.title'),
-            description: t('about.values.community.description'),
+            title: t('about.values.womensHealth.title'),
+            description: t('about.values.womensHealth.description'),
             icon: Heart,
         },
         {
-            title: t('about.values.accountability.title'),
-            description: t('about.values.accountability.description'),
+            title: t('about.values.transparency.title'),
+            description: t('about.values.transparency.description'),
+            icon: TrendingUp,
+        },
+        {
+            title: t('about.values.quality.title'),
+            description: t('about.values.quality.description'),
             icon: Target,
         },
     ];

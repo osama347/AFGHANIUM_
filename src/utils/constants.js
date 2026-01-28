@@ -14,144 +14,18 @@ export const COLORS = {
 // Departments
 export const DEPARTMENTS = [
     {
-        id: 'orphan-children',
+        id: 'womens-medical-fund',
         name: {
-            en: 'Orphan Children Support',
-            dari: 'حمایت از کودکان یتیم',
-            pashto: 'د یتیمو ماشومانو ملاتړ'
+            en: 'Medical Fund (Women\'s Clinics)',
+            dari: 'صندوق پزشکی (کلینیک‌های زنان)',
+            pashto: 'طبي صندوق (د میرمنو کلینیکونه)'
         },
         description: {
-            en: 'Providing shelter, education, and care for orphaned children across Afghanistan',
-            dari: 'فراهم کردن سرپناه، آموزش و مراقبت برای کودکان یتیم در سراسر افغانستان',
-            pashto: 'په افغانستان کې د یتیمو ماشومانو لپاره د سرپناه، زده کړې او پاملرنې چمتو کول'
-        },
-        icon: '👶',
-    },
-    {
-        id: 'widows-support',
-        name: {
-            en: 'Widows Support',
-            dari: 'حمایت از بیوه زنان',
-            pashto: 'د کونډو میرمنو ملاتړ'
-        },
-        description: {
-            en: 'Empowering widowed women with vocational training and financial assistance',
-            dari: 'توانمندسازی زنان بیوه با آموزش حرفه‌ای و کمک مالی',
-            pashto: 'د مسلکي روزنې او مالي مرستې سره د کونډو میرمنو پیاوړتیا'
-        },
-        icon: '👩',
-    },
-    {
-        id: 'poor-families',
-        name: {
-            en: 'Poor & Vulnerable Families',
-            dari: 'خانواده‌های فقیر و آسیب‌پذیر',
-            pashto: 'بې وزله او زیان منونکي کورنۍ'
-        },
-        description: {
-            en: 'Supporting struggling families with essential resources and livelihood programs',
-            dari: 'حمایت از خانواده‌های در مبارزه با منابع ضروری و برنامه‌های معیشتی',
-            pashto: 'د اړینو سرچینو او ژوند پالنې پروګرامونو سره د مبارزو کورنیو ملاتړ'
-        },
-        icon: '🏠',
-    },
-    {
-        id: 'emergency-food',
-        name: {
-            en: 'Emergency Food Packs',
-            dari: 'بسته‌های غذایی اضطراری',
-            pashto: 'د بیړني خوړو کڅوړې'
-        },
-        description: {
-            en: 'Delivering urgent food supplies to families in crisis',
-            dari: 'تحویل مواد غذایی فوری به خانواده‌های در بحران',
-            pashto: 'په بحران کې کورنیو ته د بیړني خوړو رسول'
-        },
-        icon: '🍞',
-    },
-    {
-        id: 'education-aid',
-        name: {
-            en: 'Education Aid',
-            dari: 'کمک آموزشی',
-            pashto: 'د زده کړې مرسته'
-        },
-        description: {
-            en: 'Providing school supplies, uniforms, and educational support',
-            dari: 'فراهم کردن لوازم مدرسه، یونیفورم و پشتیبانی آموزشی',
-            pashto: 'د ښوونځي سامان، یونیفورم او تعلیمي مرستې چمتو کول'
-        },
-        icon: '📚',
-    },
-    {
-        id: 'winter-relief',
-        name: {
-            en: 'Winter Relief',
-            dari: 'کمک زمستانی',
-            pashto: 'د ژمي مرسته'
-        },
-        description: {
-            en: 'Distributing warm clothing, blankets, and heating supplies for harsh winters',
-            dari: 'توزیع لباس گرم، پتو و وسایل گرمایشی برای زمستان‌های سخت',
-            pashto: 'د سختو ژمو لپاره د ګرمو جامو، بلینکیټونو او تودوخې سامان ویش'
-        },
-        icon: '🧥',
-    },
-    {
-        id: 'medical-assistance',
-        name: {
-            en: 'Medical Assistance',
-            dari: 'کمک‌های پزشکی',
-            pashto: 'طبي مرستې'
-        },
-        description: {
-            en: 'Providing healthcare services and medical supplies to underserved communities',
-            dari: 'فراهم کردن خدمات بهداشتی و لوازم پزشکی به جوامع محروم',
-            pashto: 'د محرومو ټولنو ته د روغتیا پاملرنې خدماتو او طبي سامان چمتو کول'
+            en: 'Supporting women-only healthcare clinics staffed by women professionals. Your donation provides essential medical services, equipment, and supplies to ensure women have access to safe, professional healthcare.',
+            dari: 'حمایت از کلینیک‌های بهداشتی تنها برای زنان با کارکنان زن. فطریه شما خدمات پزشکی ضروری، تجهیزات و مواد برای تضمین دسترسی زنان به مراقبت‌های بهداشتی ایمن و حرفه‌ای فراهم می‌کند.',
+            pashto: 'د میرمنو د رسته د صحتي کلینیکونو ملاتړ چې د میرمنو متخصصین کار کوي. ستاسو فطريه ضروري طبي خدمات، تجهيزات او مواد چمتو کوي تر څو میرمنو د خوندي او حرفه‌وي روغتيايي پاملرنې لاسرسي وړ شي.'
         },
         icon: '🏥',
-    },
-    {
-        id: 'clean-water',
-        name: {
-            en: 'Clean Water Wells',
-            dari: 'چاه‌های آب تمیز',
-            pashto: 'د پاکو اوبو کانونه'
-        },
-        description: {
-            en: 'Building wells to provide access to clean drinking water',
-            dari: 'ساخت چاه برای فراهم کردن دسترسی به آب آشامیدنی تمیز',
-            pashto: 'د پاکو څښاک اوبو ته د لاسرسي چمتو کولو لپاره د کانونو جوړول'
-        },
-        icon: '💧',
-    },
-    {
-        id: 'refugee-support',
-        name: {
-            en: 'Refugee / IDP Support',
-            dari: 'حمایت از پناهندگان / آوارگان',
-            pashto: 'د کډوالو / بې ځایه شویو ملاتړ'
-        },
-        description: {
-            en: 'Assisting displaced persons with shelter, food, and essential services',
-            dari: 'کمک به افراد بی‌جاشده با سرپناه، غذا و خدمات ضروری',
-            pashto: 'د بې ځایه شویو افرادو سره د سرپناه، خوړو او اړینو خدماتو مرسته'
-        },
-        icon: '⛺',
-    },
-    {
-        id: 'ramadan-zakat',
-        name: {
-            en: 'Ramadan Food Packs / Zakat',
-            dari: 'بسته‌های غذایی رمضان / زکات',
-            pashto: 'د رمضان خوړو کڅوړې / زکات'
-        },
-        description: {
-            en: 'Distributing food packages and Zakat assistance during Ramadan',
-            dari: 'توزیع بسته‌های غذایی و کمک زکات در ماه رمضان',
-            pashto: 'په رمضان کې د خوړو کڅوړو او د زکات مرستې ویش'
-        },
-        icon: '🌙',
     },
 ];
 

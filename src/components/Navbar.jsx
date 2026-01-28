@@ -16,6 +16,7 @@ const Navbar = () => {
         { path: '/departments', label: t('nav.departments') },
         { path: '/track', label: t('nav.track') },
         { path: '/impact', label: t('nav.impact') },
+        {path: '/research', label: t('nav.research') },
         { path: '/about', label: t('nav.about') },
         { path: '/contact', label: t('nav.contact') },
         { path: '/faq', label: t('nav.faq') },

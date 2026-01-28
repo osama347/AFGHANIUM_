@@ -16,6 +16,7 @@ import DepartmentsPage from './pages/DepartmentsPage';
 import Donate from './pages/Donate';
 import TrackDonation from './pages/TrackDonation';
 import ImpactStories from './pages/ImpactStories';
+import Research from './pages/Research';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -35,6 +36,7 @@ import AdminInbox from './components/Admin/AdminInbox';
 import AdminSettings from './components/Admin/AdminSettings';
 import AdminContent from './components/Admin/AdminContent';
 import AdminEmergency from './components/Admin/AdminEmergency';
+import AdminResearch from './components/Admin/AdminResearch';
 
 // Layout wrapper for public pages
 const PublicLayout = ({ children }) => (
@@ -65,6 +67,7 @@ function App() {
             <Route path="/debug" element={<DebugStats />} />
             <Route path="/track" element={<PublicLayout><TrackDonation /></PublicLayout>} />
             <Route path="/impact" element={<PublicLayout><ImpactStories /></PublicLayout>} />
+            <Route path="/research" element={<PublicLayout><Research /></PublicLayout>} />
             <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
             <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
             <Route path="/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
@@ -79,6 +82,7 @@ function App() {
               <Route path="impacts" element={<ImpactList />} />
               <Route path="inbox" element={<AdminInbox />} />
               <Route path="emergency" element={<AdminEmergency />} />
+              <Route path="research" element={<AdminResearch />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>

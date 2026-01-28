@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabase/client';
-import { Lock, Mail, Save, UserPlus, Users } from 'lucide-react';
+import { Lock, Mail, Save, UserPlus, Users, BookOpen } from 'lucide-react';
 import Loader from '../Loader';
+import { getContent, updateContent } from '../../supabase/content';
 
 const AdminSettings = () => {
     const [passwordForm, setPasswordForm] = useState({
@@ -13,8 +14,35 @@ const AdminSettings = () => {
         password: '',
         confirmPassword: ''
     });
+    const [aboutUsForm, setAboutUsForm] = useState({
+        longVersion: '',
+        shortVersion: ''
+    });
     const [passwordStatus, setPasswordStatus] = useState({ loading: false, error: null, success: false });
     const [adminStatus, setAdminStatus] = useState({ loading: false, error: null, success: false });
+    const [aboutUsStatus, setAboutUsStatus] = useState({ loading: false, error: null, success: false });
+    const [loadingAboutUs, setLoadingAboutUs] = useState(true);
+
+    useEffect(() => {
+        fetchAboutUsContent();
+    }, []);
+
+    const fetchAboutUsContent = async () => {
+        setLoadingAboutUs(true);
+        try {
+            const longResult = await getContent('about_us_long');
+            const shortResult = await getContent('about_us_short');
+            
+            setAboutUsForm({
+                longVersion: longResult.data || '',
+                shortVersion: shortResult.data || ''
+            });
+        } catch (error) {
+            console.error('Error fetching About Us content:', error);
+        } finally {
+            setLoadingAboutUs(false);
+        }
+    };
 
     const handlePasswordChange = (e) => {
         setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
@@ -81,11 +109,118 @@ const AdminSettings = () => {
         }
     };
 
+    const handleAboutUsChange = (e) => {
+        const { name, value } = e.target;
+        setAboutUsForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleAboutUsSubmit = async (e) => {
+        e.preventDefault();
+        setAboutUsStatus({ loading: true, error: null, success: false });
+
+        try {
+            const longResult = await updateContent('about_us_long', aboutUsForm.longVersion);
+            const shortResult = await updateContent('about_us_short', aboutUsForm.shortVersion);
+
+            if (!longResult.success || !shortResult.success) {
+                throw new Error('Failed to update About Us content');
+            }
+
+            setAboutUsStatus({ loading: false, error: null, success: true });
+            setTimeout(() => {
+                setAboutUsStatus({ loading: false, error: null, success: false });
+            }, 3000);
+        } catch (error) {
+            setAboutUsStatus({ loading: false, error: error.message, success: false });
+        }
+    };
+
     return (
         <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Settings</h2>
 
             <div className="space-y-8">
+                {/* About Us Content Section */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-primary" />
+                        About Us Content
+                    </h3>
+
+                    {loadingAboutUs ? (
+                        <div className="flex justify-center py-8">
+                            <Loader />
+                        </div>
+                    ) : (
+                        <>
+                            {aboutUsStatus.success && (
+                                <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg">
+                                    About Us content updated successfully!
+                                </div>
+                            )}
+
+                            {aboutUsStatus.error && (
+                                <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg">
+                                    Error: {aboutUsStatus.error}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleAboutUsSubmit} className="space-y-6">
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Long Version (About Page)
+                                    </label>
+                                    <textarea
+                                        name="longVersion"
+                                        value={aboutUsForm.longVersion}
+                                        onChange={handleAboutUsChange}
+                                        className="input-field h-64 resize-none"
+                                        placeholder="Enter the full About Us text for the About page..."
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        This content appears on the full About Us page
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Short Version (Homepage)
+                                    </label>
+                                    <textarea
+                                        name="shortVersion"
+                                        value={aboutUsForm.shortVersion}
+                                        onChange={handleAboutUsChange}
+                                        className="input-field h-40 resize-none"
+                                        placeholder="Enter the short About Us text for the homepage..."
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        This content appears on the homepage
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={aboutUsStatus.loading}
+                                    className="btn-primary"
+                                >
+                                    {aboutUsStatus.loading ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <Loader size="sm" color="white" /> Saving...
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <Save className="w-4 h-4" /> Save About Us Content
+                                        </span>
+                                    )}
+                                </button>
+                            </form>
+                        </>
+                    )}
+                </div>
+
                 {/* Change Password Section */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-2xl">
                     <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">

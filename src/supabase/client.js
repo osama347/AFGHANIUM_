@@ -25,10 +25,12 @@ export const TABLES = {
     DONATIONS: 'donations',
     IMPACTS: 'impacts',
     ADMINS: 'admins',
+    RESEARCH: 'research_submissions',
 };
 
 // Storage bucket names
 export const BUCKETS = {
     IMPACT_PHOTOS: 'impact-photos',
     TESTIMONIALS: 'testimonials',
+    RESEARCH_FILES: 'research-files',
 };

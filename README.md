@@ -10,6 +10,7 @@ A modern, transparent donation platform for Afghan humanitarian relief, built wi
 - ✅ **Impact Proofs**: Visual documentation of how donations are used
 - ✅ **Multi-Language**: English, Dari, Pashto
 - ✅ **Admin Dashboard**: Manage donations and upload impact proofs
+- ✅ **Email Notifications**: Automated emails for donations, messages, impacts, and emergencies
 - ✅ **Responsive Design**: Works great on all devices
 
 ## Tech Stack
@@ -20,6 +21,7 @@ A modern, transparent donation platform for Afghan humanitarian relief, built wi
 - **Authentication**: Supabase Auth
 - **Storage**: Supabase Storage for images
 - **Payments**: Stripe, PayPal, Crypto wallets
+- **Email**: MailerSend SMTP via Supabase Edge Functions
 - **Routing**: React Router v6
 - **Icons**: Lucide React
 
@@ -105,7 +107,49 @@ CREATE TABLE impacts (
 #### Storage Bucket
 Create a public storage bucket named `impact-photos` in Supabase Storage.
 
-### 4. Run Development Server
+### 4. Email Setup (Optional)
+
+The app includes automated email notifications for donations, messages, impacts, and emergency campaigns.
+
+#### Deploy Edge Functions
+
+```bash
+# Install Supabase CLI if not already installed
+npm install -g supabase
+
+# Login to Supabase
+supabase login
+
+# Link to your project
+supabase link --project-ref your-project-ref
+
+# Deploy the email functions
+supabase functions deploy send-email
+supabase functions deploy send-donation-confirmation
+supabase functions deploy send-message-notification
+supabase functions deploy send-impact-notification
+supabase functions deploy send-emergency-notification
+```
+
+#### Configure Email Triggers
+
+Run the `email_triggers.sql` file in your Supabase SQL Editor to create database triggers that automatically send emails.
+
+Update the site_content table with your Supabase URL and service role key:
+
+```sql
+UPDATE site_content SET value = 'https://your-project.supabase.co' WHERE key = 'supabase_url';
+UPDATE site_content SET value = 'your-service-role-key' WHERE key = 'supabase_service_key';
+```
+
+#### Email Events
+
+- **Donation Confirmation**: Sent to donor when donation is submitted
+- **Message Notification**: Sent to admin when contact message is received
+- **Impact Notification**: Sent to donor when impact proof is uploaded for their donation
+- **Emergency Campaign**: Sent to admin when emergency campaign is activated
+
+### 5. Run Development Server
 
 ```bash
 npm run dev
@@ -113,7 +157,7 @@ npm run dev
 
 Visit `http://localhost:5173` to view the app.
 
-### 5. Build for Production
+### 6. Build for Production
 
 ```bash
 npm run build

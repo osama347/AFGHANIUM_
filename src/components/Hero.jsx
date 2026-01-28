@@ -6,6 +6,34 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
     const [currentSlide, setCurrentSlide] = useState(0);
     const [images, setImages] = useState(backgroundImages.length > 0 ? backgroundImages : []);
     const [loading, setLoading] = useState(true);
+    const [imagesLoaded, setImagesLoaded] = useState(new Set());
+
+    // Preload images
+    useEffect(() => {
+        const preloadImages = () => {
+            const promises = images.map((image) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        setImagesLoaded((prev) => new Set(prev).add(image));
+                        resolve();
+                    };
+                    img.onerror = resolve; // Resolve even if image fails
+                    img.src = image;
+                });
+            });
+
+            Promise.all(promises).then(() => {
+                setLoading(false);
+            });
+        };
+
+        if (images.length > 0) {
+            preloadImages();
+        } else {
+            setLoading(false);
+        }
+    }, [images]);
 
     // Fetch slideshow images from database
     useEffect(() => {
@@ -24,7 +52,6 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
                     ]);
                 }
             }
-            setLoading(false);
         };
 
         fetchImages();
@@ -54,11 +81,12 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
     };
 
     return (
-        <div className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
+        <div className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#1F5130] to-[#3A9D58]">
             {/* Slideshow Background */}
             <div className="absolute inset-0">
                 {loading ? (
-                    <div className="absolute inset-0 hero-gradient" />
+                    // Skeleton Loader with animated shimmer
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#1F5130] via-[#3A9D58] to-[#1F5130] bg-size-200 animate-shimmer" />
                 ) : (
                     images.map((image, index) => (
                         <div
@@ -74,12 +102,23 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
 
             {/* Fallback Gradient if no images */}
             {!loading && images.length === 0 && (
-                <div className="absolute inset-0 hero-gradient" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#1F5130] to-[#3A9D58]" />
             )}
 
             {/* Overlay */}
             {overlay && (
                 <div className="absolute inset-0 bg-black/30" />
+            )}
+
+            {/* Loading Indicator */}
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center z-30">
+                    <div className="text-center">
+                        <div className="inline-flex items-center justify-center">
+                            <div className="w-12 h-12 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Afghan Pattern Overlay */}

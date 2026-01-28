@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import LoadingScreen from '../components/LoadingScreen';
 
 const LanguageContext = createContext();
 
@@ -11,9 +12,15 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider = ({ children }) => {
-    const [currentLanguage, setCurrentLanguage] = useState('en');
+    // Get initial language from localStorage or default to 'en'
+    const [currentLanguage, setCurrentLanguage] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('language') || 'en';
+        }
+        return 'en';
+    });
     const [translations, setTranslations] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true); // Start with true to wait for initial load
 
     useEffect(() => {
         loadTranslations(currentLanguage);
@@ -58,15 +65,25 @@ export const LanguageProvider = ({ children }) => {
         let value = translations;
 
         for (const key of keys) {
-            if (value && typeof value === 'object') {
+            if (value && typeof value === 'object' && key in value) {
                 value = value[key];
             } else {
+                // Return the original path as fallback if key not found
                 return path;
             }
         }
 
+        // If value is not a string, return the path
+        if (typeof value !== 'string') {
+            return path;
+        }
+
         return value || path;
     };
+
+    if (loading) {
+        return <LoadingScreen />;
+    }
 
     return (
         <LanguageContext.Provider
