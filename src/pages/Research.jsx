@@ -300,14 +300,26 @@ const Research = () => {
                                         {t('research.submitSection.instructions')}
                                     </h3>
                                     <ul className="space-y-3">
-                                        {Array.isArray(t('research.submitSection.criteria', { returnObjects: true }))
-                                            ? t('research.submitSection.criteria', { returnObjects: true }).map((criterion, index) => (
-                                                <li key={index} className="flex items-start gap-3">
-                                                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                                                    <span className="text-gray-700">{criterion}</span>
-                                                </li>
-                                            ))
-                                            : null}
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                                            <span className="text-gray-700">{t('research.submitSection.criteria.0')}</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                                            <span className="text-gray-700">{t('research.submitSection.criteria.1')}</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                                            <span className="text-gray-700">{t('research.submitSection.criteria.2')}</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                                            <span className="text-gray-700">{t('research.submitSection.criteria.3')}</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                                            <span className="text-gray-700">{t('research.submitSection.criteria.4')}</span>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
