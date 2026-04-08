@@ -64,6 +64,12 @@ VITE_BANK_ACCOUNT_NAME=Account Holder Name
 # App Configuration
 VITE_APP_NAME=AFGHANIUM
 VITE_APP_URL=http://localhost:5173
+
+# Impact email delivery mode: 'client' (default) or 'trigger'
+# client mode: app invokes edge function directly after impact save
+# trigger mode: use safe_impact_email_trigger.sql and disable client path
+# Do not enable both modes at the same time (prevents duplicate emails)
+VITE_IMPACT_EMAIL_MODE=client
 ```
 
 ### 3. Supabase Setup
@@ -129,6 +135,13 @@ supabase functions deploy send-donation-confirmation
 supabase functions deploy send-message-notification
 supabase functions deploy send-impact-notification
 supabase functions deploy send-emergency-notification
+
+# Set SMTP secrets (example for Namecheap Private Email)
+supabase secrets set SMTP_HOST=mail.privateemail.com
+supabase secrets set SMTP_PORT=465
+supabase secrets set SMTP_USER=info@afghanium.org
+supabase secrets set SMTP_PASS=your-namecheap-mailbox-password
+supabase secrets set EMAIL_FROM="Afghanium <info@afghanium.org>"
 ```
 
 #### Configure Email Triggers

@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useImpact } from '../../hooks/useImpact';
 import { useStorage } from '../../hooks/useStorage';
 import { updateDonationStatus } from '../../supabase/donations';
+import { useToast } from '../../contexts/ToastContext';
 import { DEPARTMENTS } from '../../utils/constants';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import Loader from '../Loader';
 
 const AddImpactForm = ({ onSuccess, initialValues }) => {
     const { create, loading: impactLoading } = useImpact();
     const { upload, uploading } = useStorage();
+    const toast = useToast();
 
     const [formData, setFormData] = useState({
         title: '',
@@ -74,7 +76,7 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
                     uploadedUrls.push(uploadResult.data.publicUrl);
                 } else {
                     console.error('❌ Upload failed for file:', file.name, uploadResult.error);
-                    alert(`Failed to upload ${file.name}: ${uploadResult.error}`);
+                    toast.error(`Failed to upload ${file.name}: ${uploadResult.error}`);
                 }
             }
 
@@ -82,7 +84,7 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
             console.log('🔗 URLs:', uploadedUrls);
 
             if (uploadedUrls.length === 0) {
-                alert('All file uploads failed. Please try again.');
+                toast.error('All file uploads failed. Please try again.');
                 return;
             }
         } else {
@@ -110,6 +112,20 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
                 await updateDonationStatus(formData.donationId, 'completed');
             }
 
+            if (formData.donationId) {
+                if (result.emailNotification?.sent) {
+                    toast.success('Impact proof added and donor email sent.');
+                } else if (result.emailNotification?.reason === 'email-delivery-disabled') {
+                    toast.info('Impact proof added. Donor email is disabled by configuration.');
+                } else if (result.emailNotification?.attempted) {
+                    toast.warning('Impact proof added, but donor email could not be sent.');
+                } else {
+                    toast.success('Impact proof added successfully.');
+                }
+            } else {
+                toast.success('Impact proof added successfully.');
+            }
+
             // Reset form
             setFormData({
                 title: '',
@@ -123,6 +139,8 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
             setMediaPreviews([]);
 
             if (onSuccess) onSuccess();
+        } else {
+            toast.error(`Failed to create impact proof: ${result.error || 'Unknown error'}`);
         }
     };
 

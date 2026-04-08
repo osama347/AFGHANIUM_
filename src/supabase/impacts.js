@@ -1,5 +1,71 @@
 import { supabase, TABLES } from './client.js';
 
+const impactEmailMode = (import.meta.env.VITE_IMPACT_EMAIL_MODE || 'client').toLowerCase();
+
+const notifyImpactEmail = async (impactRow) => {
+    if (impactEmailMode !== 'client') {
+        return {
+            attempted: false,
+            sent: false,
+            reason: 'email-delivery-disabled',
+            mode: impactEmailMode,
+        };
+    }
+
+    if (!impactRow?.donation_id || !supabase) {
+        return { attempted: false, sent: false, reason: 'missing-donation-id-or-client' };
+    }
+
+    try {
+        const { data: donation, error: donationError } = await supabase
+            .from(TABLES.DONATIONS)
+            .select('donation_id, full_name, email')
+            .eq('donation_id', impactRow.donation_id)
+            .single();
+
+        if (donationError || !donation?.email) {
+            return {
+                attempted: true,
+                sent: false,
+                reason: 'donor-not-found',
+                error: donationError?.message || 'Donor record missing email',
+            };
+        }
+
+        const { error: functionError } = await supabase.functions.invoke('send-impact-notification', {
+            body: {
+                donation_id: donation.donation_id,
+                donor_name: donation.full_name,
+                donor_email: donation.email,
+                title: impactRow.title,
+                description: impactRow.description,
+                cost: impactRow.cost,
+                department: impactRow.department,
+                image_url: impactRow.image_url,
+                media: impactRow.media || [],
+            },
+        });
+
+        if (functionError) {
+            return {
+                attempted: true,
+                sent: false,
+                reason: 'function-error',
+                error: functionError.message,
+            };
+        }
+
+        return { attempted: true, sent: true };
+    } catch (error) {
+        return {
+            attempted: true,
+            sent: false,
+            reason: 'unexpected-error',
+            error: error.message,
+        };
+    }
+};
+
 /**
  * Create a new impact proof
  * @param {object} impactData - Impact data
@@ -31,7 +97,18 @@ export const createImpact = async (impactData) => {
         if (error) throw error;
 
         console.log('✅ Database insert successful:', data);
-        return { success: true, data };
+
+        const emailNotification = await notifyImpactEmail(data);
+
+        if (emailNotification.attempted && !emailNotification.sent) {
+            console.warn('⚠️ Impact saved, but email notification failed:', emailNotification);
+        }
+
+        if (emailNotification.reason === 'email-delivery-disabled') {
+            console.info('ℹ️ Impact saved and email delivery skipped by VITE_IMPACT_EMAIL_MODE setting.');
+        }
+
+        return { success: true, data, emailNotification };
     } catch (error) {
         console.error('❌ Error creating impact:', error);
         return { success: false, error: error.message };
