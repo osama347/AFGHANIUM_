@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { DEPARTMENTS } from '../utils/constants';
+import { useDepartment } from '../hooks/useDepartment';
 import { useLanguage } from '../contexts/LanguageContext';
 import CTAButton from './CTAButton';
 import ProgressBar from './ProgressBar';
 import { supabase } from '../supabase/client';
+import Loader from './Loader';
 
 const Departments = ({ limit = null, showCTA = true }) => {
-    const { currentLanguage } = useLanguage();
+    const { currentLanguage, t } = useLanguage();
+    const { getActive, loading } = useDepartment();
+    const [departments, setDepartments] = useState([]);
     const [deptStats, setDeptStats] = useState({});
-
-    const departments = limit ? DEPARTMENTS.slice(0, limit) : DEPARTMENTS;
 
     // Hardcoded goals for demo purposes
     const goals = {
@@ -25,8 +25,21 @@ const Departments = ({ limit = null, showCTA = true }) => {
     };
 
     useEffect(() => {
+        fetchDepartments();
         fetchDepartmentStats();
     }, []);
+
+    const fetchDepartments = async () => {
+        const result = await getActive();
+        if (!result.success) {
+            console.error('Failed to fetch departments:', result.error);
+            setDepartments([]);
+            return;
+        }
+
+        const list = result.data || [];
+        setDepartments(limit ? list.slice(0, limit) : list);
+    };
 
     const fetchDepartmentStats = async () => {
         const { data, error } = await supabase
@@ -46,6 +59,23 @@ const Departments = ({ limit = null, showCTA = true }) => {
         }
     };
 
+    if (loading && departments.length === 0) {
+        return (
+            <div className="flex justify-center py-12">
+                <Loader size="lg" />
+            </div>
+        );
+    }
+
+    if (!loading && departments.length === 0) {
+        return (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-10 text-center">
+                <h3 className="text-xl font-semibold text-gray-900">No departments available yet</h3>
+                <p className="text-gray-600 mt-2">Please check back soon.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {departments.map((dept) => {
@@ -62,12 +92,12 @@ const Departments = ({ limit = null, showCTA = true }) => {
 
                         {/* Department Name */}
                         <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                            {dept.name[currentLanguage] || dept.name.en}
+                            {dept[`name_${currentLanguage}`] || dept.name_en}
                         </h3>
 
                         {/* Description */}
                         <p className="text-gray-600 mb-6 flex-grow">
-                            {dept.description[currentLanguage] || dept.description.en}
+                            {dept[`description_${currentLanguage}`] || dept.description_en || ''}
                         </p>
 
                         {/* Progress Bar */}
@@ -87,7 +117,7 @@ const Departments = ({ limit = null, showCTA = true }) => {
                                 size="sm"
                                 fullWidth
                             >
-                                Donate Now
+                                {t('departments.donateNow')}
                             </CTAButton>
                         )}
                     </div>

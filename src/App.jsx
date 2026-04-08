@@ -37,6 +37,7 @@ import AdminSettings from './components/Admin/AdminSettings';
 import AdminContent from './components/Admin/AdminContent';
 import AdminEmergency from './components/Admin/AdminEmergency';
 import AdminResearch from './components/Admin/AdminResearch';
+import AdminDepartments from './components/Admin/AdminDepartments';
 
 // Layout wrapper for public pages
 const PublicLayout = ({ children }) => (
@@ -83,6 +84,7 @@ function App() {
               <Route path="inbox" element={<AdminInbox />} />
               <Route path="emergency" element={<AdminEmergency />} />
               <Route path="research" element={<AdminResearch />} />
+              <Route path="departments" element={<AdminDepartments />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>

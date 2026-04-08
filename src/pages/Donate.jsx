@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { DEPARTMENTS, PRESET_AMOUNTS, PAYMENT_METHODS, RECEIVER_INFO } from '../utils/constants';
+import { PRESET_AMOUNTS, PAYMENT_METHODS, RECEIVER_INFO } from '../utils/constants';
 import { validateDonationForm } from '../utils/validators';
 import { useDonation } from '../hooks/useDonation';
 import { useEmergencyCampaign } from '../hooks/useEmergencyCampaign';
+import { useDepartment } from '../hooks/useDepartment';
 import { useLanguage } from '../contexts/LanguageContext';
 import Hero from '../components/Hero';
 import Loader from '../components/Loader';
@@ -16,10 +17,12 @@ const Donate = () => {
     const { t, currentLanguage } = useLanguage();
     const { create, loading } = useDonation();
     const { getById } = useEmergencyCampaign();
+    const { getActive } = useDepartment();
 
     const emergencyId = searchParams.get('emergency');
     const [emergencyCampaign, setEmergencyCampaign] = useState(null);
     const [fetchingCampaign, setFetchingCampaign] = useState(false);
+    const [departments, setDepartments] = useState([]);
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -37,6 +40,17 @@ const Donate = () => {
             fetchEmergencyCampaign();
         }
     }, [emergencyId]);
+
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            const result = await getActive();
+            if (result.success) {
+                setDepartments(result.data || []);
+            }
+        };
+
+        fetchDepartments();
+    }, []);
 
     const fetchEmergencyCampaign = async () => {
         setFetchingCampaign(true);
@@ -248,11 +262,12 @@ const Donate = () => {
                                                 value={formData.department}
                                                 onChange={handleInputChange}
                                                 className={`input-field ${errors.department ? 'border-red-500' : ''}`}
+                                                disabled={departments.length === 0}
                                             >
-                                                <option value="">Select a department...</option>
-                                                {DEPARTMENTS.map((dept) => (
+                                                <option value="">{departments.length === 0 ? 'No departments available' : 'Select a department...'}</option>
+                                                {departments.map((dept) => (
                                                     <option key={dept.id} value={dept.id}>
-                                                        {dept.icon} {dept.name[currentLanguage] || dept.name.en}
+                                                        {dept.icon || '🏥'} {dept[`name_${currentLanguage}`] || dept.name_en}
                                                     </option>
                                                 ))}
                                             </select>
