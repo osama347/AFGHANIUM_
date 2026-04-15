@@ -21,7 +21,7 @@ export const adminLogin = async (email, password) => {
 
         return {
             success: true,
-            data: data.user,
+            data,
         };
     } catch (error) {
         console.error('Admin login error:', error);
@@ -40,6 +40,7 @@ export const checkAdminAuth = async () => {
         if (!supabase) {
             return {
                 success: false,
+                error: 'Supabase not configured. Please add credentials to .env file.',
                 isAuthenticated: false,
                 user: null,
             };
@@ -58,6 +59,7 @@ export const checkAdminAuth = async () => {
         console.error('Check admin auth error:', error);
         return {
             success: false,
+            error: error.message,
             isAuthenticated: false,
             user: null,
         };
@@ -95,6 +97,7 @@ export const getCurrentAdmin = async () => {
         if (!supabase) {
             return {
                 success: false,
+                error: 'Supabase not configured. Please add credentials to .env file.',
                 user: null,
             };
         }
@@ -111,6 +114,7 @@ export const getCurrentAdmin = async () => {
         console.error('Get current admin error:', error);
         return {
             success: false,
+            error: error.message,
             user: null,
         };
     }

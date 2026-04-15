@@ -4,12 +4,15 @@ import { PRESET_AMOUNTS, PAYMENT_METHODS, RECEIVER_INFO } from '../utils/constan
 import { validateDonationForm } from '../utils/validators';
 import { useDonation } from '../hooks/useDonation';
 import { useEmergencyCampaign } from '../hooks/useEmergencyCampaign';
-import { useDepartment } from '../hooks/useDepartment';
 import { useLanguage } from '../contexts/LanguageContext';
-import Hero from '../components/Hero';
 import Loader from '../components/Loader';
-import Modal from '../components/Modal';
-import { CreditCard, Smartphone, Bitcoin, Building2, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Building2, CheckCircle2, Landmark, Smartphone } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/Alert';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/FormElements';
 
 const Donate = () => {
     const [searchParams] = useSearchParams();
@@ -17,18 +20,15 @@ const Donate = () => {
     const { t, currentLanguage } = useLanguage();
     const { create, loading } = useDonation();
     const { getById } = useEmergencyCampaign();
-    const { getActive } = useDepartment();
 
     const emergencyId = searchParams.get('emergency');
     const [emergencyCampaign, setEmergencyCampaign] = useState(null);
     const [fetchingCampaign, setFetchingCampaign] = useState(false);
-    const [departments, setDepartments] = useState([]);
 
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         amount: searchParams.get('amount') || '',
-        department: searchParams.get('department') || emergencyId || '',
         paymentMethod: '',
         message: '',
     });
@@ -41,24 +41,11 @@ const Donate = () => {
         }
     }, [emergencyId]);
 
-    useEffect(() => {
-        const fetchDepartments = async () => {
-            const result = await getActive();
-            if (result.success) {
-                setDepartments(result.data || []);
-            }
-        };
-
-        fetchDepartments();
-    }, []);
-
     const fetchEmergencyCampaign = async () => {
         setFetchingCampaign(true);
         const result = await getById(emergencyId);
         if (result.success) {
             setEmergencyCampaign(result.data);
-            // Ensure department is set to campaign ID
-            setFormData(prev => ({ ...prev, department: emergencyId }));
         }
         setFetchingCampaign(false);
     };
@@ -105,6 +92,14 @@ const Donate = () => {
         }
     };
 
+    const campaignName = emergencyCampaign
+        ? (emergencyCampaign[`name_${currentLanguage}`] || emergencyCampaign.name_en)
+        : t('donation.form.title');
+
+    const campaignSubtitle = emergencyCampaign
+        ? 'You are donating to a specific emergency relief campaign.'
+        : 'Your contribution makes a real difference in the lives of those who need it most.';
+
     const paymentMethodOptions = [
         {
             value: PAYMENT_METHODS.HAWALA,
@@ -121,7 +116,7 @@ const Donate = () => {
         {
             value: PAYMENT_METHODS.BANK_TRANSFER,
             label: 'Bank Transfer',
-            icon: Building2,
+            icon: Landmark,
             description: 'Wire Transfer',
         },
         {
@@ -132,241 +127,243 @@ const Donate = () => {
         },
     ];
 
-    return (
-        <div>
-            <Hero
-                title={emergencyCampaign ? (emergencyCampaign[`name_${currentLanguage}`] || emergencyCampaign.name_en) : t('donation.form.title')}
-                subtitle={emergencyCampaign ? "You are donating to a specific emergency relief campaign." : "Your contribution makes a real difference in the lives of those who need it most"}
-                backgroundImage="/Donation.png"
-            />
+    const receiverInfo = formData.paymentMethod ? RECEIVER_INFO[formData.paymentMethod] : null;
 
-            <section className="section-padding bg-gray-50">
-                <div className="container-custom">
-                    <div className="max-w-4xl mx-auto">
-                        {fetchingCampaign ? (
-                            <div className="flex justify-center py-12">
+    const quickAmounts = emergencyCampaign?.quick_amounts || PRESET_AMOUNTS;
+
+    return (
+        <div className="bg-background text-foreground">
+            <section className="section-padding bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/60">
+                <div className="container-custom space-y-8">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="secondary" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+                            Donate
+                        </Badge>
+                        <Badge variant="outline" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+                            Direct and traceable impact
+                        </Badge>
+                    </div>
+
+                    <div className="max-w-4xl space-y-4">
+                        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+                            {campaignName}
+                        </h1>
+                        <p className="text-lg leading-8 text-muted-foreground sm:text-xl">
+                            {campaignSubtitle}
+                        </p>
+                    </div>
+
+                    {fetchingCampaign ? (
+                        <Card className="rounded-[2rem] border-border/70 shadow-sm">
+                            <CardContent className="flex justify-center py-14">
                                 <Loader size="lg" />
-                            </div>
-                        ) : (
-                            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-8">
-                                {/* Emergency Campaign Banner */}
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <Card className="rounded-[2rem] border-border/70 shadow-xl">
+                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
+                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                    {t('donation.form.title')}
+                                </CardDescription>
+                                <CardTitle className="text-2xl sm:text-3xl">Secure donation details</CardTitle>
+                            </CardHeader>
+
+                            <CardContent className="space-y-8 p-6 sm:p-8">
                                 {emergencyCampaign && (
-                                    <div className="mb-8 bg-red-50 border-l-4 border-red-600 p-6 rounded-r-lg">
-                                        <div className="flex items-start gap-4">
-                                            <div className="text-4xl">{emergencyCampaign.icon}</div>
-                                            <div>
-                                                <h3 className="text-xl font-bold text-red-800 mb-2">
-                                                    Donating to: {emergencyCampaign[`name_${currentLanguage}`] || emergencyCampaign.name_en}
-                                                </h3>
-                                                <p className="text-red-700">
-                                                    {emergencyCampaign[`description_${currentLanguage}`] || emergencyCampaign.description_en}
-                                                </p>
-                                                <div className="mt-4 flex items-center gap-2 text-sm font-medium text-red-600">
-                                                    <AlertTriangle className="w-4 h-4" />
-                                                    100% of this donation goes directly to this emergency cause.
-                                                </div>
+                                    <Alert className="border-red-200 bg-red-50 text-red-800">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        <AlertTitle className="flex items-center gap-2">
+                                            <span className="text-xl leading-none">{emergencyCampaign.icon}</span>
+                                            <span>
+                                                Donating to {emergencyCampaign[`name_${currentLanguage}`] || emergencyCampaign.name_en}
+                                            </span>
+                                        </AlertTitle>
+                                        <AlertDescription>
+                                            <p className="mb-2">
+                                                {emergencyCampaign[`description_${currentLanguage}`] || emergencyCampaign.description_en}
+                                            </p>
+                                            <p className="font-semibold">100% of this donation goes directly to this emergency cause.</p>
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                {errors.submit && (
+                                    <Alert className="border-red-200 bg-red-50 text-red-800">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        <AlertTitle>{t('common.error')}</AlertTitle>
+                                        <AlertDescription>{errors.submit}</AlertDescription>
+                                    </Alert>
+                                )}
+
+                                <form onSubmit={handleSubmit} className="space-y-8">
+                                    <div className="space-y-4">
+                                        <h2 className="text-xl font-semibold text-foreground">Personal information</h2>
+                                        <div className="grid gap-5 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <label htmlFor="fullName" className="text-sm font-medium text-foreground">
+                                                    {t('donation.form.fullName')} *
+                                                </label>
+                                                <Input
+                                                    id="fullName"
+                                                    type="text"
+                                                    name="fullName"
+                                                    value={formData.fullName}
+                                                    onChange={handleInputChange}
+                                                    placeholder={t('donation.form.fullName')}
+                                                    className={errors.fullName ? 'border-red-500' : ''}
+                                                />
+                                                {errors.fullName && <p className="text-sm text-red-600">{errors.fullName}</p>}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label htmlFor="email" className="text-sm font-medium text-foreground">
+                                                    {t('donation.form.email')} *
+                                                </label>
+                                                <Input
+                                                    id="email"
+                                                    type="email"
+                                                    name="email"
+                                                    value={formData.email}
+                                                    onChange={handleInputChange}
+                                                    placeholder={t('donation.form.email')}
+                                                    className={errors.email ? 'border-red-500' : ''}
+                                                />
+                                                {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
                                             </div>
                                         </div>
                                     </div>
-                                )}
 
-                                {/* Personal Information */}
-                                <div className="mb-8">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Personal Information</h3>
+                                    <div className="space-y-4">
+                                        <h2 className="text-xl font-semibold text-foreground">Donation details</h2>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                {t('donation.form.fullName')} *
+                                        <div className="space-y-3">
+                                            <label className="text-sm font-medium text-foreground">
+                                                Select amount or enter custom
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="fullName"
-                                                value={formData.fullName}
-                                                onChange={handleInputChange}
-                                                className={`input-field ${errors.fullName ? 'border-red-500' : ''}`}
-                                                placeholder={t('donation.form.fullName')}
-                                            />
-                                            {errors.fullName && (
-                                                <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                {t('donation.form.email')} *
-                                            </label>
-                                            <input
-                                                type="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleInputChange}
-                                                className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-                                                placeholder={t('donation.form.email')}
-                                            />
-                                            {errors.email && (
-                                                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Donation Details */}
-                                <div className="mb-8">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Donation Details</h3>
-
-                                    {/* Preset Amounts */}
-                                    <div className="mb-6">
-                                        <label className="block text-gray-700 font-medium mb-3">
-                                            Select Amount or Enter Custom
-                                        </label>
-                                        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                                            {(emergencyCampaign?.quick_amounts || PRESET_AMOUNTS).map((amount) => (
-                                                <button
-                                                    key={amount}
-                                                    type="button"
-                                                    onClick={() => handlePresetAmount(amount)}
-                                                    className={`py-3 px-4 rounded-lg font-semibold transition-colors ${formData.amount === amount.toString()
-                                                        ? 'bg-primary text-white'
-                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                        }`}
-                                                >
-                                                    ${amount}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            value={formData.amount}
-                                            onChange={handleInputChange}
-                                            className={`input-field ${errors.amount ? 'border-red-500' : ''}`}
-                                            placeholder={t('donation.form.customAmount')}
-                                            min="5"
-                                            step="0.01"
-                                        />
-                                        {errors.amount && (
-                                            <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
-                                        )}
-                                    </div>
-
-                                    {/* Department Selection - HIDDEN IF EMERGENCY */}
-                                    {!emergencyCampaign && (
-                                        <div className="mb-6">
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                {t('donation.form.department')} *
-                                            </label>
-                                            <select
-                                                name="department"
-                                                value={formData.department}
-                                                onChange={handleInputChange}
-                                                className={`input-field ${errors.department ? 'border-red-500' : ''}`}
-                                                disabled={departments.length === 0}
-                                            >
-                                                <option value="">{departments.length === 0 ? 'No departments available' : 'Select a department...'}</option>
-                                                {departments.map((dept) => (
-                                                    <option key={dept.id} value={dept.id}>
-                                                        {dept.icon || '🏥'} {dept[`name_${currentLanguage}`] || dept.name_en}
-                                                    </option>
+                                            <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+                                                {quickAmounts.map((amount) => (
+                                                    <Button
+                                                        key={amount}
+                                                        type="button"
+                                                        variant={formData.amount === amount.toString() ? 'default' : 'outline'}
+                                                        onClick={() => handlePresetAmount(amount)}
+                                                        className="rounded-xl"
+                                                    >
+                                                        ${amount}
+                                                    </Button>
                                                 ))}
-                                            </select>
-                                            {errors.department && (
-                                                <p className="text-red-500 text-sm mt-1">{errors.department}</p>
-                                            )}
+                                            </div>
+                                            <Input
+                                                type="number"
+                                                name="amount"
+                                                value={formData.amount}
+                                                onChange={handleInputChange}
+                                                placeholder={t('donation.form.customAmount')}
+                                                className={errors.amount ? 'border-red-500' : ''}
+                                                min="5"
+                                                step="0.01"
+                                            />
+                                            {errors.amount && <p className="text-sm text-red-600">{errors.amount}</p>}
                                         </div>
-                                    )}
 
-                                    {/* Optional Message */}
-                                    <div>
-                                        <label className="block text-gray-700 font-medium mb-2">
-                                            {t('donation.form.message')}
-                                        </label>
-                                        <textarea
-                                            name="message"
-                                            value={formData.message}
-                                            onChange={handleInputChange}
-                                            className="input-field resize-none"
-                                            rows="4"
-                                            placeholder="Leave an optional message..."
-                                        />
+                                        <div className="space-y-2">
+                                            <label htmlFor="message" className="text-sm font-medium text-foreground">
+                                                {t('donation.form.message')}
+                                            </label>
+                                            <Textarea
+                                                id="message"
+                                                name="message"
+                                                value={formData.message}
+                                                onChange={handleInputChange}
+                                                className="resize-none"
+                                                rows={4}
+                                                placeholder="Leave an optional message..."
+                                            />
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Payment Method */}
-                                <div className="mb-8">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Payment Method *</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {paymentMethodOptions.map(({ value, label, icon: Icon, description }) => (
-                                            <button
-                                                key={value}
-                                                type="button"
-                                                onClick={() => {
-                                                    setFormData((prev) => ({ ...prev, paymentMethod: value }));
-                                                    setErrors((prev) => ({ ...prev, paymentMethod: '' }));
-                                                }}
-                                                className={`p-4 border-2 rounded-lg text-left transition-all ${formData.paymentMethod === value
-                                                    ? 'border-primary bg-secondary-light'
-                                                    : 'border-gray-300 hover:border-primary'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center space-x-3">
-                                                    <Icon className={`w-8 h-8 ${formData.paymentMethod === value ? 'text-primary' : 'text-gray-500'}`} />
-                                                    <div>
-                                                        <div className="font-semibold text-gray-900">{label}</div>
-                                                        <div className="text-sm text-gray-500">{description}</div>
+                                    <div className="space-y-4">
+                                        <h2 className="text-xl font-semibold text-foreground">Payment method *</h2>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            {paymentMethodOptions.map(({ value, label, icon: Icon, description }) => {
+                                                const isSelected = formData.paymentMethod === value;
+                                                return (
+                                                    <button
+                                                        key={value}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setFormData((prev) => ({ ...prev, paymentMethod: value }));
+                                                            setErrors((prev) => ({ ...prev, paymentMethod: '' }));
+                                                        }}
+                                                        className={`rounded-2xl border p-4 text-left transition-all ${isSelected
+                                                            ? 'border-primary bg-primary/5 shadow-md'
+                                                            : 'border-border bg-card hover:border-primary/60'
+                                                            }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
+                                                                <Icon className="h-5 w-5" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-semibold text-foreground">{label}</p>
+                                                                <p className="text-sm text-muted-foreground">{description}</p>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        {errors.paymentMethod && <p className="text-sm text-red-600">{errors.paymentMethod}</p>}
+                                    </div>
+
+                                    {receiverInfo && (
+                                        <Card className="border-blue-200 bg-blue-50/80">
+                                            <CardHeader>
+                                                <CardTitle className="text-xl text-blue-900">Receiver information</CardTitle>
+                                                <CardDescription className="text-blue-700">
+                                                    Use these exact details for the selected transfer method.
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="grid gap-3 text-sm text-blue-900 sm:grid-cols-2">
+                                                {Object.entries(receiverInfo).map(([key, value]) => (
+                                                    <div key={key}>
+                                                        <span className="font-semibold capitalize text-blue-800">
+                                                            {key.replace(/_/g, ' ')}:
+                                                        </span>
+                                                        <span className="ml-2 break-all">{value}</span>
                                                     </div>
+                                                ))}
+                                                <div className="sm:col-span-2 rounded-xl border border-blue-200 bg-blue-100/80 p-3">
+                                                    <p>
+                                                        <strong>Important:</strong> Include your donation ID once generated on the success page so we can match your transfer quickly.
+                                                    </p>
                                                 </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                    {errors.paymentMethod && (
-                                        <p className="text-red-500 text-sm mt-2">{errors.paymentMethod}</p>
+                                            </CardContent>
+                                        </Card>
                                     )}
-                                </div>
 
-                                {/* Receiver Information */}
-                                {formData.paymentMethod && RECEIVER_INFO[formData.paymentMethod] && (
-                                    <div className="mb-8 bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg">
-                                        <h3 className="text-xl font-bold text-blue-800 mb-4">Receiver Information</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                            {Object.entries(RECEIVER_INFO[formData.paymentMethod]).map(([key, value]) => (
-                                                <div key={key}>
-                                                    <span className="font-semibold text-blue-700 capitalize">
-                                                        {key.replace(/_/g, ' ')}:
-                                                    </span>
-                                                    <span className="ml-2 text-blue-900">{value}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="mt-4 p-3 bg-blue-100 rounded text-blue-800 text-sm">
-                                            <strong>Important:</strong> Please include your donation ID ({formData.donationId || 'will be generated'}) in the transfer notes for proper tracking.
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Submit Button */}
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="btn-primary w-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {loading ? (
-                                        <span className="flex items-center justify-center">
-                                            <Loader size="sm" color="white" />
-                                            <span className="ml-2">{t('donation.form.processing')}</span>
-                                        </span>
-                                    ) : (
-                                        t('donation.form.submit')
-                                    )}
-                                </button>
-
-                                {errors.submit && (
-                                    <p className="text-red-500 text-sm mt-2 text-center">{errors.submit}</p>
-                                )}
-                            </form>
-                        )}
-                    </div>
+                                    <Button
+                                        type="submit"
+                                        disabled={loading}
+                                        size="lg"
+                                        className="w-full rounded-full text-base shadow-lg shadow-primary/20"
+                                    >
+                                        {loading ? (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <Loader size="sm" color="white" />
+                                                <span>{t('donation.form.processing')}</span>
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <CheckCircle2 className="h-5 w-5" />
+                                                {t('donation.form.submit')}
+                                            </span>
+                                        )}
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </section>
         </div>

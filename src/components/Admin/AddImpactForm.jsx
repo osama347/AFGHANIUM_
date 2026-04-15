@@ -3,22 +3,18 @@ import { useImpact } from '../../hooks/useImpact';
 import { useStorage } from '../../hooks/useStorage';
 import { updateDonationStatus } from '../../supabase/donations';
 import { useToast } from '../../contexts/ToastContext';
-import { useDepartment } from '../../hooks/useDepartment';
 import { Upload, X } from 'lucide-react';
 import Loader from '../Loader';
 
 const AddImpactForm = ({ onSuccess, initialValues }) => {
     const { create, loading: impactLoading } = useImpact();
     const { upload, uploading } = useStorage();
-    const { getActive, loading: departmentsLoading } = useDepartment();
     const toast = useToast();
-    const [departments, setDepartments] = useState([]);
 
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         cost: '',
-        department: '',
         donationId: '',
         adminComment: '',
     });
@@ -31,20 +27,6 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
             }));
         }
     }, [initialValues]);
-
-    React.useEffect(() => {
-        const fetchDepartments = async () => {
-            const result = await getActive();
-            if (result.success) {
-                setDepartments(result.data || []);
-                return;
-            }
-
-            toast.error(`Failed to load departments: ${result.error}`);
-        };
-
-        fetchDepartments();
-    }, []);
 
     const [mediaFiles, setMediaFiles] = useState([]);
     const [mediaPreviews, setMediaPreviews] = useState([]);
@@ -112,7 +94,6 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
             title: formData.title,
             description: formData.description,
             cost: parseFloat(formData.cost),
-            department: formData.department,
             imageUrl: uploadedUrls[0] || null, // Primary image for backward compatibility
             media: uploadedUrls, // All media
             donationId: formData.donationId || null,
@@ -147,7 +128,6 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
                 title: '',
                 description: '',
                 cost: '',
-                department: '',
                 donationId: '',
                 adminComment: '',
             });
@@ -204,29 +184,6 @@ const AddImpactForm = ({ onSuccess, initialValues }) => {
                     <p className="text-xs text-gray-500 mt-1">Linking a donation will mark it as "Completed".</p>
                 </div>
 
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">Department *</label>
-                    <select
-                        name="department"
-                        value={formData.department}
-                        onChange={handleInputChange}
-                        className="input-field"
-                        disabled={departmentsLoading || departments.length === 0}
-                        required
-                    >
-                        <option value="">
-                            {departmentsLoading ? 'Loading departments...' : 'Select department...'}
-                        </option>
-                        {departments.map((dept) => (
-                            <option key={dept.id} value={dept.id}>
-                                {dept.icon || '🏥'} {dept.name_en}
-                            </option>
-                        ))}
-                    </select>
-                    {!departmentsLoading && departments.length === 0 && (
-                        <p className="text-xs text-amber-600 mt-1">No active departments found. Add one from Admin - Departments.</p>
-                    )}
-                </div>
             </div>
 
             <div>

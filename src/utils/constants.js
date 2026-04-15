@@ -11,26 +11,8 @@ export const COLORS = {
     black: '#000000',
 };
 
-// Departments
-export const DEPARTMENTS = [
-    {
-        id: 'womens-medical-fund',
-        name: {
-            en: 'Medical Fund (Women\'s Clinics)',
-            dari: 'صندوق پزشکی (کلینیک‌های زنان)',
-            pashto: 'طبي صندوق (د میرمنو کلینیکونه)'
-        },
-        description: {
-            en: 'Supporting women-only healthcare clinics staffed by women professionals. Your donation provides essential medical services, equipment, and supplies to ensure women have access to safe, professional healthcare.',
-            dari: 'حمایت از کلینیک‌های بهداشتی تنها برای زنان با کارکنان زن. فطریه شما خدمات پزشکی ضروری، تجهیزات و مواد برای تضمین دسترسی زنان به مراقبت‌های بهداشتی ایمن و حرفه‌ای فراهم می‌کند.',
-            pashto: 'د میرمنو د رسته د صحتي کلینیکونو ملاتړ چې د میرمنو متخصصین کار کوي. ستاسو فطريه ضروري طبي خدمات، تجهيزات او مواد چمتو کوي تر څو میرمنو د خوندي او حرفه‌وي روغتيايي پاملرنې لاسرسي وړ شي.'
-        },
-        icon: '🏥',
-    },
-];
-
-// Emergency/Urgent Departments
-export const EMERGENCY_DEPARTMENTS = [
+// Emergency/Urgent Campaigns
+export const EMERGENCY_CAMPAIGNS = [
     {
         id: 'earthquake-herat-2024',
         name: {

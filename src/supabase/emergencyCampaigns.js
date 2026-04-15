@@ -1,4 +1,56 @@
-import { supabase, TABLES } from './client.js';
+import { supabase } from './client.js';
+
+const TABLE_NAME = 'emergency_campaigns';
+
+const withDefaultStats = (campaign) => ({
+    ...campaign,
+    current_amount: Number(campaign.current_amount || 0),
+    donation_count: Number(campaign.donation_count || 0),
+    progress_percentage: Number(campaign.progress_percentage || 0),
+});
+
+const attachCampaignStats = async (campaigns) => {
+    if (!campaigns || campaigns.length === 0) {
+        return [];
+    }
+
+    return campaigns.map((campaign) => {
+        const currentAmount = Number(campaign.current_amount || 0);
+        const goalAmount = Number(campaign.goal_amount || 0);
+        const progressPercentage = goalAmount > 0
+            ? Number(((currentAmount / goalAmount) * 100).toFixed(2))
+            : Number(campaign.progress_percentage || 0);
+
+        return withDefaultStats({
+            ...campaign,
+            current_amount: currentAmount,
+            donation_count: Number(campaign.donation_count || 0),
+            progress_percentage: progressPercentage,
+        });
+    });
+};
+
+const fetchCampaigns = async ({ onlyActive = false, singleId = null, orderByPriority = false } = {}) => {
+    let tableQuery = supabase.from(TABLE_NAME).select('*');
+    if (onlyActive) tableQuery = tableQuery.eq('is_active', true);
+    if (singleId) tableQuery = tableQuery.eq('id', singleId);
+    if (orderByPriority) tableQuery = tableQuery.order('priority', { ascending: true });
+    tableQuery = tableQuery.order('created_at', { ascending: false });
+
+    const { data: tableData, error: tableError } = singleId
+        ? await tableQuery.single()
+        : await tableQuery;
+
+    if (tableError) throw tableError;
+
+    if (singleId) {
+        const enriched = await attachCampaignStats([tableData]);
+        return { success: true, data: enriched[0] };
+    }
+
+    const enriched = await attachCampaignStats(tableData || []);
+    return { success: true, data: enriched };
+};
 
 /**
  * Get all active emergency campaigns with donation stats
@@ -6,15 +58,7 @@ import { supabase, TABLES } from './client.js';
  */
 export const getActiveEmergencyCampaigns = async () => {
     try {
-        const { data, error } = await supabase
-            .from('emergency_campaigns_with_stats')
-            .select('*')
-            .eq('is_active', true)
-            .order('priority', { ascending: true });
-
-        if (error) throw error;
-
-        return { success: true, data };
+        return await fetchCampaigns({ onlyActive: true, orderByPriority: true });
     } catch (error) {
         console.error('Error fetching active emergency campaigns:', error);
         return { success: false, error: error.message };
@@ -27,14 +71,7 @@ export const getActiveEmergencyCampaigns = async () => {
  */
 export const getAllEmergencyCampaigns = async () => {
     try {
-        const { data, error } = await supabase
-            .from('emergency_campaigns_with_stats')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        return { success: true, data };
+        return await fetchCampaigns();
     } catch (error) {
         console.error('Error fetching all emergency campaigns:', error);
         return { success: false, error: error.message };
@@ -56,19 +93,7 @@ export const createEmergencyCampaign = async (campaignData) => {
 
         if (error) throw error;
 
-        // Fetch the campaign with stats from the view
-        const { data: campaignWithStats, error: viewError } = await supabase
-            .from('emergency_campaigns_with_stats')
-            .select('*')
-            .eq('id', data.id)
-            .single();
-
-        if (viewError) {
-            console.warn('Could not fetch campaign stats, returning basic data:', viewError);
-            return { success: true, data };
-        }
-
-        return { success: true, data: campaignWithStats };
+        return await fetchCampaigns({ singleId: data.id });
     } catch (error) {
         console.error('Error creating emergency campaign:', error);
         return { success: false, error: error.message };
@@ -92,19 +117,7 @@ export const updateEmergencyCampaign = async (id, updates) => {
 
         if (error) throw error;
 
-        // Fetch the updated campaign with stats from the view
-        const { data: campaignWithStats, error: viewError } = await supabase
-            .from('emergency_campaigns_with_stats')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (viewError) {
-            console.warn('Could not fetch updated campaign stats, returning basic data:', viewError);
-            return { success: true, data };
-        }
-
-        return { success: true, data: campaignWithStats };
+        return await fetchCampaigns({ singleId: id });
     } catch (error) {
         console.error('Error updating emergency campaign:', error);
         return { success: false, error: error.message };
@@ -163,15 +176,7 @@ export const deleteEmergencyCampaign = async (id) => {
  */
 export const getEmergencyCampaignById = async (id) => {
     try {
-        const { data, error } = await supabase
-            .from('emergency_campaigns_with_stats')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) throw error;
-
-        return { success: true, data };
+        return await fetchCampaigns({ singleId: id });
     } catch (error) {
         console.error('Error fetching emergency campaign:', error);
         return { success: false, error: error.message };

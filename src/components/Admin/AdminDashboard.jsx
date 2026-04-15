@@ -1,181 +1,261 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
-import { LayoutDashboard, Heart, DollarSign, LogOut, Menu, Mail, Settings, FileText, AlertTriangle, BookOpen, Building2 } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Heart,
+  DollarSign,
+  LogOut,
+  Menu,
+  X,
+  Mail,
+  Settings,
+  FileText,
+  AlertTriangle,
+  BookOpen,
+  Package,
+  ChevronRight,
+} from 'lucide-react';
+import { Button } from '../ui/Button';
+import { cn } from '../../lib/utils';
 import Loader from '../Loader';
 import { supabase } from '../../supabase/client';
 import { getUnreadCount } from '../../supabase/messages';
+import { checkAdminAuth } from '../../supabase/admin';
 
-const AdminDashboard = () => {
-    const { isAuthenticated, loading, logout, user } = useAdminAuth();
-    const navigate = useNavigate();
-    const location = useLocation();
+const AdminLayout = () => {
+  const { isAuthenticated, loading, logout, user } = useAdminAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-    useEffect(() => {
-        if (!loading && !isAuthenticated) {
-            navigate('/admin');
-        }
-    }, [isAuthenticated, loading, navigate]);
+  useEffect(() => {
+    let cancelled = false;
 
-    // Close sidebar when navigating on mobile
-    useEffect(() => {
-        setIsSidebarOpen(false);
-    }, [location.pathname]);
+    const verifyAndRedirect = async () => {
+      if (loading || isAuthenticated) return;
 
-    // Fetch unread count and subscribe to changes
-    useEffect(() => {
-        if (!isAuthenticated) return;
+      const result = await checkAdminAuth();
+      if (cancelled) return;
 
-        const fetchUnread = async () => {
-            const result = await getUnreadCount();
-            if (result.success) {
-                setUnreadCount(result.count);
-            }
-        };
-
-        fetchUnread();
-
-        // Realtime subscription
-        const subscription = supabase
-            .channel('messages')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
-                // Refetch count on any change (Insert, Update, Delete) to ensure accuracy
-                fetchUnread();
-            })
-            .subscribe();
-
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [isAuthenticated]);
-
-    const handleLogout = async () => {
-        await logout();
+      if (!result.success || !result.isAuthenticated) {
         navigate('/admin');
+      }
     };
 
-    const menuItems = [
-        { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/admin/donations', icon: DollarSign, label: 'Donations' },
-        { path: '/admin/impacts', icon: Heart, label: 'Impact Proofs' },
-        {
-            path: '/admin/inbox',
-            icon: Mail,
-            label: 'Inbox',
-            badge: unreadCount > 0 ? unreadCount : null
-        },
-        { path: '/admin/emergency', icon: AlertTriangle, label: 'Emergency' },
-        { path: '/admin/research', icon: BookOpen, label: 'Research' },
-        { path: '/admin/departments', icon: Building2, label: 'Departments' },
-        { path: '/admin/content', icon: FileText, label: 'Content' },
-        { path: '/admin/settings', icon: Settings, label: 'Settings' },
-    ];
+    verifyAndRedirect();
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader size="lg" />
-            </div>
-        );
-    }
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, loading, navigate]);
 
-    if (!isAuthenticated) {
-        return null;
-    }
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchUnread = async () => {
+      const result = await getUnreadCount();
+      if (result.success) {
+        setUnreadCount(result.count);
+      }
+    };
+
+    fetchUnread();
+
+    const subscription = supabase
+      .channel('messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+        fetchUnread();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [isAuthenticated]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin');
+  };
+
+  const menuItems = [
+    { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', badge: null },
+    { path: '/admin/donations', icon: DollarSign, label: 'Donations', badge: null },
+    { path: '/admin/impacts', icon: Heart, label: 'Impact Proofs', badge: null },
+    {
+      path: '/admin/inbox',
+      icon: Mail,
+      label: 'Inbox',
+      badge: unreadCount > 0 ? unreadCount : null
+    },
+    { path: '/admin/emergency', icon: AlertTriangle, label: 'Emergency', badge: null },
+    { path: '/admin/research', icon: BookOpen, label: 'Research', badge: null },
+    { path: '/admin/products', icon: Package, label: 'Products', badge: null },
+    { path: '/admin/content', icon: FileText, label: 'Content', badge: null },
+    { path: '/admin/settings', icon: Settings, label: 'Settings', badge: null },
+  ];
+
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Top Navigation */}
-            <nav className="bg-white shadow-md fixed w-full z-30 top-0 left-0">
-                <div className="w-full px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-4">
-                            {/* Mobile Menu Button */}
-                            <button
-                                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
-                            >
-                                <Menu className="w-6 h-6" />
-                            </button>
-
-                            <Link to="/admin/dashboard" className="flex-shrink-0">
-                                <img
-                                    src="/logo.jpg"
-                                    alt="AFGHANIUM Logo"
-                                    className="h-10 w-auto object-contain"
-                                />
-                            </Link>
-                            <div className="hidden md:block">
-                                <div className="text-xl font-bold text-primary-dark leading-none">AFGHANIUM</div>
-                                <div className="text-xs text-gray-500 font-medium tracking-wider uppercase mt-1">Admin Portal</div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center space-x-4">
-                            <span className="hidden sm:block text-gray-600">{user?.email}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <LogOut className="w-5 h-5" />
-                                <span className="hidden sm:inline">Logout</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <div className="flex pt-16">
-                {/* Sidebar Overlay for Mobile */}
-                {isSidebarOpen && (
-                    <div
-                        className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
-                        onClick={() => setIsSidebarOpen(false)}
-                    ></div>
-                )}
-
-                {/* Sidebar */}
-                <aside className={`
-                    fixed md:sticky top-16 left-0 z-20 w-64 bg-white min-h-[calc(100vh-4rem)] shadow-md transition-transform duration-300 ease-in-out
-                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-                `}>
-                    <nav className="p-4 space-y-2">
-                        {menuItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
-                                    ? 'bg-primary text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
-                                    }`}
-                            >
-                                <div className="flex items-center space-x-3">
-                                    <item.icon className="w-5 h-5" />
-                                    <span className="font-medium">{item.label}</span>
-                                </div>
-                                {item.badge && (
-                                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${location.pathname === item.path
-                                        ? 'bg-white text-primary'
-                                        : 'bg-red-500 text-white'
-                                        }`}>
-                                        {item.badge}
-                                    </span>
-                                )}
-                            </Link>
-                        ))}
-                    </nav>
-                </aside>
-
-                {/* Main Content */}
-                <main className="flex-1 p-4 md:p-8 w-full overflow-x-hidden">
-                    <Outlet />
-                </main>
-            </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader size="lg" />
+      </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Desktop Sidebar */}
+      <aside
+        className={cn(
+          'hidden lg:flex flex-col w-64 bg-card border-r border-border transition-all duration-300 overflow-hidden',
+          !isSidebarOpen && 'w-20'
+        )}
+      >
+        {/* Logo Section */}
+        <div className="flex items-center justify-between p-6 border-b border-border">
+          <div className={cn('flex items-center transition-all', !isSidebarOpen && 'justify-center w-full')}>
+            <img
+              src="/logo.jpg"
+              alt="AFGHANIUM"
+              className="h-8 w-8 rounded object-cover"
+            />
+            {isSidebarOpen && <span className="ml-3 text-lg font-bold text-primary">ADMIN</span>}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-6 space-y-1">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                )}
+                title={!isSidebarOpen ? item.label : ''}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                {isSidebarOpen && (
+                  <>
+                    <span className="flex-1 text-left text-sm font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* User Info & Logout */}
+        <div className="p-4 border-t border-border space-y-2">
+          {isSidebarOpen && (
+            <div className="px-2 py-2 text-xs">
+              <p className="text-muted-foreground truncate">Signed in as</p>
+              <p className="font-semibold text-foreground truncate">{user?.email || 'Admin'}</p>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="w-full justify-start text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            {isSidebarOpen && <span className="ml-2">Logout</span>}
+          </Button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
+        <header className="lg:hidden flex items-center justify-between px-4 py-4 bg-card border-b border-border">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+          <div className="text-lg font-bold text-primary">AFGHANIUM Admin</div>
+          <div className="w-10" /> {/* Spacer for centering */}
+        </header>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden bg-card border-b border-border overflow-y-auto max-h-[calc(100vh-73px)]">
+            <nav className="p-4 space-y-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="flex-1 text-left text-sm font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className="inline-flex items-center justify-center px-2 py-1 rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+              <div className="pt-4 border-t border-border mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="w-full justify-start text-destructive hover:bg-destructive/10"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="ml-2">Logout</span>
+                </Button>
+              </div>
+            </nav>
+          </div>
+        )}
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-secondary/5">
+          <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 };
 
-export default AdminDashboard;
+export default AdminLayout;

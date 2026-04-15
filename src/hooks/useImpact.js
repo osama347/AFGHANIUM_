@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
     createImpact,
     getAllImpacts,
-    getImpactsByDepartment,
     getImpactsByDonation,
     updateImpact,
     deleteImpact,
@@ -33,19 +32,6 @@ export const useImpact = () => {
         setLoading(true);
         setError(null);
         const result = await getAllImpacts(filters);
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
-    };
-
-    const getByDepartment = async (department) => {
-        setLoading(true);
-        setError(null);
-        const result = await getImpactsByDepartment(department);
         setLoading(false);
 
         if (!result.success) {
@@ -110,7 +96,6 @@ export const useImpact = () => {
     return {
         create,
         getAll,
-        getByDepartment,
         getByDonation,
         update,
         remove,

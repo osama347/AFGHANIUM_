@@ -7,7 +7,7 @@ CREATE TABLE public.donations (
   full_name text NOT NULL,
   email text NOT NULL,
   amount numeric NOT NULL CHECK (amount >= 0::numeric),
-  department text NOT NULL,
+  department text,
   payment_method text NOT NULL,
   message text,
   status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'completed'::text, 'failed'::text, 'cancelled'::text])),
@@ -15,21 +15,6 @@ CREATE TABLE public.donations (
   updated_at timestamp with time zone DEFAULT now(),
   transaction_reference text,
   CONSTRAINT donations_pkey PRIMARY KEY (id)
-);
-CREATE TABLE public.departments (
-  id text NOT NULL,
-  name_en text NOT NULL,
-  name_dari text,
-  name_pashto text,
-  description_en text,
-  description_dari text,
-  description_pashto text,
-  icon text DEFAULT '🏥'::text,
-  display_order integer DEFAULT 1,
-  is_active boolean DEFAULT true,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT departments_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.emergency_campaigns (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -57,7 +42,7 @@ CREATE TABLE public.impacts (
   title text NOT NULL,
   description text NOT NULL,
   cost numeric NOT NULL CHECK (cost >= 0::numeric),
-  department text NOT NULL,
+  department text,
   image_url text,
   donation_id text,
   admin_comment text,
@@ -75,6 +60,20 @@ CREATE TABLE public.messages (
   message text NOT NULL,
   read boolean DEFAULT false,
   CONSTRAINT messages_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.products (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name_en text NOT NULL,
+  category text,
+  origin_region text DEFAULT 'Afghanistan'::text,
+  description_en text,
+  image_url text,
+  inquiry_email text,
+  display_order integer NOT NULL DEFAULT 1,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT products_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.research_submissions (
   id bigint NOT NULL DEFAULT nextval('research_submissions_id_seq'::regclass),

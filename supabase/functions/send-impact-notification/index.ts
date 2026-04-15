@@ -9,7 +9,6 @@ type ImpactPayload = {
   title?: string;
   description?: string;
   cost?: number;
-  department?: string;
   image_url?: string;
   media?: string[];
 };
@@ -44,7 +43,6 @@ const htmlBody = (payload: ImpactPayload) => {
     <ul>
       <li><strong>Donation ID:</strong> ${payload.donation_id || 'N/A'}</li>
       <li><strong>Impact Title:</strong> ${payload.title || 'N/A'}</li>
-      <li><strong>Department:</strong> ${payload.department || 'N/A'}</li>
       <li><strong>Cost Used:</strong> ${formatCurrency(payload.cost)}</li>
     </ul>
     <p><strong>Description:</strong><br/>${payload.description || 'N/A'}</p>
@@ -115,7 +113,6 @@ serve(async (req) => {
         'Your donation has created impact.',
         `Donation ID: ${payload.donation_id || 'N/A'}`,
         `Impact Title: ${payload.title || 'N/A'}`,
-        `Department: ${payload.department || 'N/A'}`,
         `Cost Used: ${formatCurrency(payload.cost)}`,
         `Description: ${payload.description || 'N/A'}`,
         payload.image_url ? `Main Image: ${payload.image_url}` : '',

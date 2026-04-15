@@ -5,6 +5,48 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.6%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.6%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 142.1 70.6% 32.4%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.3% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 142.1 70.6% 32.4%;
+    --radius: 0.5rem;
+    
+    /* Afghan charity color overrides */
+    --primary: 142.1 50.6% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142.1 30% 60%;
+    --secondary-foreground: 0 0% 3.6%;
+  }
+
+  .dark {
+    --background: 0 0% 3.6%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.6%;
+    --popover-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 142.1 70.6% 65%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 142.1 70.6% 65%;
+  }
 
   html,
   body,
@@ -48,15 +90,30 @@
   }
 
   .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    @apply hover:opacity-90 font-semibold py-3 px-8 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
   }
 
   .btn-secondary {
-    @apply bg-secondary hover:bg-secondary-dark text-primary-dark font-semibold py-3 px-8 rounded-lg transition-all duration-200;
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    @apply hover:opacity-80 font-semibold py-3 px-8 rounded-lg transition-all duration-200;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid hsl(var(--input));
+    border-radius: 0.5rem;
+    @apply focus:outline-none focus:ring-2 transition-all;
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
+    outline: none;
+  }
+
+  .input-field:focus {
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
   }
 
   .section-padding {
@@ -170,7 +227,7 @@
   animation-play-state: paused;
 }
 
-/* Urgent/Emergency Department Styling */
+/* Urgent/Emergency Styling */
 .urgent-gradient {
   background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
 }

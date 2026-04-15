@@ -24,7 +24,7 @@ if (!hasSupabaseConfig) {
 export const TABLES = {
     DONATIONS: 'donations',
     IMPACTS: 'impacts',
-    DEPARTMENTS: 'departments',
+    PRODUCTS: 'products',
     ADMINS: 'admins',
     RESEARCH: 'research_submissions',
 };

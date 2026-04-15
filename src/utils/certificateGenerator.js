@@ -50,11 +50,6 @@ export const generateCertificate = (donation) => {
     doc.setTextColor(80, 80, 80);
     doc.text(`For the generous contribution of $${donation.amount.toLocaleString()}`, 148.5, 120, { align: 'center' });
 
-    // Department
-    if (donation.department) {
-        doc.text(`towards ${donation.department.replace('-', ' ').toUpperCase()}`, 148.5, 130, { align: 'center' });
-    }
-
     // Date
     const date = new Date(donation.created_at).toLocaleDateString('en-US', {
         year: 'numeric',

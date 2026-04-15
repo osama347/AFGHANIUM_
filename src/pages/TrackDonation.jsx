@@ -6,9 +6,10 @@ import { useImpact } from '../hooks/useImpact';
 import { formatCurrency, formatDateTime, formatDonationId } from '../utils/formatters';
 import { validateDonationId } from '../utils/validators';
 import { PAYMENT_METHODS, CRYPTO_CURRENCIES } from '../utils/constants';
-import Hero from '../components/Hero';
 import Loader from '../components/Loader';
 import ImpactCard from '../components/ImpactCard';
+import { Badge } from '../components/ui/Badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 
 const TrackDonation = () => {
     const [searchParams] = useSearchParams();
@@ -207,176 +208,210 @@ const TrackDonation = () => {
     };
 
     return (
-        <div>
-            <Hero
-                title="Track Your Donation"
-                subtitle="See the journey and impact of your contribution"
-                backgroundImage="/Track.jpg"
-            />
-
-            <section className="section-padding bg-gray-50">
+        <div className="bg-background text-foreground">
+            <section className="section-padding bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/60">
                 <div className="container-custom">
-                    <div className="max-w-2xl mx-auto mb-12">
-                        <div className="bg-white rounded-lg shadow-lg p-8">
-                            {/* Search Type Selector */}
-                            <div className="flex space-x-4 mb-6">
-                                <button
-                                    onClick={() => setSearchType('id')}
-                                    className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${searchType === 'id'
-                                        ? 'bg-primary text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    Search by Donation ID
-                                </button>
-                                <button
-                                    onClick={() => setSearchType('name')}
-                                    className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${searchType === 'name'
-                                        ? 'bg-primary text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    Search by Name
-                                </button>
-                            </div>
+                    <div className="mx-auto max-w-4xl space-y-6">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="secondary" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+                                Donation tracking
+                            </Badge>
+                            <Badge variant="outline" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+                                Transparent updates
+                            </Badge>
+                        </div>
 
-                            {/* Search Input */}
-                            <div className="flex space-x-3">
-                                <input
-                                    type="text"
-                                    value={searchValue}
-                                    onChange={(e) => setSearchValue(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="input-field flex-1"
-                                    placeholder={
-                                        searchType === 'id'
-                                            ? 'Enter Donation ID (e.g., AFG-123456)'
-                                            : 'Enter Full Name'
-                                    }
-                                />
-                                <button
-                                    onClick={() => handleSearch()}
-                                    disabled={donationLoading}
-                                    className="btn-primary px-8 disabled:opacity-50"
-                                >
-                                    {donationLoading ? (
-                                        <Loader size="sm" color="white" />
-                                    ) : (
-                                        <>
-                                            <Search className="w-5 h-5" />
-                                        </>
-                                    )}
-                                </button>
-                            </div>
+                        <div className="max-w-3xl">
+                            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+                                Track your donation with clarity.
+                            </h1>
+                            <p className="mt-5 text-lg leading-8 text-muted-foreground sm:text-xl">
+                                Search by donation ID or donor name to view status, payment instructions, and any published impact proofs connected to your contribution.
+                            </p>
+                        </div>
 
-                            {error && (
-                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                                    {error}
-                                </div>
-                            )}
+                        <div className="grid gap-4 md:grid-cols-3">
+                            {[
+                                { label: 'Search by ID or name', value: 'Fast lookup' },
+                                { label: 'Review payment instructions', value: 'Pending donations' },
+                                { label: 'See impact proofs', value: 'Completed donations' },
+                            ].map((item) => (
+                                <Card key={item.label} className="border-border/70 shadow-sm">
+                                    <CardContent className="p-5">
+                                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.label}</p>
+                                        <p className="mt-2 text-lg font-semibold text-foreground">{item.value}</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    {/* Donation Details */}
-                    {donation && (
-                        <div className="max-w-4xl mx-auto space-y-6">
-                            {/* Main Details Card */}
-                            <div className="bg-white rounded-lg shadow-lg p-8">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-3xl font-bold text-gray-900">Donation Details</h2>
-                                    <div className="flex items-center space-x-2">
-                                        {getStatusIcon(donation.status)}
-                                        <span className={`px-4 py-2 rounded-full font-semibold ${getStatusColor(donation.status)}`}>
-                                            {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
-                                        </span>
-                                    </div>
+            <section className="section-padding bg-muted/30">
+                <div className="container-custom">
+                    <div className="mx-auto max-w-3xl">
+                        <Card className="overflow-hidden border-border/70 shadow-xl">
+                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
+                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                    Search panel
+                                </CardDescription>
+                                <CardTitle className="text-2xl">Look up a donation</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6 p-6 sm:p-8">
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    <button
+                                        onClick={() => setSearchType('id')}
+                                        className={`rounded-2xl border px-4 py-3 text-left transition-all ${searchType === 'id'
+                                            ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
+                                            : 'border-border bg-background hover:border-primary/20 hover:bg-muted/50'
+                                            }`}
+                                    >
+                                        <span className="block text-sm font-semibold">Search by Donation ID</span>
+                                        <span className="mt-1 block text-xs text-muted-foreground">Best for receipt lookups and exact tracking.</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setSearchType('name')}
+                                        className={`rounded-2xl border px-4 py-3 text-left transition-all ${searchType === 'name'
+                                            ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
+                                            : 'border-border bg-background hover:border-primary/20 hover:bg-muted/50'
+                                            }`}
+                                    >
+                                        <span className="block text-sm font-semibold">Search by Name</span>
+                                        <span className="mt-1 block text-xs text-muted-foreground">Useful when the donation ID isn’t available.</span>
+                                    </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Donation ID</div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {formatDonationId(donation.donation_id)}
+                                <div className="flex flex-col gap-3 sm:flex-row">
+                                    <div className="relative flex-1">
+                                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                        <input
+                                            type="text"
+                                            value={searchValue}
+                                            onChange={(e) => setSearchValue(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                            className="input-field h-12 pl-10"
+                                            placeholder={
+                                                searchType === 'id'
+                                                    ? 'Enter Donation ID (e.g., AFG-123456)'
+                                                    : 'Enter full name'
+                                            }
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => handleSearch()}
+                                        disabled={donationLoading}
+                                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 font-semibold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary/90 disabled:opacity-50"
+                                    >
+                                        {donationLoading ? <Loader size="sm" color="white" /> : <Search className="h-4 w-4" />}
+                                        Track
+                                    </button>
+                                </div>
+
+                                {error && (
+                                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
+                                        {error}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </section>
+
+            {/* Donation Details */}
+            {donation && (
+                <section className="section-padding bg-background">
+                    <div className="container-custom">
+                        <div className="mx-auto max-w-5xl space-y-6">
+                            <Card className="overflow-hidden border-border/70 shadow-xl">
+                                <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                                Donation details
+                                            </CardDescription>
+                                            <CardTitle className="mt-2 text-3xl">{formatDonationId(donation.donation_id)}</CardTitle>
+                                        </div>
+                                        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 shadow-sm">
+                                            {getStatusIcon(donation.status)}
+                                            <span className={`rounded-full px-3 py-1 text-sm font-semibold ${getStatusColor(donation.status)}`}>
+                                                {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                                            </span>
                                         </div>
                                     </div>
+                                </CardHeader>
 
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Amount</div>
-                                        <div className="text-lg font-semibold text-primary">
-                                            {formatCurrency(donation.amount)}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Donor Name</div>
-                                        <div className="text-lg font-semibold text-gray-900">{donation.full_name}</div>
-                                    </div>
-
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Email</div>
-                                        <div className="text-lg font-semibold text-gray-900">{donation.email}</div>
-                                    </div>
-
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Department</div>
-                                        <div className="text-lg font-semibold text-gray-900">{donation.department}</div>
-                                    </div>
-
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Payment Method</div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {donation.payment_method.replace('_', ' ').toUpperCase()}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="text-sm text-gray-500 mb-1">Date</div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {formatDateTime(donation.created_at)}
-                                        </div>
+                                <CardContent className="space-y-6 p-6 sm:p-8">
+                                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                        {[
+                                            { label: 'Amount', value: formatCurrency(donation.amount) },
+                                            { label: 'Donor name', value: donation.full_name },
+                                            { label: 'Email', value: donation.email },
+                                            { label: 'Payment method', value: donation.payment_method.replace('_', ' ').toUpperCase() },
+                                            { label: 'Date', value: formatDateTime(donation.created_at) },
+                                        ].map((item) => (
+                                            <div key={item.label} className="rounded-2xl border border-border bg-muted/30 p-4">
+                                                <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.label}</div>
+                                                <div className="mt-2 text-base font-semibold text-foreground break-words">{item.value}</div>
+                                            </div>
+                                        ))}
                                     </div>
 
                                     {donation.message && (
-                                        <div className="md:col-span-2">
-                                            <div className="text-sm text-gray-500 mb-1">Message</div>
-                                            <div className="text-gray-700 italic">"{donation.message}"</div>
+                                        <div className="rounded-2xl border border-border bg-background p-5">
+                                            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Message</div>
+                                            <div className="mt-2 text-base italic leading-7 text-foreground">"{donation.message}"</div>
                                         </div>
                                     )}
-                                </div>
 
-                                {/* Payment Instructions */}
-                                {renderPaymentInstructions()}
-                            </div>
+                                    {renderPaymentInstructions()}
+                                </CardContent>
+                            </Card>
 
-                            {/* Impact Proofs */}
                             {impacts.length > 0 && (
-                                <div className="bg-white rounded-lg shadow-lg p-8">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Your Impact</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {impacts.map((impact) => (
-                                            <ImpactCard key={impact.id} impact={impact} />
-                                        ))}
-                                    </div>
-                                </div>
+                                <Card className="border-border/70 shadow-xl">
+                                    <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
+                                        <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                            Impact proofs
+                                        </CardDescription>
+                                        <CardTitle className="text-2xl">Your impact</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-6 sm:p-8">
+                                        <div className="grid gap-6 md:grid-cols-2">
+                                            {impacts.map((impact) => (
+                                                <ImpactCard key={impact.id} impact={impact} />
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             )}
 
                             {impacts.length === 0 && donation.status === 'completed' && (
-                                <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-                                    <p className="text-gray-600">
-                                        Impact proofs will be added soon. Thank you for your patience!
-                                    </p>
-                                </div>
+                                <Card className="border-border/70 shadow-xl">
+                                    <CardContent className="p-8 text-center">
+                                        <p className="text-muted-foreground">
+                                            Impact proofs will be added soon. Thank you for your patience!
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             )}
                         </div>
-                    )}
+                    </div>
+                </section>
+            )}
 
-                    {searched && !donation && !donationLoading && !error && (
-                        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-12 text-center">
-                            <p className="text-gray-600 text-lg">No donation found. Please check your search criteria.</p>
-                        </div>
-                    )}
-                </div>
-            </section>
+            {searched && !donation && !donationLoading && !error && (
+                <section className="section-padding bg-background">
+                    <div className="container-custom">
+                        <Card className="mx-auto max-w-3xl border-border/70 shadow-xl">
+                            <CardContent className="p-10 text-center">
+                                <p className="text-lg text-muted-foreground">No donation found. Please check your search criteria.</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </section>
+            )}
         </div>
     );
 };

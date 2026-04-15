@@ -117,12 +117,6 @@ const ImpactCard = ({ impact }) => {
 
                 {/* Content */}
                 <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                        <span className="inline-block px-3 py-1 bg-secondary text-primary-dark text-sm font-medium rounded-full">
-                            {impact.department}
-                        </span>
-                    </div>
-
                     <h3 className="text-xl font-bold text-gray-900 mb-3">
                         {impact.title}
                     </h3>
@@ -231,10 +225,7 @@ const ImpactCard = ({ impact }) => {
                     {/* Details */}
                     <div className="space-y-6">
                         <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="px-4 py-1.5 bg-secondary text-primary-dark font-semibold rounded-full">
-                                    {impact.department}
-                                </span>
+                            <div className="flex items-center justify-end mb-4">
                                 <span className="text-2xl font-bold text-primary">
                                     {formatCurrency(impact.cost)}
                                 </span>

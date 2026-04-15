@@ -69,19 +69,16 @@ CREATE TRIGGER emergency_campaigns_updated_at
     EXECUTE FUNCTION update_emergency_campaigns_updated_at();
 
 -- View to get emergency campaigns with donation stats
+-- Note: Department linkage was removed from donations. This view keeps campaign rows
+-- available and returns zeroed stats until a dedicated campaign reference field exists.
 CREATE OR REPLACE VIEW emergency_campaigns_with_stats AS
 SELECT 
     ec.*,
-    COALESCE(SUM(d.amount), 0) as current_amount,
-    COUNT(d.id) as donation_count,
-    CASE 
-        WHEN ec.goal_amount > 0 THEN 
-            ROUND((COALESCE(SUM(d.amount), 0) / ec.goal_amount) * 100, 2)
-        ELSE 0 
-    END as progress_percentage
+    0::numeric as current_amount,
+    0::bigint as donation_count,
+    0::numeric as progress_percentage
 FROM emergency_campaigns ec
-LEFT JOIN donations d ON d.department = ec.id::text AND d.status = 'completed'
-GROUP BY ec.id;
+;
 
 -- Grant permissions
 GRANT SELECT ON emergency_campaigns_with_stats TO anon, authenticated;

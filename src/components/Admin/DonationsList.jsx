@@ -1,391 +1,569 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDonation } from '../../hooks/useDonation';
-import { getAllEmergencyCampaigns } from '../../supabase/emergencyCampaigns';
 import { updateDonationStatus } from '../../supabase/donations';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { DollarSign, Plus, Download, Search, AlertTriangle } from 'lucide-react';
+import {
+  DollarSign,
+  Plus,
+  Download,
+  Search,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  TrendingUp,
+  Filter,
+  Eye,
+} from 'lucide-react';
 import Loader from '../Loader';
 import { exportToCSV } from '../../utils/export';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Badge } from '../ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../ui/Dialog';
 
 const DonationsList = () => {
-    const navigate = useNavigate();
-    const { getAll, loading } = useDonation();
-    const [donations, setDonations] = useState([]);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [emergencyCampaigns, setEmergencyCampaigns] = useState({});
+  const navigate = useNavigate();
+  const { getAll, loading } = useDonation();
+  const [donations, setDonations] = useState([]);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedDonation, setSelectedDonation] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
 
-    useEffect(() => {
-        fetchDonations();
-        fetchEmergencyCampaigns();
-    }, []);
+  useEffect(() => {
+    fetchDonations();
+  }, []);
 
-    const fetchDonations = async () => {
-        const result = await getAll();
-        if (result.success) {
-            setDonations(result.data);
-        } else {
-            setError(result.error);
-        }
-    };
-
-    const fetchEmergencyCampaigns = async () => {
-        const result = await getAllEmergencyCampaigns();
-        if (result.success) {
-            const campaignMap = {};
-            result.data.forEach(c => {
-                campaignMap[c.id] = c.name_en;
-            });
-            setEmergencyCampaigns(campaignMap);
-        }
-    };
-
-    const handleApproveDonation = async (donationId) => {
-        if (window.confirm('Are you sure you want to approve this donation? This will mark it as completed.')) {
-            const result = await updateDonationStatus(donationId, 'completed');
-            if (result.success) {
-                // Refresh the donations list
-                fetchDonations();
-                alert('Donation approved successfully!');
-            } else {
-                alert('Failed to approve donation: ' + result.error);
-            }
-        }
-    };
-
-    const handleRejectDonation = async (donationId) => {
-        const reason = prompt('Please provide a reason for rejecting this donation (optional):');
-        if (reason !== null) { // User didn't cancel
-            const result = await updateDonationStatus(donationId, 'failed');
-            if (result.success) {
-                // Refresh the donations list
-                fetchDonations();
-                alert('Donation rejected successfully!');
-            } else {
-                alert('Failed to reject donation: ' + result.error);
-            }
-        }
-    };
-
-    const handleCancelDonation = async (donationId) => {
-        if (window.confirm('Are you sure you want to cancel this donation? This action cannot be undone.')) {
-            const result = await updateDonationStatus(donationId, 'cancelled');
-            if (result.success) {
-                // Refresh the donations list
-                fetchDonations();
-                alert('Donation cancelled successfully!');
-            } else {
-                alert('Failed to cancel donation: ' + result.error);
-            }
-        }
-    };
-
-    const getDepartmentLabel = (deptId) => {
-        if (emergencyCampaigns[deptId]) {
-            return (
-                <span className="flex items-center gap-1 text-red-600 font-medium">
-                    <AlertTriangle className="w-3 h-3" />
-                    {emergencyCampaigns[deptId]}
-                </span>
-            );
-        }
-        return <span className="capitalize">{deptId}</span>;
-    };
-
-    const handleExport = () => {
-        if (donations.length > 0) {
-            // Format data for export
-            const exportData = donations.map(d => ({
-                ID: d.donation_id,
-                Donor: d.full_name,
-                Email: d.email,
-                Amount: d.amount,
-                Department: emergencyCampaigns[d.department] || d.department,
-                Payment_Method: d.payment_method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                Transaction_Reference: d.transaction_reference || '',
-                Status: d.status,
-                Date: new Date(d.created_at).toLocaleDateString(),
-                Time: new Date(d.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }));
-            exportToCSV(exportData, `donations-${new Date().toISOString().split('T')[0]}.csv`);
-        }
-    };
-
-    // Filter and Group Donations
-    const groupedDonations = useMemo(() => {
-        // 1. Filter
-        const filtered = donations.filter(d => {
-            // Status filter
-            if (statusFilter !== 'all' && d.status !== statusFilter) {
-                return false;
-            }
-
-            // Search filter
-            const searchLower = searchTerm.toLowerCase();
-            const deptName = emergencyCampaigns[d.department] ? emergencyCampaigns[d.department].toLowerCase() : d.department.toLowerCase();
-            return (
-                d.full_name.toLowerCase().includes(searchLower) ||
-                d.donation_id.toLowerCase().includes(searchLower) ||
-                deptName.includes(searchLower)
-            );
-        });
-
-        // 2. Group by Date
-        const groups = {};
-        filtered.forEach(d => {
-            const date = new Date(d.created_at).toLocaleDateString(undefined, {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            if (!groups[date]) {
-                groups[date] = [];
-            }
-            groups[date].push(d);
-        });
-
-        return groups;
-    }, [donations, searchTerm, statusFilter, emergencyCampaigns]);
-
-    // Calculate donation statistics
-    const donationStats = useMemo(() => {
-        const stats = {
-            total: donations.length,
-            pending: 0,
-            completed: 0,
-            failed: 0,
-            cancelled: 0,
-            pendingManual: 0, // Manual payments waiting for approval
-        };
-
-        donations.forEach(d => {
-            stats[d.status] = (stats[d.status] || 0) + 1;
-
-            // Count manual payments that need approval
-            if (d.status === 'pending' &&
-                (d.payment_method === 'hawala' || d.payment_method === 'western_union' ||
-                 d.payment_method === 'bank_transfer' || d.payment_method === 'moneygram') &&
-                d.transaction_reference) {
-                stats.pendingManual++;
-            }
-        });
-
-        return stats;
-    }, [donations]);
-
-    if (loading) {
-        return <Loader size="lg" />;
+  const fetchDonations = async () => {
+    const result = await getAll();
+    if (result.success) {
+      setDonations(result.data);
+    } else {
+      setError(result.error);
     }
+  };
 
-    if (error) {
-        return (
-            <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-6">
-                Error loading donations: {error}
-            </div>
-        );
+  const handleApproveDonation = async () => {
+    if (!selectedDonation) return;
+    const result = await updateDonationStatus(selectedDonation.donation_id, 'completed');
+    if (result.success) {
+      fetchDonations();
+      setShowConfirmDialog(false);
+      setSelectedDonation(null);
+    } else {
+      alert('Failed to approve donation: ' + result.error);
     }
+  };
 
+  const handleRejectDonation = async () => {
+    if (!selectedDonation) return;
+    const result = await updateDonationStatus(selectedDonation.donation_id, 'failed');
+    if (result.success) {
+      fetchDonations();
+      setShowConfirmDialog(false);
+      setSelectedDonation(null);
+    } else {
+      alert('Failed to reject donation: ' + result.error);
+    }
+  };
+
+  const getStatusInfo = (status) => {
+    const statusMap = {
+      pending: {
+        badge: 'outline',
+        icon: Clock,
+        label: 'Pending',
+        color: 'text-amber-600',
+        bg: 'bg-amber-50',
+      },
+      completed: {
+        badge: 'default',
+        icon: CheckCircle2,
+        label: 'Completed',
+        color: 'text-green-600',
+        bg: 'bg-green-50',
+      },
+      failed: {
+        badge: 'destructive',
+        icon: XCircle,
+        label: 'Failed',
+        color: 'text-red-600',
+        bg: 'bg-red-50',
+      },
+      cancelled: {
+        badge: 'secondary',
+        icon: XCircle,
+        label: 'Cancelled',
+        color: 'text-gray-600',
+        bg: 'bg-gray-50',
+      },
+    };
+    return statusMap[status] || statusMap.pending;
+  };
+
+  const handleExport = () => {
+    if (donations.length > 0) {
+      const exportData = donations.map((d) => ({
+        ID: d.donation_id,
+        Donor: d.full_name,
+        Email: d.email,
+        Amount: d.amount,
+        Payment_Method: d.payment_method.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+        Transaction_Reference: d.transaction_reference || '',
+        Status: d.status,
+        Date: new Date(d.created_at).toLocaleDateString(),
+        Time: new Date(d.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }));
+      exportToCSV(exportData, `donations-${new Date().toISOString().split('T')[0]}.csv`);
+    }
+  };
+
+  // Filter and Group Donations
+  const groupedDonations = useMemo(() => {
+    const filtered = donations.filter((d) => {
+      if (statusFilter !== 'all' && d.status !== statusFilter) {
+        return false;
+      }
+
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        d.full_name.toLowerCase().includes(searchLower) ||
+        d.donation_id.toLowerCase().includes(searchLower)
+      );
+    });
+
+    const groups = {};
+    filtered.forEach((d) => {
+      const date = new Date(d.created_at).toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(d);
+    });
+
+    return groups;
+  }, [donations, searchTerm, statusFilter, emergencyCampaigns]);
+
+  // Calculate donation statistics
+  const donationStats = useMemo(() => {
+    const stats = {
+      total: donations.length,
+      pending: 0,
+      completed: 0,
+      failed: 0,
+      cancelled: 0,
+    };
+
+    donations.forEach((d) => {
+      stats[d.status] = (stats[d.status] || 0) + 1;
+    });
+
+    return stats;
+  }, [donations]);
+
+  if (loading) {
     return (
-        <div>
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-                    <div className="text-2xl font-bold text-gray-900">{donationStats.total}</div>
-                    <div className="text-sm text-gray-500">Total Donations</div>
-                </div>
-                <div className="bg-yellow-50 rounded-lg shadow-sm border border-yellow-200 p-4">
-                    <div className="text-2xl font-bold text-yellow-700">{donationStats.pending}</div>
-                    <div className="text-sm text-yellow-600">Pending</div>
-                </div>
-                <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-200 p-4">
-                    <div className="text-2xl font-bold text-blue-700">{donationStats.pendingManual}</div>
-                    <div className="text-sm text-blue-600">Need Approval</div>
-                </div>
-                <div className="bg-green-50 rounded-lg shadow-sm border border-green-200 p-4">
-                    <div className="text-2xl font-bold text-green-700">{donationStats.completed}</div>
-                    <div className="text-sm text-green-600">Completed</div>
-                </div>
-                <div className="bg-red-50 rounded-lg shadow-sm border border-red-200 p-4">
-                    <div className="text-2xl font-bold text-red-700">{donationStats.failed + donationStats.cancelled}</div>
-                    <div className="text-sm text-red-600">Rejected</div>
-                </div>
-            </div>
-
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <h2 className="text-3xl font-bold text-gray-900">All Donations</h2>
-
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                    {/* Status Filter */}
-                    <div className="relative">
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent w-full sm:w-48 appearance-none bg-white"
-                        >
-                            <option value="all">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                            <option value="failed">Failed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    {/* Search Input */}
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input
-                            type="text"
-                            placeholder="Search by Name, ID, or Department..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent w-full sm:w-64"
-                        />
-                    </div>
-
-                    <button
-                        onClick={handleExport}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                        <Download className="w-4 h-4" />
-                        Export CSV
-                    </button>
-                </div>
-            </div>
-
-            {Object.keys(groupedDonations).length === 0 ? (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                        <DollarSign className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900">No donations found</h3>
-                    <p className="text-gray-500 mt-1">Try adjusting your search or wait for new donations.</p>
-                </div>
-            ) : (
-                <div className="space-y-8">
-                    {Object.entries(groupedDonations).map(([date, groupDonations]) => (
-                        <div key={date} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-                                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                                    {date}
-                                </h3>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-white">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Donor</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Department</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Transaction Ref</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment Method</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Time</th>
-                                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {groupDonations.map((donation) => (
-                                            <tr key={donation.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {donation.donation_id}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    <div className="font-medium">{donation.full_name}</div>
-                                                    <div className="text-gray-500 text-xs">{donation.email}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-primary">
-                                                    {formatCurrency(donation.amount)}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {getDepartmentLabel(donation.department)}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                        donation.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                        }`}>
-                                                        {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {donation.transaction_reference || '-'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {donation.payment_method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {new Date(donation.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                                    {donation.status === 'pending' && (
-                                                        <div className="flex justify-end space-x-2">
-                                                            <button
-                                                                onClick={() => handleApproveDonation(donation.donation_id)}
-                                                                className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors"
-                                                                title="Approve this donation"
-                                                            >
-                                                                ✓ Approve
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleRejectDonation(donation.donation_id)}
-                                                                className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors"
-                                                                title="Reject this donation"
-                                                            >
-                                                                ✗ Reject
-                                                            </button>
-                                                        </div>
-                                                    )}
-
-                                                    {donation.status === 'completed' && (
-                                                        <span className="text-green-600 text-xs bg-green-50 px-2 py-1 rounded">
-                                                            ✓ Completed
-                                                        </span>
-                                                    )}
-
-                                                    {donation.status === 'failed' && (
-                                                        <span className="text-red-600 text-xs bg-red-50 px-2 py-1 rounded">
-                                                            ✗ Failed
-                                                        </span>
-                                                    )}
-
-                                                    {donation.status === 'cancelled' && (
-                                                        <span className="text-gray-600 text-xs bg-gray-50 px-2 py-1 rounded">
-                                                            Cancelled
-                                                        </span>
-                                                    )}
-
-                                                    {/* Add Impact Proof button - available for all completed donations */}
-                                                    {donation.status === 'completed' && (
-                                                        <button
-                                                            onClick={() => navigate(`/admin/impacts?donationId=${donation.donation_id}&donorName=${encodeURIComponent(donation.full_name)}&department=${donation.department}&amount=${donation.amount}`)}
-                                                            className="text-primary hover:text-primary-dark flex items-center gap-1 ml-2 transition-colors"
-                                                            title="Add Impact Proof"
-                                                        >
-                                                            <Plus className="w-4 h-4" />
-                                                            Add Proof
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+      <div className="flex justify-center items-center py-20">
+        <Loader size="lg" />
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-destructive/50 bg-destructive/5">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-3 text-destructive">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+            <span>Error loading donations: {error}</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          Donations
+        </h1>
+        <p className="text-muted-foreground">
+          Track and manage all incoming donations with detailed analytics
+        </p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {[
+          {
+            label: 'Total Donations',
+            value: donationStats.total,
+            icon: DollarSign,
+            color: 'primary',
+          },
+          {
+            label: 'Pending',
+            value: donationStats.pending,
+            icon: Clock,
+            color: 'amber',
+          },
+          {
+            label: 'Completed',
+            value: donationStats.completed,
+            icon: CheckCircle2,
+            color: 'green',
+          },
+          {
+            label: 'Failed',
+            value: donationStats.failed,
+            icon: XCircle,
+            color: 'red',
+          },
+          {
+            label: 'Cancelled',
+            value: donationStats.cancelled,
+            icon: AlertTriangle,
+            color: 'gray',
+          },
+        ].map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.label} className="border-0 shadow-sm hover:shadow-md transition-all duration-300">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2.5 rounded-lg bg-primary/10">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-primary" />
+                Filters & Search
+              </CardTitle>
+              <CardDescription>Find and manage donations</CardDescription>
+            </div>
+            <Button
+              onClick={handleExport}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Donations List */}
+      {Object.keys(groupedDonations).length === 0 ? (
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-muted mb-4">
+              <DollarSign className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mt-4">No donations found</h3>
+            <p className="text-muted-foreground mt-2">Try adjusting your search or filters</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          {Object.entries(groupedDonations).map(([date, groupDonations]) => (
+            <Card key={date} className="border-0 shadow-sm overflow-hidden">
+              <CardHeader className="bg-muted/30 border-b border-border pb-3">
+                <CardTitle className="text-base">{date}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  {groupDonations.map((donation) => {
+                    const statusInfo = getStatusInfo(donation.status);
+                    const StatusIcon = statusInfo.icon;
+
+                    return (
+                      <div
+                        key={donation.id}
+                        className="group flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-muted/20 transition-all cursor-pointer"
+                        onClick={() => {
+                          setSelectedDonation(donation);
+                          setShowDetailsModal(true);
+                        }}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${statusInfo.bg}`}>
+                              <StatusIcon className={`w-5 h-5 ${statusInfo.color}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold text-foreground truncate">
+                                  {donation.full_name}
+                                </h4>
+                                <Badge variant={statusInfo.badge === 'default' ? 'default' : 'outline'}>
+                                  {statusInfo.label}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                <span>{donation.donation_id}</span>
+                                <span>•</span>
+                                <span>{donation.email}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="hidden md:flex items-center gap-4 ml-4">
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-primary">
+                              {formatCurrency(donation.amount)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(donation.created_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-2 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDonation(donation);
+                            setShowDetailsModal(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                          View
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Details Modal */}
+      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Donation Details</DialogTitle>
+            <DialogDescription>{selectedDonation?.donation_id}</DialogDescription>
+          </DialogHeader>
+
+          {selectedDonation && (
+            <div className="space-y-6">
+              {/* Donor Information */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground">Donor Information</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Full Name</p>
+                    <p className="font-medium text-foreground">{selectedDonation.full_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Email</p>
+                    <p className="font-medium text-foreground">{selectedDonation.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Donation Information */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground">Donation Information</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Amount</p>
+                    <p className="font-bold text-primary text-lg">
+                      {formatCurrency(selectedDonation.amount)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Payment Method</p>
+                    <p className="font-medium text-foreground">
+                      {selectedDonation.payment_method.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Status</p>
+                    <Badge variant={getStatusInfo(selectedDonation.status).badge === 'default' ? 'default' : 'outline'}>
+                      {getStatusInfo(selectedDonation.status).label}
+                    </Badge>
+                  </div>
+                  {selectedDonation.transaction_reference && (
+                    <div className="col-span-2">
+                      <p className="text-muted-foreground">Transaction Reference</p>
+                      <p className="font-medium text-foreground font-mono">
+                        {selectedDonation.transaction_reference}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <DialogFooter className="flex gap-3 pt-6 border-t border-border">
+                {selectedDonation.status === 'pending' && (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setConfirmAction('reject');
+                        setShowConfirmDialog(true);
+                      }}
+                    >
+                      Reject
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setConfirmAction('approve');
+                        setShowConfirmDialog(true);
+                      }}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Approve
+                    </Button>
+                  </>
+                )}
+
+                {selectedDonation.status === 'completed' && (
+                  <Button
+                    onClick={() =>
+                      navigate(
+                        `/admin/impacts?donationId=${selectedDonation.donation_id}&donorName=${encodeURIComponent(selectedDonation.full_name)}&amount=${selectedDonation.amount}`
+                      )
+                    }
+                    className="gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Impact Proof
+                  </Button>
+                )}
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowDetailsModal(false);
+                    setSelectedDonation(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmAction === 'approve' ? 'Approve Donation' : 'Reject Donation'}
+            </DialogTitle>
+            <DialogDescription>
+              {confirmAction === 'approve'
+                ? 'Are you sure you want to approve this donation? This will mark it as completed.'
+                : 'Are you sure you want to reject this donation? This action cannot be undone.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowConfirmDialog(false);
+                setConfirmAction(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (confirmAction === 'approve') {
+                  handleApproveDonation();
+                } else {
+                  handleRejectDonation();
+                }
+              }}
+              className={confirmAction === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
+            >
+              {confirmAction === 'approve' ? 'Approve' : 'Reject'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 };
 
 export default DonationsList;
+

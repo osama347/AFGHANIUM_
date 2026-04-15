@@ -1,58 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useDonation } from '../../hooks/useDonation';
-import { getAllEmergencyCampaigns } from '../../supabase/emergencyCampaigns';
-import { DollarSign, Users, TrendingUp, Calendar, Clock, AlertTriangle, Building2 } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Calendar, Clock, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import Loader from '../Loader';
 import StatsCard from './Charts/StatsCard';
 import DonationsLineChart from './Charts/DonationsLineChart';
-import DepartmentBarChart from './Charts/DepartmentBarChart';
 import PaymentMethodsPieChart from './Charts/PaymentMethodsPieChart';
 
 
 const AdminStats = () => {
-    const { getStats, getTimeSeries, getPaymentMethods, loading } = useDonation();
+    const { getDashboardData } = useDonation();
     const [stats, setStats] = useState(null);
     const [timeSeriesData, setTimeSeriesData] = useState([]);
     const [paymentMethodsData, setPaymentMethodsData] = useState([]);
     const [selectedPeriod, setSelectedPeriod] = useState(30);
     const [error, setError] = useState(null);
-    const [emergencyCampaigns, setEmergencyCampaigns] = useState({});
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchAllData();
+        fetchDashboardData();
     }, [selectedPeriod]);
 
-    const fetchAllData = async () => {
-        // Fetch stats
-        const statsResult = await getStats();
-        if (statsResult.success) {
-            setStats(statsResult.data);
-        } else {
-            setError(statsResult.error);
+    const fetchDashboardData = async () => {
+        setLoading(true);
+        const result = await getDashboardData(selectedPeriod);
+
+        if (!result.success) {
+            setError(result.error);
+            setLoading(false);
+            return;
         }
 
-        // Fetch time series
-        const timeSeriesResult = await getTimeSeries(selectedPeriod);
-        if (timeSeriesResult.success) {
-            setTimeSeriesData(timeSeriesResult.data);
-        }
-
-        // Fetch payment methods
-        const paymentResult = await getPaymentMethods();
-        if (paymentResult.success) {
-            setPaymentMethodsData(paymentResult.data);
-        }
-
-        // Fetch Emergency Campaigns for name resolution
-        const campaignsResult = await getAllEmergencyCampaigns();
-        if (campaignsResult.success) {
-            const campaignMap = {};
-            campaignsResult.data.forEach(c => {
-                campaignMap[c.id] = c.name_en;
-            });
-            setEmergencyCampaigns(campaignMap);
-        }
+        setStats(result.data.stats);
+        setTimeSeriesData(result.data.timeSeries);
+        setPaymentMethodsData(result.data.paymentMethods);
+        setLoading(false);
     };
 
     if (loading && !stats) {
@@ -104,32 +86,6 @@ const AdminStats = () => {
         },
     ];
 
-    // Split departments into Emergency vs General
-    const emergencyStats = {};
-    const generalStats = {};
-
-    Object.entries(stats.byDepartment || {}).forEach(([deptId, data]) => {
-        if (emergencyCampaigns[deptId]) {
-            emergencyStats[deptId] = { ...data, name: emergencyCampaigns[deptId] };
-        } else {
-            generalStats[deptId] = data;
-        }
-    });
-
-    // Format department data for bar chart (Combine both for overview)
-    const departmentChartData = [
-        ...Object.entries(generalStats).map(([name, data]) => ({
-            name: name.charAt(0).toUpperCase() + name.slice(1),
-            amount: data.amount,
-            count: data.count
-        })),
-        ...Object.entries(emergencyStats).map(([id, data]) => ({
-            name: data.name.substring(0, 15) + '...', // Truncate for chart
-            amount: data.amount,
-            count: data.count
-        }))
-    ];
-
     const periodOptions = [
         { value: 7, label: 'Last 7 Days' },
         { value: 30, label: 'Last 30 Days' },
@@ -179,69 +135,9 @@ const AdminStats = () => {
             </div>
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {/* Department Bar Chart */}
-                <DepartmentBarChart data={departmentChartData} />
-
+            <div className="grid grid-cols-1 gap-6 mb-8">
                 {/* Payment Methods Pie Chart */}
                 <PaymentMethodsPieChart data={paymentMethodsData} />
-            </div>
-
-            {/* Department Breakdown Tables */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                {/* Emergency Relief Funds */}
-                <div className="bg-white rounded-xl shadow-sm border border-red-100 overflow-hidden">
-                    <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center gap-2">
-                        <AlertTriangle className="w-5 h-5 text-red-600" />
-                        <h3 className="text-lg font-bold text-red-800">Emergency Relief Funds</h3>
-                    </div>
-                    <div className="p-6">
-                        {Object.keys(emergencyStats).length > 0 ? (
-                            <div className="space-y-4">
-                                {Object.entries(emergencyStats).map(([id, data]) => (
-                                    <div key={id} className="flex items-center justify-between p-4 bg-white border border-red-100 rounded-lg shadow-sm">
-                                        <div>
-                                            <div className="font-semibold text-gray-900">{data.name}</div>
-                                            <div className="text-sm text-gray-600">{data.count} donations</div>
-                                        </div>
-                                        <div className="text-lg font-bold text-red-600">{formatCurrency(data.amount)}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8 text-gray-500">
-                                No emergency donations yet.
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* General Department Funds */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center gap-2">
-                        <Building2 className="w-5 h-5 text-gray-600" />
-                        <h3 className="text-lg font-bold text-gray-800">General Departments</h3>
-                    </div>
-                    <div className="p-6">
-                        {Object.keys(generalStats).length > 0 ? (
-                            <div className="space-y-4">
-                                {Object.entries(generalStats).map(([dept, data]) => (
-                                    <div key={dept} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                        <div>
-                                            <div className="font-semibold text-gray-900 capitalize">{dept}</div>
-                                            <div className="text-sm text-gray-600">{data.count} donations</div>
-                                        </div>
-                                        <div className="text-lg font-bold text-gray-700">{formatCurrency(data.amount)}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8 text-gray-500">
-                                No general donations yet.
-                            </div>
-                        )}
-                    </div>
-                </div>
             </div>
         </div>
     );

@@ -76,11 +76,6 @@ export const validateDonationForm = (data) => {
         errors.amount = amountValidation.error;
     }
 
-    // Validate department
-    if (!data.department) {
-        errors.department = 'Please select a department';
-    }
-
     // Validate payment method
     if (!data.paymentMethod) {
         errors.paymentMethod = 'Please select a payment method';

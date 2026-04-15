@@ -18,7 +18,6 @@ export const createDonation = async (donationData) => {
                     full_name: donationData.fullName,
                     email: donationData.email,
                     amount: donationData.amount,
-                    department: donationData.department,
                     payment_method: donationData.paymentMethod,
                     transaction_reference: donationData.transactionReference || null,
                     message: donationData.message || null,
@@ -138,7 +137,7 @@ export const updateDonationTransactionReference = async (donationId, transaction
 
 /**
  * Get all donations (Admin only)
- * @param {object} filters - Optional filters (status, department, dateRange)
+ * @param {object} filters - Optional filters (status, dateRange)
  * @returns {Promise<object>} Array of donations
  */
 export const getAllDonations = async (filters = {}) => {
@@ -150,10 +149,6 @@ export const getAllDonations = async (filters = {}) => {
         // Apply filters
         if (filters.status) {
             query = query.eq('status', filters.status);
-        }
-
-        if (filters.department) {
-            query = query.eq('department', filters.department);
         }
 
         if (filters.startDate) {
@@ -226,24 +221,6 @@ export const getDonationStats = async () => {
 
         if (monthError) throw monthError;
 
-        // Get donations by department
-        const { data: departmentData, error: deptError } = await supabase
-            .from(TABLES.DONATIONS)
-            .select('department, amount')
-            .neq('status', 'failed')
-            .neq('status', 'cancelled');
-
-        if (deptError) throw deptError;
-
-        const byDepartment = departmentData.reduce((acc, donation) => {
-            if (!acc[donation.department]) {
-                acc[donation.department] = { count: 0, amount: 0 };
-            }
-            acc[donation.department].count++;
-            acc[donation.department].amount += donation.amount;
-            return acc;
-        }, {});
-
         return {
             success: true,
             data: {
@@ -251,7 +228,6 @@ export const getDonationStats = async () => {
                 pendingDonations: pendingCount,
                 totalAmount,
                 monthlyDonations: monthCount,
-                byDepartment,
             },
         };
     } catch (error) {
@@ -395,6 +371,90 @@ export const getTimeSeriesData = async (days = 30) => {
         return { success: true, data: Object.values(dailyStats) };
     } catch (error) {
         console.error('Error fetching time-series data:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Get consolidated dashboard metrics for admin in a single donation query.
+ * @param {number} days - Number of days for time-series window
+ * @returns {Promise<object>} Combined stats, time series, and payment methods data
+ */
+export const getDashboardMetrics = async (days = 30) => {
+    try {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+        startDate.setHours(0, 0, 0, 0);
+
+        const firstDayOfMonth = new Date();
+        firstDayOfMonth.setDate(1);
+        firstDayOfMonth.setHours(0, 0, 0, 0);
+
+        const { data, error } = await supabase
+            .from(TABLES.DONATIONS)
+            .select('amount, payment_method, status, created_at')
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        const rows = data || [];
+        const validRows = rows.filter((row) => row.status !== 'failed' && row.status !== 'cancelled');
+        const completedRows = rows.filter((row) => row.status === 'completed');
+
+        const stats = {
+            totalDonations: validRows.length,
+            pendingDonations: rows.filter((row) => row.status === 'pending').length,
+            totalAmount: validRows.reduce((sum, row) => sum + Number(row.amount || 0), 0),
+            monthlyDonations: validRows.filter((row) => new Date(row.created_at) >= firstDayOfMonth).length,
+        };
+
+        const paymentStats = validRows.reduce((acc, row) => {
+            const method = row.payment_method || 'other';
+            if (!acc[method]) {
+                acc[method] = { count: 0, total: 0 };
+            }
+            acc[method].count += 1;
+            acc[method].total += Number(row.amount || 0);
+            return acc;
+        }, {});
+
+        const paymentTotal = Object.values(paymentStats).reduce((sum, item) => sum + item.total, 0);
+        const paymentMethods = Object.entries(paymentStats).map(([method, item]) => ({
+            method,
+            name: method.charAt(0).toUpperCase() + method.slice(1),
+            total: item.total,
+            count: item.count,
+            percentage: paymentTotal > 0 ? ((item.total / paymentTotal) * 100).toFixed(1) : 0,
+        }));
+
+        const dailyStats = {};
+        for (let i = 0; i < days; i += 1) {
+            const d = new Date();
+            d.setDate(d.getDate() - (days - 1 - i));
+            const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            dailyStats[label] = { date: label, count: 0, total: 0 };
+        }
+
+        completedRows
+            .filter((row) => new Date(row.created_at) >= startDate)
+            .forEach((row) => {
+                const label = new Date(row.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                if (dailyStats[label]) {
+                    dailyStats[label].count += 1;
+                    dailyStats[label].total += Number(row.amount || 0);
+                }
+            });
+
+        return {
+            success: true,
+            data: {
+                stats,
+                paymentMethods,
+                timeSeries: Object.values(dailyStats),
+            },
+        };
+    } catch (error) {
+        console.error('Error fetching consolidated dashboard metrics:', error);
         return { success: false, error: error.message };
     }
 };

@@ -1,191 +1,376 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe } from 'lucide-react';
-import CTAButton from './CTAButton';
+import { ArrowRight, BookOpen, ChevronDown, CircleHelp, Globe, Mail, Menu, PhoneCall, Sparkles } from 'lucide-react';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Dialog, DialogContent, DialogTitle } from './ui/Dialog';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from './ui/Select';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LANGUAGES } from '../utils/constants';
 
 const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
     const location = useLocation();
     const { t, currentLanguage, changeLanguage } = useLanguage();
 
-    const navLinks = [
+    const primaryLinks = [
         { path: '/', label: t('nav.home') },
-        { path: '/departments', label: t('nav.departments') },
-        { path: '/track', label: t('nav.track') },
         { path: '/impact', label: t('nav.impact') },
-        {path: '/research', label: t('nav.research') },
-        { path: '/about', label: t('nav.about') },
-        { path: '/contact', label: t('nav.contact') },
-        { path: '/faq', label: t('nav.faq') },
+    ];
+
+    const secondaryLinks = [
+        { path: '/track', label: t('nav.track'), icon: ArrowRight },
+        { path: '/research', label: t('nav.research'), icon: BookOpen },
+        { path: '/about', label: t('nav.about'), icon: Sparkles },
+        { path: '/contact', label: t('nav.contact'), icon: Mail },
+        { path: '/faq', label: t('nav.faq'), icon: CircleHelp },
+    ];
+
+    const policyLinks = [
+        { path: '/privacy', label: t('footer.privacy') },
+        { path: '/terms', label: t('footer.terms') },
     ];
 
     const isActive = (path) => location.pathname === path;
+    const isSecondaryActive = [...secondaryLinks, ...policyLinks].some((link) => isActive(link.path));
+
+    const languageLabel = LANGUAGES.find((lang) => lang.code === currentLanguage)?.name || currentLanguage;
+
+    const linkClasses = (active) => [
+        'inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200',
+        active
+            ? 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/10'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+    ].join(' ');
+
+    const mobileSectionLinkClasses = (active) => [
+        'flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all duration-200',
+        active
+            ? 'border-primary/20 bg-primary/5 text-primary shadow-sm'
+            : 'border-border bg-background hover:border-primary/20 hover:bg-muted/60',
+    ].join(' ');
+
+    const closeMobileMenu = () => setMobileMenuOpen(false);
 
     return (
-        <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
-            <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16 md:h-20">
-                    {/* Logo - Left Side */}
-                    <Link to="/" className="flex-shrink-0">
-                        <img
-                            src="/logo.jpg"
-                            alt="AFGHANIUM"
-                            className="h-10 w-auto md:h-12"
-                        />
+        <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur-xl">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+            <div className="container-custom">
+                <div className="flex h-16 items-center justify-between gap-3 md:h-20">
+                    <Link to="/" className="group flex flex-shrink-0 items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/10 transition-transform duration-200 group-hover:scale-105">
+                            <img
+                                src="/logo.jpg"
+                                alt="AFGHANIUM"
+                                className="h-8 w-8 rounded-xl object-cover"
+                            />
+                        </div>
+                        <div className="hidden sm:block">
+                            <div className="font-display text-lg font-bold tracking-tight text-foreground">
+                                AFGHANIUM
+                            </div>
+                            <div className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
+                                Humanitarian network
+                            </div>
+                        </div>
                     </Link>
 
-                    {/* Desktop Navigation - Center */}
-                    <div className="hidden lg:flex items-center space-x-8 flex-1 justify-end pr-6">
-                        {navLinks.map((link) => (
-                            <Link
+                    <div className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2">
+                        {primaryLinks.map((link) => (
+                            <Button
                                 key={link.path}
-                                to={link.path}
-                                className={`text-sm font-semibold uppercase tracking-wide transition-all duration-200 ${isActive(link.path)
-                                    ? 'text-primary border-b-2 border-primary pb-1'
-                                    : 'text-gray-700 hover:text-primary'
-                                    }`}
+                                asChild
+                                variant="ghost"
+                                size="sm"
+                                className={linkClasses(isActive(link.path))}
                             >
-                                {link.label}
-                            </Link>
+                                <Link to={link.path}>{link.label}</Link>
+                            </Button>
                         ))}
 
-                        {/* Language Switcher */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
-                                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                                aria-label="Change language"
-                            >
-                                <Globe className="w-5 h-5" />
-                                <span className="text-xs font-bold uppercase">{currentLanguage}</span>
-                            </button>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={[
+                                        linkClasses(isSecondaryActive),
+                                        'gap-1.5 pr-3',
+                                    ].join(' ')}
+                                >
+                                    <span>More</span>
+                                    <ChevronDown className="h-4 w-4" />
+                                </Button>
+                            </PopoverTrigger>
 
-                            {languageMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                                    {LANGUAGES.map((lang) => (
-                                        <button
-                                            key={lang.code}
-                                            onClick={() => {
-                                                changeLanguage(lang.code);
-                                                setLanguageMenuOpen(false);
-                                            }}
-                                            className={`block w-full text-left px-4 py-3 text-sm transition-colors ${currentLanguage === lang.code
-                                                ? 'bg-primary text-white font-bold'
-                                                : 'text-gray-700 hover:bg-gray-50'
-                                                }`}
-                                        >
-                                            {lang.name}
-                                        </button>
-                                    ))}
+                            <PopoverContent className="w-[28rem] p-0" align="center">
+                                <div className="border-b border-border/70 bg-muted/30 px-5 py-4">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div>
+                                            <p className="text-sm font-semibold text-foreground">Everything in one place</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                Quick access to support, stories, and policies.
+                                            </p>
+                                        </div>
+                                        <Badge variant="secondary" className="gap-1.5 px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+                                            <Sparkles className="h-3 w-3" />
+                                            Updated
+                                        </Badge>
+                                    </div>
                                 </div>
-                            )}
+
+                                <div className="grid gap-4 p-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <p className="px-1 text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                            Explore
+                                        </p>
+                                        <div className="space-y-1">
+                                            {secondaryLinks.map((link) => {
+                                                const Icon = link.icon;
+
+                                                return (
+                                                    <Button
+                                                        key={link.path}
+                                                        asChild
+                                                        variant="ghost"
+                                                        className={[
+                                                            'h-auto w-full justify-start gap-3 rounded-xl px-3 py-3 text-left',
+                                                            isActive(link.path)
+                                                                ? 'bg-primary/10 text-primary'
+                                                                : 'hover:bg-muted',
+                                                        ].join(' ')}
+                                                    >
+                                                        <Link to={link.path}>
+                                                            <Icon className="h-4 w-4 shrink-0" />
+                                                            <span>{link.label}</span>
+                                                        </Link>
+                                                    </Button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <p className="px-1 text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                            Policies
+                                        </p>
+                                        <div className="space-y-1">
+                                            {policyLinks.map((link) => (
+                                                <Button
+                                                    key={link.path}
+                                                    asChild
+                                                    variant="ghost"
+                                                    className={[
+                                                        'h-auto w-full justify-start rounded-xl px-3 py-3 text-left',
+                                                        isActive(link.path)
+                                                            ? 'bg-primary/10 text-primary'
+                                                            : 'hover:bg-muted',
+                                                    ].join(' ')}
+                                                >
+                                                    <Link to={link.path}>{link.label}</Link>
+                                                </Button>
+                                            ))}
+                                        </div>
+
+                                        <div className="rounded-2xl border border-border bg-gradient-to-br from-primary/5 to-primary/10 p-4">
+                                            <p className="text-sm font-semibold text-foreground">Need help fast?</p>
+                                            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                                                Jump straight to donation or contact the team.
+                                            </p>
+                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                <Button asChild size="sm" className="rounded-full px-4">
+                                                    <Link to="/donate">Donate now</Link>
+                                                </Button>
+                                                <Button asChild variant="outline" size="sm" className="rounded-full px-4">
+                                                    <Link to="/contact">Contact</Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    <div className="hidden lg:flex items-center gap-3">
+                        <div className="hidden xl:block min-w-36">
+                            <Select value={currentLanguage} onValueChange={changeLanguage}>
+                                <SelectTrigger className="h-11 rounded-full border-border bg-background px-4 text-sm shadow-sm">
+                                    <Globe className="mr-2 h-4 w-4 text-muted-foreground" />
+                                    <SelectValue placeholder={languageLabel} />
+                                </SelectTrigger>
+                                <SelectContent align="end">
+                                    {LANGUAGES.map((lang) => (
+                                        <SelectItem key={lang.code} value={lang.code}>
+                                            {lang.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
+
+                        <Button asChild variant="outline" className="h-11 rounded-full px-6">
+                            <Link to="/shop">Shop</Link>
+                        </Button>
+
+                        <Button asChild className="h-11 rounded-full px-6 shadow-lg shadow-primary/20">
+                            <Link to="/donate">Donate</Link>
+                        </Button>
                     </div>
 
-                    {/* Donate Button - Desktop */}
-                    <div className="hidden lg:block">
-                        <CTAButton to="/donate" size="md" className="font-bold">
-                            {t('nav.donate')}
-                        </CTAButton>
-                    </div>
-
-                    {/* Mobile Menu Button */}
                     <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                        aria-label="Toggle menu"
+                        onClick={() => setMobileMenuOpen(true)}
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-all hover:bg-muted lg:hidden"
+                        aria-label="Open menu"
                     >
-                        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        <Menu className="h-5 w-5" />
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay & Drawer */}
-            {mobileMenuOpen && (
-                <div className="fixed inset-0 z-50 lg:hidden">
-                    {/* Backdrop */}
-                    <div
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-                        onClick={() => setMobileMenuOpen(false)}
-                    />
+            <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <DialogContent className="!left-auto !top-0 !h-[100dvh] !w-[min(92vw,24rem)] !max-w-none !translate-x-0 !translate-y-0 !rounded-none !border-l !border-t-0 !border-r-0 !border-b-0 !p-0 sm:!w-[24rem]">
+                    <DialogTitle className="sr-only">Mobile navigation</DialogTitle>
 
-                    {/* Drawer */}
-                    <div className="fixed right-0 top-0 bottom-0 w-[280px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col">
-                        {/* Drawer Header */}
-                        <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                            <span className="font-bold text-lg text-gray-900">Menu</span>
-                            <button
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        {/* Drawer Content */}
-                        <div className="flex-1 overflow-y-auto py-4">
-                            <div className="px-4 space-y-1">
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.path}
-                                        to={link.path}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(link.path)
-                                            ? 'bg-primary/10 text-primary font-bold'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                            }`}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                ))}
+                    <div className="flex h-full flex-col bg-background">
+                        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/10">
+                                    <img src="/logo.jpg" alt="AFGHANIUM" className="h-8 w-8 rounded-xl object-cover" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold uppercase tracking-[0.22em] text-foreground">AFGHANIUM</p>
+                                    <p className="text-xs text-muted-foreground">Navigation</p>
+                                </div>
                             </div>
 
-                            <div className="mt-6 px-4">
-                                <div className="h-px bg-gray-100 mb-6" />
+                        </div>
 
-                                {/* Language Selector */}
-                                <div className="space-y-3">
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-2">
-                                        {t('common.language')}
+                        <div className="flex-1 overflow-y-auto px-5 py-5">
+                            <div className="mb-5 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/10 to-primary/5 p-4">
+                                <div className="flex items-center gap-2">
+                                    <Badge variant="secondary" className="px-2.5 py-0.5 text-[10px] uppercase tracking-[0.24em]">
+                                        Fast access
+                                    </Badge>
+                                </div>
+                                <p className="mt-3 text-sm font-medium text-foreground">
+                                    Find donation paths, updates, and support without digging through the page.
+                                </p>
+                            </div>
+
+                            <div className="space-y-5">
+                                <div>
+                                    <p className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                        Main
                                     </p>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {LANGUAGES.map((lang) => (
-                                            <button
-                                                key={lang.code}
-                                                onClick={() => {
-                                                    changeLanguage(lang.code);
-                                                    setMobileMenuOpen(false);
-                                                }}
-                                                className={`px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${currentLanguage === lang.code
-                                                    ? 'bg-primary text-white border-primary shadow-sm'
-                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                                    }`}
+                                    <div className="grid gap-2">
+                                        {primaryLinks.map((link) => (
+                                            <Link
+                                                key={link.path}
+                                                to={link.path}
+                                                onClick={closeMobileMenu}
+                                                className={mobileSectionLinkClasses(isActive(link.path))}
                                             >
-                                                {lang.code}
-                                            </button>
+                                                <span className="font-medium">{link.label}</span>
+                                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                            </Link>
                                         ))}
                                     </div>
+                                </div>
+
+                                <div>
+                                    <p className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                        More
+                                    </p>
+                                    <div className="grid gap-2">
+                                        {secondaryLinks.map((link) => (
+                                            <Link
+                                                key={link.path}
+                                                to={link.path}
+                                                onClick={closeMobileMenu}
+                                                className={mobileSectionLinkClasses(isActive(link.path))}
+                                            >
+                                                <span className="font-medium">{link.label}</span>
+                                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                        Policies
+                                    </p>
+                                    <div className="grid gap-2">
+                                        {policyLinks.map((link) => (
+                                            <Link
+                                                key={link.path}
+                                                to={link.path}
+                                                onClick={closeMobileMenu}
+                                                className={mobileSectionLinkClasses(isActive(link.path))}
+                                            >
+                                                <span className="font-medium">{link.label}</span>
+                                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="rounded-3xl border border-border bg-muted/30 p-4">
+                                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                        Language
+                                    </p>
+                                    <Select value={currentLanguage} onValueChange={changeLanguage}>
+                                        <SelectTrigger className="mt-3 h-12 w-full rounded-2xl bg-background px-4">
+                                            <Globe className="mr-2 h-4 w-4 text-muted-foreground" />
+                                            <SelectValue placeholder={languageLabel} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {LANGUAGES.map((lang) => (
+                                                <SelectItem key={lang.code} value={lang.code}>
+                                                    {lang.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Drawer Footer */}
-                        <div className="p-4 border-t border-gray-100 bg-gray-50">
-                            <CTAButton
-                                to="/donate"
-                                fullWidth
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="shadow-lg"
-                            >
-                                {t('nav.donate')}
-                            </CTAButton>
+                        <div className="border-t border-border bg-background px-5 py-4">
+                            <div className="grid gap-3">
+                                <Button asChild variant="outline" className="h-12 rounded-2xl px-5">
+                                    <Link to="/shop" onClick={closeMobileMenu}>
+                                        Shop
+                                    </Link>
+                                </Button>
+                                <Button asChild className="h-12 rounded-2xl px-5 shadow-lg shadow-primary/20">
+                                    <Link to="/donate" onClick={closeMobileMenu}>
+                                        Donate now
+                                    </Link>
+                                </Button>
+                                <Button asChild variant="outline" className="h-12 rounded-2xl px-5">
+                                    <Link to="/track" onClick={closeMobileMenu}>
+                                        Track donation
+                                    </Link>
+                                </Button>
+                                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                                    <PhoneCall className="h-3.5 w-3.5" />
+                                    <span>Support and donation guidance are a tap away.</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                </DialogContent>
+            </Dialog>
         </nav>
     );
 };

@@ -53,31 +53,18 @@ const StatsSection = () => {
                 console.error('Error counting impacts:', impactError);
             }
 
-            // Get unique departments (active projects)
-            const { data: departments, error: deptError } = await supabase
-                .from('donations')
-                .select('department')
-                .neq('status', 'failed')
-                .neq('status', 'cancelled');
-
-            if (deptError) {
-                console.error('Error fetching departments:', deptError);
-            }
-
-            const uniqueDepartments = new Set(departments?.map(d => d.department).filter(Boolean) || []);
-
             console.log('Stats loaded:', {
                 totalRaised,
                 donationCount,
                 impactCount,
-                departments: uniqueDepartments.size
+                impacts: impactCount
             });
 
             setStats({
                 totalRaised: Math.round(totalRaised),
                 totalDonations: donationCount || 0,
                 livesImpacted: Math.floor(totalRaised / 20), // Estimate: $20 helps 1 person
-                activeProjects: uniqueDepartments.size || 6, // Default to 6 if no data
+                activeProjects: impactCount || 6,
             });
         } catch (error) {
             console.error('Error fetching stats:', error);

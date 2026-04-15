@@ -1,7 +1,7 @@
 {
     "nav": {
         "home": "Home",
-        "departments": "Departments",
+        "products": "Products",
         "donate": "Donate Now",
         "track": "Track Donation",
         "impact": "Impact Roadmap",
@@ -13,20 +13,14 @@
     },
     "hero": {
         "title": "Help Transform Lives in Afghanistan",
-        "subtitle": "Your donation provides hope, dignity, and a brighter future for those in need",
-        "cta": "Make a Difference Today"
+        "subtitle": "A social enterprise connecting authentic Afghan products to global buyers while keeping donations as a channel for direct impact.",
+        "cta": "Support the Mission"
     },
     "stats": {
         "donated": "Total Donated",
         "helped": "People Helped",
         "projects": "Active Projects",
         "volunteers": "Volunteers"
-    },
-    "departments": {
-        "title": "Our Departments",
-        "subtitle": "Choose where your donation makes the most impact",
-        "viewAll": "View All Departments",
-        "donateNow": "Donate to This Cause"
     },
     "donation": {
         "form": {
@@ -35,7 +29,6 @@
             "email": "Email Address",
             "amount": "Donation Amount",
             "customAmount": "Custom Amount",
-            "department": "Select Department",
             "paymentMethod": "Payment Method",
             "message": "Optional Message",
             "submit": "Proceed to Payment",
@@ -67,7 +60,6 @@
         "title": "Impact Roadmap",
         "subtitle": "Why Afghanium Exists: Building Market Access for Afghan Producers",
         "cost": "Project Cost",
-        "department": "Department",
         "noImpacts": "No impact stories yet"
     },
     "research": {

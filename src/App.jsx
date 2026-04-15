@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ToastProvider } from './contexts/ToastContext';
 
@@ -12,10 +12,10 @@ import BackToTop from './components/BackToTop';
 
 // Pages
 import Home from './pages/Home';
-import DepartmentsPage from './pages/DepartmentsPage';
 import Donate from './pages/Donate';
 import TrackDonation from './pages/TrackDonation';
 import ImpactStories from './pages/ImpactStories';
+import Products from './pages/Products';
 import Research from './pages/Research';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -29,7 +29,7 @@ import AdminPage from './pages/AdminPage';
 
 // Admin Components
 import AdminDashboard from './components/Admin/AdminDashboard';
-import AdminStats from './components/Admin/AdminStats';
+import AdminDashboardPage from './components/Admin/AdminDashboardPage';
 import DonationsList from './components/Admin/DonationsList';
 import ImpactList from './components/Admin/ImpactList';
 import AdminInbox from './components/Admin/AdminInbox';
@@ -37,7 +37,7 @@ import AdminSettings from './components/Admin/AdminSettings';
 import AdminContent from './components/Admin/AdminContent';
 import AdminEmergency from './components/Admin/AdminEmergency';
 import AdminResearch from './components/Admin/AdminResearch';
-import AdminDepartments from './components/Admin/AdminDepartments';
+import AdminProducts from './components/Admin/AdminProducts';
 
 // Layout wrapper for public pages
 const PublicLayout = ({ children }) => (
@@ -62,12 +62,13 @@ function App() {
           <Routes>
             {/* Public Routes with Layout */}
             <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-            <Route path="/departments" element={<PublicLayout><DepartmentsPage /></PublicLayout>} />
             <Route path="/donate" element={<PublicLayout><Donate /></PublicLayout>} />
             <Route path="/donation-success" element={<PublicLayout><DonationSuccess /></PublicLayout>} />
             <Route path="/debug" element={<DebugStats />} />
             <Route path="/track" element={<PublicLayout><TrackDonation /></PublicLayout>} />
             <Route path="/impact" element={<PublicLayout><ImpactStories /></PublicLayout>} />
+            <Route path="/shop" element={<Products />} />
+            <Route path="/products" element={<Navigate to="/shop" replace />} />
             <Route path="/research" element={<PublicLayout><Research /></PublicLayout>} />
             <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
             <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
@@ -78,13 +79,13 @@ function App() {
             {/* Admin Routes (No Layout) */}
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin" element={<AdminDashboard />}>
-              <Route path="dashboard" element={<AdminStats />} />
+              <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="donations" element={<DonationsList />} />
               <Route path="impacts" element={<ImpactList />} />
               <Route path="inbox" element={<AdminInbox />} />
               <Route path="emergency" element={<AdminEmergency />} />
               <Route path="research" element={<AdminResearch />} />
-              <Route path="departments" element={<AdminDepartments />} />
+              <Route path="products" element={<AdminProducts />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>

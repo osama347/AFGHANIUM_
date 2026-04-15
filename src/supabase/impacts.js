@@ -40,7 +40,6 @@ const notifyImpactEmail = async (impactRow) => {
                 title: impactRow.title,
                 description: impactRow.description,
                 cost: impactRow.cost,
-                department: impactRow.department,
                 image_url: impactRow.image_url,
                 media: impactRow.media || [],
             },
@@ -77,7 +76,6 @@ export const createImpact = async (impactData) => {
             title: impactData.title,
             description: impactData.description,
             cost: impactData.cost,
-            department: impactData.department,
             image_url: impactData.imageUrl, // Keep for backward compatibility
             media: impactData.media || [], // New field for multiple media
             donation_id: impactData.donationId || null,
@@ -126,10 +124,6 @@ export const getAllImpacts = async (filters = {}) => {
             .from(TABLES.IMPACTS)
             .select('*');
 
-        if (filters.department) {
-            query = query.eq('department', filters.department);
-        }
-
         if (filters.donationId) {
             query = query.eq('donation_id', filters.donationId);
         }
@@ -146,15 +140,6 @@ export const getAllImpacts = async (filters = {}) => {
         console.error('Error fetching impacts:', error);
         return { success: false, error: error.message };
     }
-};
-
-/**
- * Get impacts by department
- * @param {string} department - Department ID
- * @returns {Promise<object>} Array of impacts
- */
-export const getImpactsByDepartment = async (department) => {
-    return getAllImpacts({ department });
 };
 
 /**

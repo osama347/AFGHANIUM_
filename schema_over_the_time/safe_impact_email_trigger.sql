@@ -38,7 +38,6 @@ BEGIN
         'title', NEW.title,
         'description', NEW.description,
         'cost', NEW.cost,
-        'department', NEW.department,
         'donation_id', NEW.donation_id,
         'image_url', NEW.image_url,
         'media', COALESCE(NEW.media, '[]'::jsonb)

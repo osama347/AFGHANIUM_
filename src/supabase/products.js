@@ -1,54 +1,45 @@
 import { supabase, TABLES } from './client';
 
-/**
- * Get active departments for public forms and impact creation.
- */
-export const getActiveDepartments = async () => {
+export const getActiveProducts = async () => {
     try {
         const { data, error } = await supabase
-            .from(TABLES.DEPARTMENTS)
+            .from(TABLES.PRODUCTS)
             .select('*')
             .eq('is_active', true)
             .order('display_order', { ascending: true })
-            .order('created_at', { ascending: true });
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
         return { success: true, data: data || [] };
     } catch (error) {
-        console.error('Error fetching active departments:', error);
+        console.error('Error fetching active products:', error);
         return { success: false, error: error.message };
     }
 };
 
-/**
- * Get all departments for admin management.
- */
-export const getAllDepartments = async () => {
+export const getAllProducts = async () => {
     try {
         const { data, error } = await supabase
-            .from(TABLES.DEPARTMENTS)
+            .from(TABLES.PRODUCTS)
             .select('*')
             .order('display_order', { ascending: true })
-            .order('created_at', { ascending: true });
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
         return { success: true, data: data || [] };
     } catch (error) {
-        console.error('Error fetching all departments:', error);
+        console.error('Error fetching all products:', error);
         return { success: false, error: error.message };
     }
 };
 
-/**
- * Create a department.
- */
-export const createDepartment = async (departmentData) => {
+export const createProduct = async (payload) => {
     try {
         const { data, error } = await supabase
-            .from(TABLES.DEPARTMENTS)
-            .insert([departmentData])
+            .from(TABLES.PRODUCTS)
+            .insert([payload])
             .select()
             .single();
 
@@ -56,22 +47,16 @@ export const createDepartment = async (departmentData) => {
 
         return { success: true, data };
     } catch (error) {
-        console.error('Error creating department:', error);
+        console.error('Error creating product:', error);
         return { success: false, error: error.message };
     }
 };
 
-/**
- * Update department by ID.
- */
-export const updateDepartment = async (id, updates) => {
+export const updateProduct = async (id, updates) => {
     try {
         const { data, error } = await supabase
-            .from(TABLES.DEPARTMENTS)
-            .update({
-                ...updates,
-                updated_at: new Date().toISOString(),
-            })
+            .from(TABLES.PRODUCTS)
+            .update({ ...updates, updated_at: new Date().toISOString() })
             .eq('id', id)
             .select()
             .single();
@@ -80,25 +65,19 @@ export const updateDepartment = async (id, updates) => {
 
         return { success: true, data };
     } catch (error) {
-        console.error('Error updating department:', error);
+        console.error('Error updating product:', error);
         return { success: false, error: error.message };
     }
 };
 
-/**
- * Toggle whether a department is available.
- */
-export const toggleDepartmentStatus = async (id, isActive) => {
-    return updateDepartment(id, { is_active: isActive });
+export const toggleProductStatus = async (id, isActive) => {
+    return updateProduct(id, { is_active: isActive });
 };
 
-/**
- * Delete a department.
- */
-export const deleteDepartment = async (id) => {
+export const deleteProduct = async (id) => {
     try {
         const { error } = await supabase
-            .from(TABLES.DEPARTMENTS)
+            .from(TABLES.PRODUCTS)
             .delete()
             .eq('id', id);
 
@@ -106,7 +85,7 @@ export const deleteDepartment = async (id) => {
 
         return { success: true };
     } catch (error) {
-        console.error('Error deleting department:', error);
+        console.error('Error deleting product:', error);
         return { success: false, error: error.message };
     }
 };

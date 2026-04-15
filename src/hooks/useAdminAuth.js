@@ -27,7 +27,12 @@ export const useAdminAuth = () => {
             if (mounted) {
                 setUser(session?.user || null);
                 setIsAuthenticated(!!session);
-                setLoading(false);
+
+                // Keep initial loading controlled by checkInitialAuth to avoid
+                // redirect races on INITIAL_SESSION during page refresh/navigation.
+                if (_event !== 'INITIAL_SESSION') {
+                    setLoading(false);
+                }
             }
         });
 
@@ -47,6 +52,12 @@ export const useAdminAuth = () => {
             if (result.success) {
                 setIsAuthenticated(result.isAuthenticated);
                 setUser(result.user);
+            } else {
+                setIsAuthenticated(false);
+                setUser(null);
+                if (result.error) {
+                    setError(result.error);
+                }
             }
         } catch (err) {
             console.error('Check initial auth failed:', err);
@@ -63,8 +74,10 @@ export const useAdminAuth = () => {
         const result = await adminLogin(email, password);
 
         if (result.success) {
-            setUser(result.data.user);
-            setIsAuthenticated(true);
+            const authUser = result.data?.user || null;
+            const hasSession = Boolean(result.data?.session);
+            setUser(authUser);
+            setIsAuthenticated(Boolean(authUser) || hasSession);
         } else {
             setError(result.error);
         }

@@ -9,6 +9,7 @@ import {
     getDailyDonationStats,
     getPaymentMethodsStats,
     getTimeSeriesData,
+    getDashboardMetrics,
 } from '../supabase/donations.js';
 
 /**
@@ -18,121 +19,58 @@ export const useDonation = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const create = async (donationData) => {
+    const run = async (operation) => {
         setLoading(true);
         setError(null);
-        const result = await createDonation(donationData);
-        setLoading(false);
+
+        const result = await operation();
 
         if (!result.success) {
             setError(result.error);
         }
 
+        setLoading(false);
         return result;
+    };
+
+    const create = async (donationData) => {
+        return run(() => createDonation(donationData));
     };
 
     const getById = async (donationId) => {
-        setLoading(true);
-        setError(null);
-        const result = await getDonationById(donationId);
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => getDonationById(donationId));
     };
 
     const getByName = async (fullName) => {
-        setLoading(true);
-        setError(null);
-        const result = await getDonationsByName(fullName);
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => getDonationsByName(fullName));
     };
 
     const updateStatus = async (donationId, status) => {
-        setLoading(true);
-        setError(null);
-        const result = await updateDonationStatus(donationId, status);
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => updateDonationStatus(donationId, status));
     };
 
     const getAll = async (filters) => {
-        setLoading(true);
-        setError(null);
-        const result = await getAllDonations(filters);
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => getAllDonations(filters));
     };
 
     const getStats = async () => {
-        setLoading(true);
-        setError(null);
-        const result = await getDonationStats();
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => getDonationStats());
     };
 
     const getDailyStats = async () => {
-        setLoading(true);
-        setError(null);
-        const result = await getDailyDonationStats();
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => getDailyDonationStats());
     };
 
     const getPaymentMethods = async () => {
-        setLoading(true);
-        setError(null);
-        const result = await getPaymentMethodsStats();
-        setLoading(false);
-
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+        return run(() => getPaymentMethodsStats());
     };
 
     const getTimeSeries = async (days = 30) => {
-        setLoading(true);
-        setError(null);
-        const result = await getTimeSeriesData(days);
-        setLoading(false);
+        return run(() => getTimeSeriesData(days));
+    };
 
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        return result;
+    const getDashboardData = async (days = 30) => {
+        return run(() => getDashboardMetrics(days));
     };
 
     return {
@@ -145,6 +83,7 @@ export const useDonation = () => {
         getDailyStats,
         getPaymentMethods,
         getTimeSeries,
+        getDashboardData,
         loading,
         error,
     };

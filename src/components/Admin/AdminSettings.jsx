@@ -30,8 +30,10 @@ const AdminSettings = () => {
     const fetchAboutUsContent = async () => {
         setLoadingAboutUs(true);
         try {
-            const longResult = await getContent('about_us_long');
-            const shortResult = await getContent('about_us_short');
+            const [longResult, shortResult] = await Promise.all([
+                getContent('about_us_long'),
+                getContent('about_us_short'),
+            ]);
             
             setAboutUsForm({
                 longVersion: longResult.data || '',
@@ -122,8 +124,10 @@ const AdminSettings = () => {
         setAboutUsStatus({ loading: true, error: null, success: false });
 
         try {
-            const longResult = await updateContent('about_us_long', aboutUsForm.longVersion);
-            const shortResult = await updateContent('about_us_short', aboutUsForm.shortVersion);
+            const [longResult, shortResult] = await Promise.all([
+                updateContent('about_us_long', aboutUsForm.longVersion),
+                updateContent('about_us_short', aboutUsForm.shortVersion),
+            ]);
 
             if (!longResult.success || !shortResult.success) {
                 throw new Error('Failed to update About Us content');

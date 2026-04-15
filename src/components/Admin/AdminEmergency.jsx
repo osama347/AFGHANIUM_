@@ -1,61 +1,332 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useEmergencyCampaign } from '../../hooks/useEmergencyCampaign';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import {
+    Plus,
+    Edit2,
+    Trash2,
+    Eye,
+    EyeOff,
+    AlertTriangle,
+    Target,
+    Heart,
+    Search,
+    Calendar,
+} from 'lucide-react';
 import Loader from '../Loader';
 import { useToast } from '../../contexts/ToastContext';
-import { supabase } from '../../supabase/client';
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/Card';
+import { Badge } from '../ui/Badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '../ui/Dialog';
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
+import { Textarea } from '../ui/FormElements';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
+import { cn } from '../../lib/utils';
+
+const toDateInputValue = (value) => {
+    if (!value) return '';
+    return String(value).split('T')[0];
+};
+
+const getInitialFormValues = (campaign = null) => ({
+    name_en: campaign?.name_en || '',
+    name_dari: campaign?.name_dari || '',
+    name_pashto: campaign?.name_pashto || '',
+    description_en: campaign?.description_en || '',
+    description_dari: campaign?.description_dari || '',
+    description_pashto: campaign?.description_pashto || '',
+    impact_message_en: campaign?.impact_message_en || '',
+    impact_message_dari: campaign?.impact_message_dari || '',
+    impact_message_pashto: campaign?.impact_message_pashto || '',
+    icon: campaign?.icon || '🚨',
+    goal_amount: campaign?.goal_amount || '',
+    urgent_until: toDateInputValue(campaign?.urgent_until),
+    priority: campaign?.priority || 1,
+});
+
+const CampaignForm = ({
+    mode,
+    initialValues,
+    onSubmit,
+    onCancel,
+    isSubmitting,
+}) => {
+    const [form, setForm] = useState(initialValues);
+
+    useEffect(() => {
+        setForm(initialValues);
+    }, [initialValues]);
+
+    const isEditMode = mode === 'edit';
+
+    const handleChange = (field, value) => {
+        setForm((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit({
+            ...form,
+            goal_amount: parseFloat(form.goal_amount) || 0,
+            priority: parseInt(form.priority, 10) || 1,
+            urgent_until: form.urgent_until || null,
+        });
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                    <Label htmlFor="name_en">Campaign Name (English) *</Label>
+                    <Input
+                        id="name_en"
+                        required
+                        value={form.name_en}
+                        onChange={(e) => handleChange('name_en', e.target.value)}
+                        placeholder="Herat Earthquake Relief"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="name_dari">Campaign Name (Dari)</Label>
+                    <Input
+                        id="name_dari"
+                        dir="rtl"
+                        value={form.name_dari}
+                        onChange={(e) => handleChange('name_dari', e.target.value)}
+                        placeholder="نام کمپین"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="name_pashto">Campaign Name (Pashto)</Label>
+                    <Input
+                        id="name_pashto"
+                        dir="rtl"
+                        value={form.name_pashto}
+                        onChange={(e) => handleChange('name_pashto', e.target.value)}
+                        placeholder="د کمپاین نوم"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                    <Label htmlFor="description_en">Description (English) *</Label>
+                    <Textarea
+                        id="description_en"
+                        required
+                        rows={4}
+                        value={form.description_en}
+                        onChange={(e) => handleChange('description_en', e.target.value)}
+                        placeholder="Emergency aid for families affected by..."
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="description_dari">Description (Dari)</Label>
+                    <Textarea
+                        id="description_dari"
+                        rows={4}
+                        dir="rtl"
+                        value={form.description_dari}
+                        onChange={(e) => handleChange('description_dari', e.target.value)}
+                        placeholder="توضیحات"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="description_pashto">Description (Pashto)</Label>
+                    <Textarea
+                        id="description_pashto"
+                        rows={4}
+                        dir="rtl"
+                        value={form.description_pashto}
+                        onChange={(e) => handleChange('description_pashto', e.target.value)}
+                        placeholder="توضیحات"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                    <Label htmlFor="impact_message_en">Impact Message (English)</Label>
+                    <Input
+                        id="impact_message_en"
+                        value={form.impact_message_en}
+                        onChange={(e) => handleChange('impact_message_en', e.target.value)}
+                        placeholder="Your $50 provides emergency shelter..."
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="impact_message_dari">Impact Message (Dari)</Label>
+                    <Input
+                        id="impact_message_dari"
+                        dir="rtl"
+                        value={form.impact_message_dari}
+                        onChange={(e) => handleChange('impact_message_dari', e.target.value)}
+                        placeholder="پیام تاثیر"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="impact_message_pashto">Impact Message (Pashto)</Label>
+                    <Input
+                        id="impact_message_pashto"
+                        dir="rtl"
+                        value={form.impact_message_pashto}
+                        onChange={(e) => handleChange('impact_message_pashto', e.target.value)}
+                        placeholder="د اغیزې پیغام"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                <div className="space-y-2">
+                    <Label htmlFor="icon">Icon (Emoji) *</Label>
+                    <Input
+                        id="icon"
+                        required
+                        maxLength={4}
+                        className="text-center text-xl"
+                        value={form.icon}
+                        onChange={(e) => handleChange('icon', e.target.value)}
+                        placeholder="🚨"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="goal_amount">Goal Amount ($) *</Label>
+                    <Input
+                        id="goal_amount"
+                        type="number"
+                        required
+                        min="1"
+                        step="0.01"
+                        value={form.goal_amount}
+                        onChange={(e) => handleChange('goal_amount', e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="urgent_until">Expires On (Optional)</Label>
+                    <Input
+                        id="urgent_until"
+                        type="date"
+                        value={form.urgent_until}
+                        onChange={(e) => handleChange('urgent_until', e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="priority">Priority (1 = High)</Label>
+                    <Input
+                        id="priority"
+                        type="number"
+                        min="1"
+                        value={form.priority}
+                        onChange={(e) => handleChange('priority', e.target.value)}
+                    />
+                </div>
+            </div>
+
+            <div className="flex flex-col-reverse justify-end gap-2 border-t pt-4 sm:flex-row">
+                <Button type="button" variant="outline" onClick={onCancel}>
+                    Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : isEditMode ? 'Save Changes' : 'Create Campaign'}
+                </Button>
+            </div>
+        </form>
+    );
+};
 
 const AdminEmergency = () => {
     const { getAll, toggleVisibility, remove, create, update, loading } = useEmergencyCampaign();
     const [campaigns, setCampaigns] = useState([]);
-    const [showForm, setShowForm] = useState(false);
-    const [editingCampaign, setEditingCampaign] = useState(null); // Track which campaign is being edited
-    const [loadingStates, setLoadingStates] = useState({}); // Track loading for individual campaigns
-    const [isCreating, setIsCreating] = useState(false); // Track creating state
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [editingCampaign, setEditingCampaign] = useState(null);
+    const [loadingStates, setLoadingStates] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
     const { showToast } = useToast();
 
     useEffect(() => {
-        // Initial fetch of campaigns
         fetchCampaigns();
-        // No real-time subscription here; UI will refresh after each action
     }, []);
 
     const fetchCampaigns = async () => {
-        console.log('Fetching campaigns directly from component...');
-        try {
-            const { data, error } = await supabase
-                .from('emergency_campaigns')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-
-            console.log('Direct fetch success:', data);
-            setCampaigns(data || []);
-        } catch (error) {
-            console.error('Direct fetch error:', error);
-            showToast('Failed to load campaigns: ' + error.message, 'error');
+        const result = await getAll();
+        if (result.success) {
+            setCampaigns(result.data || []);
+            return;
         }
+
+        showToast('Failed to load campaigns: ' + (result.error || 'Unknown error'), 'error');
+    };
+
+    const now = new Date();
+    const stats = useMemo(() => {
+        const totalRaised = campaigns.reduce((sum, c) => sum + Number(c.current_amount || 0), 0);
+        const totalGoal = campaigns.reduce((sum, c) => sum + Number(c.goal_amount || 0), 0);
+        const activeCount = campaigns.filter((c) => c.is_active).length;
+        const urgentCount = campaigns.filter((c) => c.urgent_until && new Date(c.urgent_until) > now).length;
+
+        return {
+            totalRaised,
+            totalGoal,
+            activeCount,
+            urgentCount,
+        };
+    }, [campaigns, now]);
+
+    const getVisibleCampaigns = (tabValue) => {
+        const term = searchTerm.trim().toLowerCase();
+
+        return campaigns
+            .filter((campaign) => {
+                const isExpired = campaign.urgent_until && new Date(campaign.urgent_until) < now;
+                const inTab =
+                    tabValue === 'all' ||
+                    (tabValue === 'active' && campaign.is_active) ||
+                    (tabValue === 'inactive' && !campaign.is_active) ||
+                    (tabValue === 'expired' && isExpired);
+
+                const inSearch =
+                    !term ||
+                    [
+                        campaign.name_en,
+                        campaign.name_dari,
+                        campaign.name_pashto,
+                        campaign.description_en,
+                    ]
+                        .filter(Boolean)
+                        .some((value) => String(value).toLowerCase().includes(term));
+
+                return inTab && inSearch;
+            })
+            .sort((a, b) => {
+                const priorityA = Number(a.priority || 999);
+                const priorityB = Number(b.priority || 999);
+                if (priorityA !== priorityB) return priorityA - priorityB;
+                return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+            });
     };
 
     const handleToggleVisibility = async (id, currentStatus) => {
-        // Set loading state for this specific button
         setLoadingStates(prev => ({ ...prev, [`toggle_${id}`]: true }));
 
-        // Optimistically update UI immediately
         setCampaigns(prev =>
             prev.map(c => c.id === id ? { ...c, is_active: !currentStatus } : c)
         );
 
-        // Then call API
         const result = await toggleVisibility(id, !currentStatus);
 
-        // Remove loading state
         setLoadingStates(prev => ({ ...prev, [`toggle_${id}`]: false }));
 
         if (result.success) {
-            // Update with actual data from server to ensure consistency
             if (result.data) {
                 setCampaigns(prev =>
                     prev.map(c => c.id === id ? { ...c, is_active: result.data.is_active } : c)
@@ -77,33 +348,83 @@ const AdminEmergency = () => {
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this campaign?')) return;
 
-        // Set loading state
         setLoadingStates(prev => ({ ...prev, [`delete_${id}`]: true }));
-
-        // Store the campaign before deleting for potential rollback
         const deletedCampaign = campaigns.find(c => c.id === id);
-
-        // Optimistically remove from UI
         setCampaigns(prev => prev.filter(c => c.id !== id));
-
-        // Then call API
         const result = await remove(id);
-
-        // Remove loading state
         setLoadingStates(prev => ({ ...prev, [`delete_${id}`]: false }));
 
         if (result.success) {
             showToast('Campaign deleted successfully', 'success');
         } else {
-            // Revert on failure
             if (deletedCampaign) {
                 setCampaigns(prev => [...prev, deletedCampaign]);
             }
             showToast('Failed to delete campaign', 'error');
         }
     };
-    //   setShowForm(false);
-    //   fetchCampaigns();
+
+    const handleCreateCampaign = async (payload) => {
+        setIsSubmitting(true);
+
+        const campaignData = {
+            ...payload,
+            is_active: false,
+        };
+
+        const result = await create(campaignData);
+        setIsSubmitting(false);
+
+        if (result.success) {
+            showToast('Campaign created successfully!', 'success');
+            setShowCreateDialog(false);
+            if (result.data) {
+                setCampaigns((prev) => [result.data, ...prev]);
+            } else {
+                fetchCampaigns();
+            }
+            return;
+        }
+
+        showToast('Failed to create campaign: ' + (result.error || 'Unknown error'), 'error');
+    };
+
+    const handleEditCampaign = async (payload) => {
+        if (!editingCampaign) return;
+
+        setIsSubmitting(true);
+        const previousCampaign = editingCampaign;
+        const campaignId = editingCampaign.id;
+
+        setCampaigns((prev) =>
+            prev.map((campaign) =>
+                campaign.id === campaignId ? { ...campaign, ...payload } : campaign
+            )
+        );
+
+        const result = await update(campaignId, payload);
+        setIsSubmitting(false);
+
+        if (result.success) {
+            showToast('Campaign updated successfully!', 'success');
+            setEditingCampaign(null);
+            if (result.data) {
+                setCampaigns((prev) =>
+                    prev.map((campaign) =>
+                        campaign.id === result.data.id ? result.data : campaign
+                    )
+                );
+            }
+            return;
+        }
+
+        setCampaigns((prev) =>
+            prev.map((campaign) =>
+                campaign.id === previousCampaign.id ? previousCampaign : campaign
+            )
+        );
+        showToast('Failed to update campaign: ' + (result.error || 'Unknown error'), 'error');
+    };
 
 
     if (loading && campaigns.length === 0) {
@@ -115,604 +436,259 @@ const AdminEmergency = () => {
     }
 
     return (
-        <div>
-            {/* Header Section */}
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Emergency Campaigns</h1>
-                    <p className="text-gray-600">Manage urgent relief campaigns shown on homepage</p>
-                </div>
-                <button
-                    onClick={() => {
-                        setEditingCampaign(null);
-                        setShowForm(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                    <Plus className="w-5 h-5" />
-                    New Campaign
-                </button>
-            </div>
+        <div className="space-y-6">
+            <Card className="border-red-200 bg-gradient-to-r from-red-50 via-white to-orange-50">
+                <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <CardTitle className="text-2xl">Emergency Campaigns</CardTitle>
+                        <CardDescription>
+                            Manage urgent relief campaigns visible on the homepage.
+                        </CardDescription>
+                    </div>
+                    <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        New Campaign
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-4 md:grid-cols-4">
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardDescription>Total Raised</CardDescription>
+                                <CardTitle className="text-xl">{formatCurrency(stats.totalRaised)}</CardTitle>
+                            </CardHeader>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardDescription>Total Goal</CardDescription>
+                                <CardTitle className="text-xl">{formatCurrency(stats.totalGoal)}</CardTitle>
+                            </CardHeader>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardDescription>Live Campaigns</CardDescription>
+                                <CardTitle className="text-xl">{stats.activeCount}</CardTitle>
+                            </CardHeader>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardDescription>Not Expired</CardDescription>
+                                <CardTitle className="text-xl">{stats.urgentCount}</CardTitle>
+                            </CardHeader>
+                        </Card>
+                    </div>
+                </CardContent>
+            </Card>
 
-            {/* Campaigns Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {campaigns.map((campaign) => {
-                    const percentage = campaign.progress_percentage || 0;
-                    const isExpired = campaign.urgent_until && new Date(campaign.urgent_until) < new Date();
+            <Tabs defaultValue="all" className="space-y-4">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <TabsList>
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="active">Active</TabsTrigger>
+                        <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                        <TabsTrigger value="expired">Expired</TabsTrigger>
+                    </TabsList>
+                    <div className="relative w-full md:w-80">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            placeholder="Search campaigns..."
+                            className="pl-9"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {['all', 'active', 'inactive', 'expired'].map((tab) => {
+                    const visibleCampaigns = getVisibleCampaigns(tab);
 
                     return (
-                        <div
-                            key={campaign.id}
-                            className={`relative overflow-hidden bg-white rounded-xl shadow-lg border-2 p-6 transition-all hover:shadow-xl flex flex-col ${campaign.is_active ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'} ${isExpired ? 'opacity-60' : ''}`}
-                        >
-                            {/* Campaign Header */}
-                            <div className="flex items-center gap-3 mb-3">
-                                <span className="text-3xl">{campaign.icon}</span>
-                                <div className="flex-1">
-                                    <h3 className="text-xl font-bold text-gray-900">{campaign.name_en}</h3>
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                        {campaign.is_active && (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold rounded-full shadow-sm">
-                                                <Eye className="w-3 h-3" />
-                                                LIVE
-                                            </span>
-                                        )}
-                                        {isExpired && (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold rounded-full shadow-sm">
-                                                <AlertTriangle className="w-3 h-3" />
-                                                EXPIRED
-                                            </span>
-                                        )}
-                                    </div>
+                        <TabsContent key={tab} value={tab}>
+                            {visibleCampaigns.length === 0 ? (
+                                <Alert className="border-dashed">
+                                    <AlertTriangle className="h-4 w-4" />
+                                    <AlertTitle>No campaigns found</AlertTitle>
+                                    <AlertDescription>
+                                        Try a different filter or create a new emergency campaign.
+                                    </AlertDescription>
+                                </Alert>
+                            ) : (
+                                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+                                    {visibleCampaigns.map((campaign) => {
+                                        const percentage = Number(campaign.progress_percentage || 0);
+                                        const raised = Number(campaign.current_amount || 0);
+                                        const isExpired = campaign.urgent_until && new Date(campaign.urgent_until) < now;
+
+                                        return (
+                                            <Card
+                                                key={campaign.id}
+                                                className={cn(
+                                                    'overflow-hidden transition-shadow hover:shadow-md',
+                                                    campaign.is_active && 'border-red-300',
+                                                    isExpired && 'opacity-75'
+                                                )}
+                                            >
+                                                <CardHeader className="space-y-3">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="rounded-md bg-red-50 p-2 text-2xl">
+                                                                {campaign.icon || '🚨'}
+                                                            </div>
+                                                            <div>
+                                                                <CardTitle className="text-lg">{campaign.name_en}</CardTitle>
+                                                                <CardDescription>
+                                                                    Priority {campaign.priority || 1}
+                                                                </CardDescription>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-wrap items-center justify-end gap-2">
+                                                            {campaign.is_active ? (
+                                                                <Badge className="gap-1 bg-green-600 text-white">
+                                                                    <Eye className="h-3 w-3" />
+                                                                    Live
+                                                                </Badge>
+                                                            ) : (
+                                                                <Badge variant="secondary">Hidden</Badge>
+                                                            )}
+                                                            {isExpired && (
+                                                                <Badge className="gap-1 bg-amber-500 text-white">
+                                                                    <AlertTriangle className="h-3 w-3" />
+                                                                    Expired
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                                                        {campaign.description_en}
+                                                    </p>
+                                                </CardHeader>
+
+                                                <CardContent className="space-y-4">
+                                                    <div className="grid grid-cols-3 gap-3 text-sm">
+                                                        <div>
+                                                            <p className="text-muted-foreground">Goal</p>
+                                                            <p className="font-semibold">{formatCurrency(campaign.goal_amount)}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-muted-foreground">Raised</p>
+                                                            <p className="font-semibold text-emerald-600">{formatCurrency(raised)}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-muted-foreground">Progress</p>
+                                                            <p className="font-semibold">{Math.round(percentage)}%</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-1">
+                                                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                                            <div
+                                                                className="h-full rounded-full bg-gradient-to-r from-red-500 to-red-700 transition-all"
+                                                                style={{ width: `${Math.min(percentage, 100)}%` }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                            <span className="inline-flex items-center gap-1">
+                                                                <Heart className="h-3 w-3" />
+                                                                {campaign.donation_count || 0} donations
+                                                            </span>
+                                                            {campaign.urgent_until && (
+                                                                <span className="inline-flex items-center gap-1">
+                                                                    <Calendar className="h-3 w-3" />
+                                                                    {formatDateTime(campaign.urgent_until)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+
+                                                <CardFooter className="grid grid-cols-3 gap-2 pt-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant={campaign.is_active ? 'secondary' : 'default'}
+                                                        onClick={() => handleToggleVisibility(campaign.id, campaign.is_active)}
+                                                        disabled={loadingStates[`toggle_${campaign.id}`]}
+                                                        className="gap-1"
+                                                        title={campaign.is_active ? 'Hide from homepage' : 'Show on homepage'}
+                                                    >
+                                                        {campaign.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                        {loadingStates[`toggle_${campaign.id}`] ? '...' : campaign.is_active ? 'Hide' : 'Show'}
+                                                    </Button>
+
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => setEditingCampaign(campaign)}
+                                                        className="gap-1"
+                                                    >
+                                                        <Edit2 className="h-4 w-4" />
+                                                        Edit
+                                                    </Button>
+
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() => handleDelete(campaign.id)}
+                                                        disabled={loadingStates[`delete_${campaign.id}`]}
+                                                        className="gap-1"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                        {loadingStates[`delete_${campaign.id}`] ? '...' : 'Delete'}
+                                                    </Button>
+                                                </CardFooter>
+                                            </Card>
+                                        );
+                                    })}
                                 </div>
-                            </div>
-
-                            {/* Description */}
-                            <p className="text-gray-600 text-sm mb-4 min-h-[3rem]">{campaign.description_en}</p>
-
-                            {/* Stats */}
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <div className="text-left">
-                                    <p className="text-xs text-gray-500 mb-1">Goal</p>
-                                    <p className="text-lg font-bold text-gray-900 leading-tight">{formatCurrency(campaign.goal_amount)}</p>
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-xs text-gray-500 mb-1">Raised</p>
-                                    <p className="text-lg font-bold text-green-600 leading-tight">{formatCurrency(campaign.current_amount || 0)}</p>
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-xs text-gray-500 mb-1">Progress</p>
-                                    <p className="text-lg font-bold text-primary leading-tight">{Math.round(percentage)}%</p>
-                                </div>
-                            </div>
-
-                            {/* Progress Bar */}
-                            <div className="w-full bg-gray-200 rounded-full h-3 mb-3 overflow-hidden shadow-inner">
-                                <div
-                                    className="bg-gradient-to-r from-red-500 via-red-600 to-red-700 h-3 rounded-full transition-all duration-500 relative overflow-hidden"
-                                    style={{ width: `${Math.min(percentage, 100)}%` }}
-                                >
-                                    <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
-                                </div>
-                            </div>
-
-                            <p className="text-xs text-gray-500 mb-4 leading-tight">
-                                {campaign.donation_count || 0} donations
-                                {campaign.urgent_until && ` · Expires: ${formatDateTime(campaign.urgent_until)}`}
-                            </p>
-
-                            {/* Action Buttons at Bottom */}
-                            <div className="grid grid-cols-3 gap-2 mt-auto pt-4 border-t">
-                                <button
-                                    onClick={() => handleToggleVisibility(campaign.id, campaign.is_active)}
-                                    disabled={loadingStates[`toggle_${campaign.id}`]}
-                                    className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md ${campaign.is_active
-                                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:from-yellow-600 hover:to-yellow-700'
-                                        : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
-                                        } ${loadingStates[`toggle_${campaign.id}`] ? 'opacity-75 cursor-not-allowed' : ''}`}
-                                    title={campaign.is_active ? 'Hide from homepage' : 'Show on homepage'}
-                                >
-                                    {loadingStates[`toggle_${campaign.id}`] ? (
-                                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    ) : campaign.is_active ? (
-                                        <>
-                                            <EyeOff className="w-4 h-4" />
-                                            <span className="hidden sm:inline">Hide</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Eye className="w-4 h-4" />
-                                            <span className="hidden sm:inline">Show</span>
-                                        </>
-                                    )}
-                                </button>
-
-                                <button
-                                    onClick={() => setEditingCampaign(campaign)}
-                                    className="flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold text-sm transition-all shadow-sm hover:shadow-md"
-                                >
-                                    <Edit2 className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Edit</span>
-                                </button>
-
-                                <button
-                                    onClick={() => handleDelete(campaign.id)}
-                                    disabled={loadingStates[`delete_${campaign.id}`]}
-                                    className={`flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 font-semibold text-sm transition-all shadow-sm hover:shadow-md ${loadingStates[`delete_${campaign.id}`] ? 'opacity-75 cursor-not-allowed' : ''}`}
-                                >
-                                    {loadingStates[`delete_${campaign.id}`] ? (
-                                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    ) : (
-                                        <>
-                                            <Trash2 className="w-4 h-4" />
-                                            <span className="hidden sm:inline">Delete</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
+                            )}
+                        </TabsContent>
                     );
                 })}
+            </Tabs>
 
-                {campaigns.length === 0 && (
-                    <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border-2 border-dashed border-gray-300">
-                        <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
-                            <AlertTriangle className="w-10 h-10 text-red-600" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No Emergency Campaigns Yet</h3>
-                        <p className="text-gray-600 mb-8 max-w-md mx-auto">Create your first emergency relief campaign to help those in urgent need</p>
-                        <button
-                            onClick={() => setShowForm(true)}
-                            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                        >
-                            <Plus className="w-5 h-5" />
-                            Create Your First Campaign
-                        </button>
-                    </div>
-                )}
-            </div>
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="inline-flex items-center gap-2 text-2xl">
+                            <Target className="h-5 w-5 text-red-600" />
+                            Create Emergency Campaign
+                        </DialogTitle>
+                        <DialogDescription>
+                            Fields with * are required. New campaigns are hidden by default.
+                        </DialogDescription>
+                    </DialogHeader>
 
-            {showForm && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">Create Emergency Campaign</h3>
-                                <p className="text-sm text-gray-600 mt-2">
-                                    Fields marked with * are required. Campaign will be hidden by default.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setShowForm(false)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
+                    <CampaignForm
+                        mode="create"
+                        initialValues={getInitialFormValues()}
+                        onSubmit={handleCreateCampaign}
+                        onCancel={() => setShowCreateDialog(false)}
+                        isSubmitting={isSubmitting}
+                    />
+                </DialogContent>
+            </Dialog>
 
-                        <form
-                            onSubmit={async (e) => {
-                                e.preventDefault();
-                                setIsCreating(true);
+            <Dialog open={Boolean(editingCampaign)} onOpenChange={(open) => !open && setEditingCampaign(null)}>
+                <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="inline-flex items-center gap-2 text-2xl">
+                            <Edit2 className="h-5 w-5 text-blue-600" />
+                            Edit Campaign
+                        </DialogTitle>
+                        <DialogDescription>
+                            Update campaign details and save changes.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                                const formData = new FormData(e.target);
-
-                                // Extract data carefully
-                                const campaignData = {
-                                    name_en: formData.get('name_en'),
-                                    name_dari: formData.get('name_dari'),
-                                    name_pashto: formData.get('name_pashto'),
-                                    description_en: formData.get('description_en'),
-                                    description_dari: formData.get('description_dari'),
-                                    description_pashto: formData.get('description_pashto'),
-                                    impact_message_en: formData.get('impact_message_en'),
-                                    impact_message_dari: formData.get('impact_message_dari'),
-                                    impact_message_pashto: formData.get('impact_message_pashto'),
-                                    icon: formData.get('icon'),
-                                    goal_amount: parseFloat(formData.get('goal_amount')) || 0,
-                                    urgent_until: formData.get('urgent_until') ? formData.get('urgent_until') : null,
-                                    priority: parseInt(formData.get('priority')) || 1,
-                                    is_active: false,
-                                };
-
-                                console.log('Submitting campaign data:', campaignData);
-
-                                try {
-                                    // Direct Supabase Insert (Proven to work)
-                                    const { data, error } = await supabase
-                                        .from('emergency_campaigns')
-                                        .insert([campaignData])
-                                        .select()
-                                        .single();
-
-                                    if (error) throw error;
-
-                                    console.log('Campaign created successfully:', data);
-                                    showToast('Success! Reloading page...', 'success');
-
-                                    // Close form immediately
-                                    setShowForm(false);
-
-                                    // Force reload quickly
-                                    setTimeout(() => {
-                                        console.log('Reloading now...');
-                                        window.location.reload();
-                                    }, 500);
-                                } catch (error) {
-                                    console.error('Creation failed:', error);
-                                    showToast('Failed to create campaign: ' + error.message, 'error');
-                                } finally {
-                                    setIsCreating(false);
-                                }
-                            }}
-                            className="space-y-6"
-                        >
-                            {/* Campaign Names */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Campaign Name (English) *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name_en"
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="e.g. Herat Earthquake Relief"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Campaign Name (Dari)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name_dari"
-                                        dir="rtl"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="نام کمپین"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Campaign Name (Pashto)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name_pashto"
-                                        dir="rtl"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="د کمپاین نوم"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Descriptions */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Description (English) *
-                                    </label>
-                                    <textarea
-                                        name="description_en"
-                                        required
-                                        rows="3"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="Emergency aid for families affected by..."
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Description (Dari)
-                                    </label>
-                                    <textarea
-                                        name="description_dari"
-                                        rows="3"
-                                        dir="rtl"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="توضیحات"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Description (Pashto)
-                                    </label>
-                                    <textarea
-                                        name="description_pashto"
-                                        rows="3"
-                                        dir="rtl"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="توضیحات"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Impact Messages */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Impact Message (English)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="impact_message_en"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="Your $50 provides emergency shelter..."
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Impact Message (Dari)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="impact_message_dari"
-                                        dir="rtl"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="پیام تاثیر"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Impact Message (Pashto)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="impact_message_pashto"
-                                        dir="rtl"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="د اغیزې پیغام"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Icon, Goal, Date, Priority */}
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Icon (Emoji) *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="icon"
-                                        required
-                                        maxLength="2"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-2xl text-center"
-                                        placeholder="🏚️"
-                                        defaultValue="🚨"
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">e.g. 🏚️ 🌊 ❄️</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Goal Amount ($) *
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="goal_amount"
-                                        required
-                                        min="1"
-                                        step="0.01"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="100000"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Expires On (Optional)
-                                    </label>
-                                    <input
-                                        type="date"
-                                        name="urgent_until"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Priority (1=High)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="priority"
-                                        min="1"
-                                        defaultValue="1"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Form Actions */}
-                            <div className="flex gap-4 justify-end pt-6 border-t mt-8">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowForm(false)}
-                                    className="px-8 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isCreating}
-                                    className={`px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${isCreating ? 'opacity-75 cursor-not-allowed' : ''}`}
-                                >
-                                    {isCreating ? (
-                                        <span className="flex items-center gap-2">
-                                            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Creating...
-                                        </span>
-                                    ) : (
-                                        'Create Campaign'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Edit Campaign Modal */}
-            {editingCampaign && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Edit Campaign</h3>
-                                <p className="text-sm text-gray-600 mt-2">
-                                    Update campaign details. Changes are saved immediately.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setEditingCampaign(null)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <form
-                            onSubmit={async (e) => {
-                                e.preventDefault();
-                                setIsCreating(true);
-
-                                const formData = new FormData(e.target);
-                                const updates = {
-                                    name_en: formData.get('name_en'),
-                                    name_dari: formData.get('name_dari'),
-                                    name_pashto: formData.get('name_pashto'),
-                                    description_en: formData.get('description_en'),
-                                    description_dari: formData.get('description_dari'),
-                                    description_pashto: formData.get('description_pashto'),
-                                    impact_message_en: formData.get('impact_message_en'),
-                                    impact_message_dari: formData.get('impact_message_dari'),
-                                    impact_message_pashto: formData.get('impact_message_pashto'),
-                                    icon: formData.get('icon'),
-                                    goal_amount: parseFloat(formData.get('goal_amount')),
-                                    urgent_until: formData.get('urgent_until') || null,
-                                    priority: parseInt(formData.get('priority')) || 1,
-                                };
-
-                                // Optimistic update
-                                setCampaigns(prev =>
-                                    prev.map(c => c.id === editingCampaign.id ? { ...c, ...updates } : c)
-                                );
-
-                                const result = await update(editingCampaign.id, updates);
-                                setIsCreating(false);
-                                setEditingCampaign(null);
-
-                                if (result.success) {
-                                    showToast('Campaign updated successfully!', 'success');
-                                    // Update with real data from server without full refresh
-                                    if (result.data) {
-                                        setCampaigns(prev =>
-                                            prev.map(c => c.id === result.data.id ? result.data : c)
-                                        );
-                                    }
-                                } else {
-                                    showToast('Failed to update campaign', 'error');
-                                    // Revert on failure
-                                    setCampaigns(prev =>
-                                        prev.map(c => c.id === editingCampaign.id ? editingCampaign : c)
-                                    );
-                                }
-                            }}
-                            className="space-y-6"
-                        >
-                            {/* Same form fields as create, but with defaultValue from editingCampaign */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Campaign Name (English) *</label>
-                                    <input type="text" name="name_en" required defaultValue={editingCampaign.name_en}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Campaign Name (Dari)</label>
-                                    <input type="text" name="name_dari" dir="rtl" defaultValue={editingCampaign.name_dari}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Campaign Name (Pashto)</label>
-                                    <input type="text" name="name_pashto" dir="rtl" defaultValue={editingCampaign.name_pashto}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Description (English) *</label>
-                                    <textarea name="description_en" required rows="3" defaultValue={editingCampaign.description_en}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Description (Dari)</label>
-                                    <textarea name="description_dari" rows="3" dir="rtl" defaultValue={editingCampaign.description_dari}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Description (Pashto)</label>
-                                    <textarea name="description_pashto" rows="3" dir="rtl" defaultValue={editingCampaign.description_pashto}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Icon *</label>
-                                    <input type="text" name="icon" required maxLength="2" defaultValue={editingCampaign.icon}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-2xl text-center" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Goal Amount ($) *</label>
-                                    <input type="number" name="goal_amount" required min="1" step="0.01" defaultValue={editingCampaign.goal_amount}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Expires On</label>
-                                    <input type="date" name="urgent_until" defaultValue={editingCampaign.urgent_until?.split('T')[0]}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
-                                    <input type="number" name="priority" min="1" defaultValue={editingCampaign.priority}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                </div>
-                            </div>
-
-                            <div className="flex gap-4 justify-end pt-6 border-t mt-8">
-                                <button type="button" onClick={() => setEditingCampaign(null)}
-                                    className="px-8 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all">
-                                    Cancel
-                                </button>
-                                <button type="submit" disabled={isCreating}
-                                    className={`px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${isCreating ? 'opacity-75 cursor-not-allowed' : ''}`}>
-                                    {isCreating ? (
-                                        <span className="flex items-center gap-2">
-                                            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Saving...
-                                        </span>
-                                    ) : 'Save Changes'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                    <CampaignForm
+                        mode="edit"
+                        initialValues={getInitialFormValues(editingCampaign)}
+                        onSubmit={handleEditCampaign}
+                        onCancel={() => setEditingCampaign(null)}
+                        isSubmitting={isSubmitting}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

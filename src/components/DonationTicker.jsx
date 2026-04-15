@@ -24,7 +24,7 @@ const DonationTicker = () => {
     const fetchRecentDonations = async () => {
         const { data, error } = await supabase
             .from('donations')
-            .select('full_name, amount, department, created_at')
+            .select('full_name, amount, created_at')
             .neq('status', 'failed')
             .neq('status', 'cancelled')
             .order('created_at', { ascending: false })
@@ -42,9 +42,7 @@ const DonationTicker = () => {
     const getVariedMessage = (donation, index) => {
         const messages = [
             `${donation.full_name} donated $${donation.amount} 💚`,
-            `${donation.full_name} just contributed $${donation.amount} to ${donation.department}`,
             `$${donation.amount} from ${donation.full_name} - Thank you!`,
-            `${donation.full_name} supported ${donation.department} with $${donation.amount}`,
             `Amazing! ${donation.full_name} donated $${donation.amount}`,
             `${donation.full_name} made a difference with $${donation.amount}`,
         ];

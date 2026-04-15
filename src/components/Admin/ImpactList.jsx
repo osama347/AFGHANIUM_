@@ -24,7 +24,6 @@ const ImpactList = () => {
         if (donationId) {
             setInitialFormValues({
                 donationId: donationId,
-                department: searchParams.get('department') || '',
                 // We can pre-fill title or description if needed, e.g.:
                 title: `Impact for ${searchParams.get('donorName') || 'Donor'}`,
                 description: `Impact proof for donation ${donationId} of amount $${searchParams.get('amount')}`,
