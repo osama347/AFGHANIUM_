@@ -28,6 +28,13 @@ Our goal is to turn that potential into real income and stability for producers 
 • Improving visibility and trust through quality and transparency
 • Ensuring trade is handled responsibly and legally`
         },
+    {
+        title: "Why This Is Also Good Globally",
+        icon: BookOpen,
+        content: `Afghanium is not only good for Afghanistan. It also serves the international community by giving buyers in different parts of the world access to authentic Afghan products they often cannot find through normal retail channels.
+
+This means consumers globally get trusted access to real Afghan quality, while their purchases directly support fair opportunity for Afghan producers.`
+    },
         {
             title: "Why We Also Invest in Healthcare",
             icon: Heart,

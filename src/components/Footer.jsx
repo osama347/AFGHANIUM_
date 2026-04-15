@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, Globe, Heart } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { CONTACT_INFO, SOCIAL_LINKS, LANGUAGES } from '../utils/constants';
 
@@ -41,13 +41,15 @@ const Footer = () => {
                     {/* About Section */}
                     <div>
                         <div className="flex items-center space-x-3 mb-6">
-                            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
-                                <Heart className="w-6 h-6 text-primary" />
-                            </div>
+                            <img
+                                src="/logo.jpg"
+                                alt="Afghanium logo"
+                                className="w-12 h-12 rounded-lg object-cover"
+                            />
                             <span className="text-2xl font-bold">AFGHANIUM</span>
                         </div>
                         <p className="text-gray-300 mb-6">
-                            {t('footer.tagline')}
+                            Breaking barriers. Building bridges.
                         </p>
 
                         {/* Language Switcher */}

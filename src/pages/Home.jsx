@@ -94,7 +94,7 @@ const Home = () => {
                                                 <p className="opacity-90">Connecting Afghan producers with global customers through dignified work and sustainable relationships.</p>
                                             </div>
                                             <div>
-                                                <h3 className="text-2xl font-bold mb-2">Women's Healthcare</h3>
+                                                <h3 className="text-2xl font-bold mb-2">Healthcare</h3>
                                                 <p className="opacity-90">Reinvesting profits into women-only clinics staffed by women professionals.</p>
                                             </div>
                                             <div>
