@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getAllTestimonials, createTestimonial, updateTestimonial, deleteTestimonial } from '../../supabase/testimonials';
-import { uploadSlideshowImage, deleteSlideshowImage } from '../../supabase/storage';
-import { getSlideshowImages, updateSlideshowImages } from '../../supabase/content';
+import { uploadImage as uploadTestimonialImage, deleteImage as deleteTestimonialImage, uploadSlideshowImage, deleteSlideshowImage, getTestimonialImageUrl } from '../../supabase/storage';
+import { getSlideshowImages } from '../../supabase/content';
 import { MessageSquare, Plus, Edit, Trash2, Upload, X, Save, Image, Settings } from 'lucide-react';
 import Loader from '../Loader';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
-import { supabase } from '../../supabase/client';
 
 const AdminContent = () => {
     const { isAuthenticated, loading: authLoading } = useAdminAuth();
@@ -240,19 +239,6 @@ const AdminContent = () => {
             setStatus({ error: error.message, success: false });
         }
         setSaving(false);
-    };
-
-    const moveSlideshowImage = (fromIndex, toIndex) => {
-        // Note: Since images are fetched from bucket by creation time,
-        // reordering is not persistent. Images will be ordered by upload time.
-        // This function is kept for UI consistency but doesn't actually reorder
-        console.log('Note: Image reordering is not supported with bucket-based storage');
-    };
-
-    const handleSaveSlideshowOrder = async () => {
-        // Since we fetch from bucket, order is automatic by creation time
-        setStatus({ error: null, success: true });
-        console.log('Order saved (bucket-based storage uses creation time ordering)');
     };
 
     if (loading) return <Loader size="lg" />;

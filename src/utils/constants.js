@@ -105,13 +105,6 @@ export const CRYPTO_CURRENCIES = [
     { code: 'USDC', name: 'USD Coin', icon: '$' },
 ];
 
-// Languages
-export const LANGUAGES = [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'dari', name: 'Dari', nativeName: 'دری' },
-    { code: 'pashto', name: 'Pashto', nativeName: 'پښتو' },
-];
-
 // Donation Status
 export const DONATION_STATUS = {
     PENDING: 'pending',
@@ -138,7 +131,7 @@ export const SOCIAL_LINKS = {
 // Contact Information
 export const CONTACT_INFO = {
     email: 'info@afghanium.org',
-    phone: '+93 (0) 700 123 456',
+    phone: '0093784616861',
     address: 'Kabul, Afghanistan',
 };
 

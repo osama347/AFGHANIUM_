@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import LoadingScreen from '../components/LoadingScreen';
 
@@ -12,19 +14,12 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider = ({ children }) => {
-    // Get initial language from localStorage or default to 'en'
-    const [currentLanguage, setCurrentLanguage] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('language') || 'en';
-        }
-        return 'en';
-    });
     const [translations, setTranslations] = useState({});
-    const [loading, setLoading] = useState(true); // Start with true to wait for initial load
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadTranslations(currentLanguage);
-    }, [currentLanguage]);
+        loadTranslations('en');
+    }, []);
 
     const loadTranslations = async (lang) => {
         setLoading(true);
@@ -51,11 +46,6 @@ export const LanguageProvider = ({ children }) => {
             }
         }
         setLoading(false);
-    };
-
-    const changeLanguage = (lang) => {
-        setCurrentLanguage(lang);
-        localStorage.setItem('language', lang);
     };
 
     const t = (path) => {
@@ -88,8 +78,6 @@ export const LanguageProvider = ({ children }) => {
     return (
         <LanguageContext.Provider
             value={{
-                currentLanguage,
-                changeLanguage,
                 t,
                 loading,
             }}

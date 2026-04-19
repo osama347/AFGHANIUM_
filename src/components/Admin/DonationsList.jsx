@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDonation } from '../../hooks/useDonation';
 import { updateDonationStatus } from '../../supabase/donations';
-import { formatCurrency, formatDateTime } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import {
   DollarSign,
   Plus,
@@ -45,18 +45,22 @@ const DonationsList = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
-  useEffect(() => {
-    fetchDonations();
-  }, []);
-
-  const fetchDonations = async () => {
+  async function fetchDonations() {
     const result = await getAll();
     if (result.success) {
       setDonations(result.data);
     } else {
       setError(result.error);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchDonations();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleApproveDonation = async () => {
     if (!selectedDonation) return;
@@ -162,7 +166,7 @@ const DonationsList = () => {
     });
 
     return groups;
-  }, [donations, searchTerm, statusFilter, emergencyCampaigns]);
+  }, [donations, searchTerm, statusFilter]);
 
   // Calculate donation statistics
   const donationStats = useMemo(() => {

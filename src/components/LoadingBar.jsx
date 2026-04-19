@@ -6,9 +6,13 @@ const LoadingBar = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
+        const startTimer = setTimeout(() => setLoading(true), 0);
+        const stopTimer = setTimeout(() => setLoading(false), 800);
+
+        return () => {
+            clearTimeout(startTimer);
+            clearTimeout(stopTimer);
+        };
     }, [location]);
 
     if (!loading) return null;

@@ -137,7 +137,7 @@ export const uploadSlideshowImage = async (file, folder = 'hero') => {
         return {
             success: true,
             data: {
-                path: fileName,
+                path: data.path,
                 publicUrl,
             },
         };

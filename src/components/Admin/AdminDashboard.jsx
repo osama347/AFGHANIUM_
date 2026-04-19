@@ -28,7 +28,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -54,7 +54,11 @@ const AdminLayout = () => {
   }, [isAuthenticated, loading, navigate]);
 
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    const timer = setTimeout(() => {
+      setIsMobileMenuOpen(false);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [location.pathname]);
 
   useEffect(() => {

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Heart, ShieldCheck, Sparkles, Target, TrendingUp, Users, Globe } from 'lucide-react';
-import SectionTitle from '../components/SectionTitle';
+import { BookOpen, CheckCircle, Globe, Heart, ShieldCheck, Sparkles, Target, TrendingUp, Users } from 'lucide-react';
 import { getContent } from '../supabase/content';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 
 const About = () => {
     const { t } = useLanguage();
@@ -78,86 +78,146 @@ const About = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="section-padding bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/60">
-                <div className="container-custom space-y-8">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+            <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
+                <div className="absolute -left-20 top-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+                <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
+                    <div className="mx-auto max-w-4xl text-center">
+                        <Badge variant="secondary" className="mb-5 inline-flex gap-2 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.22em]">
+                            <Sparkles className="h-3.5 w-3.5" />
                             About Afghanium
                         </Badge>
-                        <Badge variant="outline" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            Mission-driven commerce
-                        </Badge>
-                    </div>
 
-                    <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-                        <div className="max-w-3xl">
-                            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-                                Building a bridge from Afghan work to global opportunity.
-                            </h1>
-                            <p className="mt-5 text-lg leading-8 text-muted-foreground sm:text-xl">
-                                Afghanium is a social enterprise that connects Afghan-made products to global customers and reinvests a portion of its success into direct humanitarian support.
-                            </p>
+                        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                            Building a bridge from Afghan work
+                            <span className="block text-primary">to global opportunity.</span>
+                        </h1>
 
-                            <div className="mt-8 flex flex-wrap gap-3">
-                                {['Trade with dignity', 'Women-focused healthcare', 'Transparent impact'].map((item) => (
-                                    <div key={item} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground shadow-sm">
-                                        <span className="h-2 w-2 rounded-full bg-primary" />
-                                        {item}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+                            Afghanium is a social enterprise that connects Afghan-made products to global customers and reinvests part of its success into direct humanitarian support.
+                        </p>
 
-                        <Card className="rounded-[2rem] border-border/70 bg-card/95 shadow-xl backdrop-blur">
-                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                                    Field note
-                                </CardDescription>
-                                <CardTitle className="text-2xl">Why the model matters</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4 p-6">
-                                <p className="text-sm leading-7 text-muted-foreground whitespace-pre-wrap">
-                                    {missionDescription || t('about.mission.description')}
-                                </p>
-
-                                <div className="rounded-2xl border border-border bg-background p-4">
-                                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Core promise</p>
-                                    <p className="mt-2 text-base font-semibold text-foreground">Trade should create dignity, and profit should create responsibility.</p>
+                        <div className="mt-8 flex flex-wrap justify-center gap-3">
+                            {['Trade with dignity', 'Women-focused healthcare', 'Transparent impact'].map((item) => (
+                                <div key={item} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm">
+                                    <span className="h-2 w-2 rounded-full bg-primary" />
+                                    {item}
                                 </div>
-                            </CardContent>
-                        </Card>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section className="section-padding bg-background">
-                <div className="container-custom space-y-10">
-                    <SectionTitle
-                        title={t('about.values.title')}
-                        subtitle={t('about.values.subtitle')}
-                    />
+                <div className="container-custom">
+                    <div className="mx-auto max-w-4xl">
+                        <Card className="border-border/70 shadow-sm">
+                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
+                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+                                    Field note
+                                </CardDescription>
+                                <CardTitle className="text-2xl">Why the model matters</CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <p className="text-base leading-8 text-muted-foreground whitespace-pre-wrap">
+                                    {missionDescription || t('about.mission.description')}
+                                </p>
+                            </CardContent>
+                            <CardFooter className="border-t border-border/60">
+                                <p className="text-sm font-medium text-foreground">
+                                    Trade should create dignity, and profit should create responsibility.
+                                </p>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                </div>
+            </section>
 
-                    <div className="grid gap-6 lg:grid-cols-2">
-                        {[mission, vision].map((item) => {
-                            const Icon = item.icon;
+            <section className="section-padding bg-muted/20">
+                <div className="container-custom">
+                    <div className="mb-8 text-center">
+                        <Badge variant="secondary" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+                            Mission and vision
+                        </Badge>
+                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                            {t('about.values.title')}
+                        </h2>
+                        <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+                            {t('about.values.subtitle')}
+                        </p>
+                    </div>
+
+                    <div className="mx-auto max-w-4xl">
+                        <Tabs defaultValue="mission" className="w-full">
+                            <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0">
+                                <TabsTrigger value="mission" className="rounded-xl border border-border bg-background py-2 data-[state=active]:border-primary/40">
+                                    Mission
+                                </TabsTrigger>
+                                <TabsTrigger value="vision" className="rounded-xl border border-border bg-background py-2 data-[state=active]:border-primary/40">
+                                    Vision
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="mission" className="mt-5">
+                                <Card className="border-border/70 shadow-sm">
+                                    <CardHeader className="pb-3">
+                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                            <mission.icon className="h-5 w-5" />
+                                        </div>
+                                        <CardTitle>{mission.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-0">
+                                        <CardDescription className="text-base leading-8">{mission.description}</CardDescription>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            <TabsContent value="vision" className="mt-5">
+                                <Card className="border-border/70 shadow-sm">
+                                    <CardHeader className="pb-3">
+                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                            <vision.icon className="h-5 w-5" />
+                                        </div>
+                                        <CardTitle>{vision.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-0">
+                                        <CardDescription className="text-base leading-8">{vision.description}</CardDescription>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        </Tabs>
+                    </div>
+                </div>
+            </section>
+
+            <section className="section-padding bg-background">
+                <div className="container-custom">
+                    <div className="mb-8 text-center">
+                        <Badge variant="outline" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+                            What we stand for
+                        </Badge>
+                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                            Principles that shape decisions
+                        </h2>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                        {values.map((value) => {
+                            const Icon = value.icon;
 
                             return (
-                                <Card key={item.title} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                                    <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5 border-b border-border/60">
-                                        <div className="flex items-start gap-4">
-                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20">
-                                                <Icon className="h-6 w-6" />
-                                            </div>
-                                            <div>
-                                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                                                    {item.title}
-                                                </CardDescription>
-                                                <CardTitle className="mt-2 text-2xl">{item.title}</CardTitle>
-                                            </div>
+                                <Card key={value.title} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                                    <CardHeader className="pb-3">
+                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                            <Icon className="h-5 w-5" />
                                         </div>
+                                        <CardTitle className="text-lg">{value.title}</CardTitle>
                                     </CardHeader>
-                                    <CardContent className="p-6">
-                                        <p className="text-base leading-8 text-muted-foreground">{item.description}</p>
+                                    <CardContent className="pt-0">
+                                        <CardDescription>{value.description}</CardDescription>
                                     </CardContent>
                                 </Card>
                             );
@@ -166,101 +226,64 @@ const About = () => {
                 </div>
             </section>
 
-            <section className="section-padding bg-muted/30">
+            <section className="section-padding bg-muted/20">
                 <div className="container-custom">
-                    <div className="mx-auto max-w-6xl space-y-8">
-                        <div className="max-w-3xl">
-                            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                                What we stand for
-                            </h2>
-                            <p className="mt-4 text-lg leading-8 text-muted-foreground">
-                                These principles shape how the brand operates, what it funds, and how we explain the work.
-                            </p>
-                        </div>
-
-                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                            {values.map((value) => {
-                                const Icon = value.icon;
-
-                                return (
-                                    <Card key={value.title} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                                        <CardContent className="p-6">
-                                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                                                <Icon className="h-5 w-5" />
-                                            </div>
-                                            <h3 className="text-xl font-semibold text-foreground">{value.title}</h3>
-                                            <p className="mt-3 text-sm leading-7 text-muted-foreground">{value.description}</p>
-                                        </CardContent>
-                                    </Card>
-                                );
-                            })}
-                        </div>
+                    <div className="mb-8 text-center">
+                        <Badge variant="secondary" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+                            How we operate
+                        </Badge>
+                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                            A practical model with two outcomes
+                        </h2>
                     </div>
-                </div>
-            </section>
 
-            <section className="section-padding bg-background">
-                <div className="container-custom">
-                    <Card className="overflow-hidden rounded-[2rem] border-border/70 bg-card shadow-xl">
-                        <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                            <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                                How we operate
-                            </CardDescription>
-                            <CardTitle className="text-2xl">A practical model with two outcomes</CardTitle>
-                        </CardHeader>
+                    <div className="grid gap-4 md:grid-cols-3">
+                        {pillars.map((pillar) => {
+                            const Icon = pillar.icon;
 
-                        <CardContent className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_1fr]">
-                            <div className="space-y-4 rounded-3xl border border-border bg-background p-5">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                        <Sparkles className="h-5 w-5" />
-                                    </div>
-                                    <p className="font-semibold text-foreground">1. Trade products globally</p>
-                                </div>
-                                <p className="text-sm leading-7 text-muted-foreground">
-                                    Afghan producers get market access for saffron, leather goods, rugs, gemstones, and other products with real demand.
-                                </p>
-                            </div>
-
-                            <div className="space-y-4 rounded-3xl border border-border bg-background p-5">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                        <Heart className="h-5 w-5" />
-                                    </div>
-                                    <p className="font-semibold text-foreground">2. Reinvest into direct support</p>
-                                </div>
-                                <p className="text-sm leading-7 text-muted-foreground">
-                                    A portion of profit supports women-focused healthcare projects, including women-only clinics staffed by women professionals.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            return (
+                                <Card key={pillar.title} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                    <CardHeader className="pb-3">
+                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                            <Icon className="h-5 w-5" />
+                                        </div>
+                                        <CardTitle className="text-lg">{pillar.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-0">
+                                        <CardDescription>{pillar.description}</CardDescription>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                    </div>
                 </div>
             </section>
 
             <section className="section-padding bg-gradient-to-br from-primary-dark to-primary text-white relative overflow-hidden">
                 <div className="afghan-pattern-bg absolute inset-0 opacity-10" />
                 <div className="container-custom relative z-10">
-                    <div className="mx-auto max-w-5xl rounded-[2rem] border border-white/15 bg-white/10 p-8 text-center shadow-2xl backdrop-blur-md sm:p-12">
-                        <Badge variant="secondary" className="mb-5 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            Join the mission
-                        </Badge>
-                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                            Support the model that connects trade and care.
-                        </h2>
-                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/85 sm:text-lg">
-                            If you want to support the work directly, or learn more about how the model fits together, these are the next steps.
-                        </p>
+                    <Card className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border-white/15 bg-white/10 text-white shadow-2xl backdrop-blur-md">
+                        <CardContent className="p-8 text-center sm:p-12">
+                            <Badge variant="secondary" className="mb-5 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+                                Join the mission
+                            </Badge>
+                            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                                Support the model that connects trade and care.
+                            </h2>
+                            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/85 sm:text-lg">
+                                If you want to support the work directly, or learn more about how the model fits together, these are the next steps.
+                            </p>
 
-                        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                            <Button asChild size="lg" className="rounded-full px-6 shadow-lg shadow-primary/20">
-                                <Link to="/donate">Make a donation</Link>
-                            </Button>
-                            <Button asChild variant="outline" size="lg" className="rounded-full px-6 !border-white !text-white hover:!bg-white hover:!text-primary">
-                                <Link to="/contact">Contact us</Link>
-                            </Button>
-                        </div>
-                    </div>
+                            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                                <Button asChild size="lg" className="rounded-full bg-white px-6 text-primary hover:bg-white/90">
+                                    <Link to="/donate">Make a donation</Link>
+                                </Button>
+                                <Button asChild variant="outline" size="lg" className="rounded-full border-white px-6 text-white hover:bg-white hover:text-primary">
+                                    <Link to="/contact">Contact us</Link>
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </section>
         </div>

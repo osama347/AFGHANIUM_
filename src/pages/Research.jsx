@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, CheckCircle, Download, FileText, FileUp, Sparkles, Send, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, CheckCircle, Download, FileText, FileUp, Send, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import Loader from '../components/Loader';
 import { useResearch } from '../hooks/useResearch';
 import { useStorage } from '../hooks/useStorage';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 
 const Research = () => {
     const { t } = useLanguage();
@@ -175,17 +176,17 @@ const Research = () => {
         {
             icon: ShieldCheck,
             title: 'Original work only',
-            description: 'Submissions should be authored by you and free from plagiarism.',
+            description: 'Submissions should be yours and free from plagiarism.',
         },
         {
             icon: BookOpen,
             title: 'Structured and credible',
-            description: 'We prefer research supported by evidence, sources, and clear organization.',
+            description: 'We prefer evidence-based research with clear sources.',
         },
         {
             icon: Users,
             title: 'Practical impact',
-            description: 'Work related to healthcare, women’s health, and development is especially welcome.',
+            description: 'Work tied to healthcare, women’s health, and development is welcome.',
         },
     ];
 
@@ -193,117 +194,103 @@ const Research = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="section-padding bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/60">
-                <div className="container-custom space-y-8">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+            <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
+                <div className="absolute -left-20 top-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+                <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
+                    <div className="mx-auto max-w-4xl text-center">
+                        <Badge variant="secondary" className="mb-5 inline-flex gap-2 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.22em]">
+                            <Sparkles className="h-3.5 w-3.5" />
                             Research and publications
                         </Badge>
-                        <Badge variant="outline" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            Evidence-based work
-                        </Badge>
-                    </div>
 
-                    <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-                        <div className="max-w-3xl">
-                            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-                                Research that is useful, readable, and publishable.
-                            </h1>
-                            <p className="mt-5 text-lg leading-8 text-muted-foreground sm:text-xl">
-                                Explore published work or submit your own research to help shape practical knowledge for Afghanistan’s future.
-                            </p>
+                        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                            Research that is useful.
+                            <span className="block text-primary">Readable. Publishable. Practical.</span>
+                        </h1>
 
-                            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                                {[
-                                    { label: 'Published research', value: 'Free access' },
-                                    { label: 'Submission review', value: 'Careful review' },
-                                    { label: 'Focus areas', value: 'Health and development' },
-                                ].map((item) => (
-                                    <Card key={item.label} className="border-border/70 shadow-sm">
-                                        <CardContent className="p-5">
-                                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.label}</p>
-                                            <p className="mt-2 text-lg font-semibold text-foreground">{item.value}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
+                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+                            Explore published work or submit your own research to help shape practical knowledge for Afghanistan’s future.
+                        </p>
+
+                        <div className="mt-8 flex flex-wrap justify-center gap-3">
+                            {['Published work', 'Submission review', 'Health and development'].map((item) => (
+                                <div key={item} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm">
+                                    <span className="h-2 w-2 rounded-full bg-primary" />
+                                    {item}
+                                </div>
+                            ))}
                         </div>
-
-                        <Card className="rounded-[2rem] border-border/70 bg-card/95 shadow-xl backdrop-blur">
-                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                                    Submission standards
-                                </CardDescription>
-                                <CardTitle className="text-2xl">What good research looks like</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4 p-6">
-                                {keyPrinciples.map((principle) => {
-                                    const Icon = principle.icon;
-
-                                    return (
-                                        <div key={principle.title} className="flex gap-4 rounded-2xl border border-border bg-background p-4">
-                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                                <Icon className="h-5 w-5" />
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-foreground">{principle.title}</p>
-                                                <p className="mt-1 text-sm leading-6 text-muted-foreground">{principle.description}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </CardContent>
-                        </Card>
                     </div>
                 </div>
             </section>
 
             <section className="section-padding bg-background">
                 <div className="container-custom">
-                    <div className="mx-auto max-w-6xl">
-                        <div className="mb-6 flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Explore research</p>
-                                <p className="mt-2 text-muted-foreground">Switch between published work and submission guidance.</p>
-                            </div>
+                    <div className="mb-8 text-center">
+                        <Badge variant="secondary" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+                            Submission standards
+                        </Badge>
+                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                            What good research looks like
+                        </h2>
+                    </div>
 
-                            <div className="inline-flex rounded-2xl border border-border bg-muted/40 p-1 shadow-sm">
-                                <button
-                                    onClick={() => setActiveTab('published')}
-                                    className={`rounded-xl px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'published'
-                                        ? 'bg-background text-primary shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                >
+                    <div className="grid gap-4 md:grid-cols-3">
+                        {keyPrinciples.map((principle) => {
+                            const Icon = principle.icon;
+
+                            return (
+                                <Card key={principle.title} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                    <CardHeader className="pb-3">
+                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                            <Icon className="h-5 w-5" />
+                                        </div>
+                                        <CardTitle className="text-lg">{principle.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-0">
+                                        <CardDescription>{principle.description}</CardDescription>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            <section className="section-padding bg-muted/20">
+                <div className="container-custom">
+                    <div className="mx-auto max-w-6xl">
+                        <div className="mb-8 text-center">
+                            <Badge variant="outline" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+                                Explore research
+                            </Badge>
+                            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                                Switch between published work and submission guidance
+                            </h2>
+                        </div>
+
+                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                            <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 md:w-fit md:grid-cols-2 md:mx-auto">
+                                <TabsTrigger value="published" className="rounded-xl border border-border bg-background py-2 data-[state=active]:border-primary/40">
                                     <span className="inline-flex items-center gap-2">
                                         <BookOpen className="h-4 w-4" />
                                         {t('research.tabs.published')}
                                     </span>
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('submit')}
-                                    className={`rounded-xl px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'submit'
-                                        ? 'bg-background text-primary shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                >
+                                </TabsTrigger>
+                                <TabsTrigger value="submit" className="rounded-xl border border-border bg-background py-2 data-[state=active]:border-primary/40">
                                     <span className="inline-flex items-center gap-2">
                                         <Send className="h-4 w-4" />
                                         {t('research.tabs.submit')}
                                     </span>
-                                </button>
-                            </div>
-                        </div>
+                                </TabsTrigger>
+                            </TabsList>
 
-                        {activeTab === 'published' && (
-                            <div className="space-y-8">
-                                <div className="max-w-3xl">
-                                    <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
-                                        {t('research.publishedSection.title')}
-                                    </h2>
-                                    <p className="mt-4 text-lg leading-8 text-muted-foreground">
-                                        {t('research.publishedSection.subtitle')}
-                                    </p>
+                            <TabsContent value="published" className="mt-8">
+                                <div className="mx-auto max-w-3xl text-center">
+                                    <p className="text-lg leading-8 text-muted-foreground">{t('research.publishedSection.subtitle')}</p>
                                 </div>
 
                                 {researchLoading ? (
@@ -311,7 +298,7 @@ const Research = () => {
                                         <Loader />
                                     </div>
                                 ) : publishedResearch && publishedResearch.length > 0 ? (
-                                    <div className="grid gap-6 xl:grid-cols-2">
+                                    <div className="mt-8 grid gap-6 xl:grid-cols-2">
                                         {publishedResearch.map((research) => (
                                             <Card key={research.id} className="overflow-hidden border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                                                 <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
@@ -324,15 +311,12 @@ const Research = () => {
                                                         </div>
 
                                                         {research.file_path && (
-                                                            <a
-                                                                href={research.file_path}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary/90"
-                                                            >
-                                                                <Download className="h-4 w-4" />
-                                                                PDF
-                                                            </a>
+                                                            <Button asChild variant="outline" className="rounded-full">
+                                                                <a href={research.file_path} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
+                                                                    <Download className="h-4 w-4" />
+                                                                    PDF
+                                                                </a>
+                                                            </Button>
                                                         )}
                                                     </div>
                                                 </CardHeader>
@@ -354,17 +338,19 @@ const Research = () => {
                                                             </Badge>
                                                         ))}
                                                     </div>
-
-                                                    <div className="flex items-center justify-between gap-3 border-t border-border pt-4 text-xs text-muted-foreground">
-                                                        <span>Published</span>
-                                                        <span>{new Date(research.published_date || research.submission_date).toLocaleDateString()}</span>
-                                                    </div>
                                                 </CardContent>
+
+                                                <CardFooter className="justify-between border-t border-border/60">
+                                                    <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Published</span>
+                                                    <span className="text-sm text-foreground">
+                                                        {new Date(research.published_date || research.submission_date).toLocaleDateString()}
+                                                    </span>
+                                                </CardFooter>
                                             </Card>
                                         ))}
                                     </div>
                                 ) : (
-                                    <Card className="border-dashed border-border/80 bg-muted/30">
+                                    <Card className="mt-8 border-dashed border-border/80 bg-muted/30">
                                         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
                                             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                                                 <FileText className="h-8 w-8" />
@@ -375,18 +361,11 @@ const Research = () => {
                                         </CardContent>
                                     </Card>
                                 )}
-                            </div>
-                        )}
+                            </TabsContent>
 
-                        {activeTab === 'submit' && (
-                            <div className="space-y-8">
-                                <div className="max-w-3xl">
-                                    <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
-                                        {t('research.submitSection.title')}
-                                    </h2>
-                                    <p className="mt-4 text-lg leading-8 text-muted-foreground">
-                                        {t('research.submitSection.subtitle')}
-                                    </p>
+                            <TabsContent value="submit" className="mt-8 space-y-8">
+                                <div className="mx-auto max-w-3xl text-center">
+                                    <p className="text-lg leading-8 text-muted-foreground">{t('research.submitSection.subtitle')}</p>
                                 </div>
 
                                 <Card className="border-border/70 shadow-xl">
@@ -449,7 +428,7 @@ const Research = () => {
                                                     { label: t('research.submitSection.form.title'), name: 'title', placeholder: 'Research title...' },
                                                     { label: t('research.submitSection.form.author'), name: 'author', placeholder: 'Your name...' },
                                                     { label: t('research.submitSection.form.email'), name: 'email', placeholder: 'your@email.com', type: 'email' },
-                                                    { label: t('research.submitSection.form.topic'), name: 'topic', placeholder: 'e.g., Women\'s Healthcare, Economic Development...' },
+                                                    { label: t('research.submitSection.form.topic'), name: 'topic', placeholder: "e.g., Women's Healthcare, Economic Development..." },
                                                     { label: t('research.submitSection.form.keywords'), name: 'keywords', placeholder: 'Separate with commas...' },
                                                 ].map((field) => (
                                                     <div key={field.name}>
@@ -535,8 +514,8 @@ const Research = () => {
                                         </form>
                                     </CardContent>
                                 </Card>
-                            </div>
-                        )}
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </div>
             </section>

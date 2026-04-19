@@ -6,8 +6,6 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
     const [currentSlide, setCurrentSlide] = useState(0);
     const [images, setImages] = useState(backgroundImages.length > 0 ? backgroundImages : []);
     const [loading, setLoading] = useState(true);
-    const [imagesLoaded, setImagesLoaded] = useState(new Set());
-
     // Preload images
     useEffect(() => {
         const preloadImages = () => {
@@ -15,7 +13,6 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.onload = () => {
-                        setImagesLoaded((prev) => new Set(prev).add(image));
                         resolve();
                     };
                     img.onerror = resolve; // Resolve even if image fails
@@ -31,7 +28,8 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
         if (images.length > 0) {
             preloadImages();
         } else {
-            setLoading(false);
+            const timer = setTimeout(() => setLoading(false), 0);
+            return () => clearTimeout(timer);
         }
     }, [images]);
 

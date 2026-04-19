@@ -14,32 +14,43 @@ const ImpactList = () => {
     const [initialFormValues, setInitialFormValues] = useState(null);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        fetchImpacts();
-
-        // Check for query params to pre-fill form
-        const searchParams = new URLSearchParams(location.search);
-        const donationId = searchParams.get('donationId');
-
-        if (donationId) {
-            setInitialFormValues({
-                donationId: donationId,
-                // We can pre-fill title or description if needed, e.g.:
-                title: `Impact for ${searchParams.get('donorName') || 'Donor'}`,
-                description: `Impact proof for donation ${donationId} of amount $${searchParams.get('amount')}`,
-            });
-            setShowForm(true);
-        }
-    }, [location.search]);
-
-    const fetchImpacts = async () => {
+    async function fetchImpacts() {
         const result = await getAll();
         if (result.success) {
             setImpacts(result.data);
         } else {
             setError(result.error);
         }
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchImpacts();
+        }, 0);
+
+        // Check for query params to pre-fill form
+        const searchParams = new URLSearchParams(location.search);
+        const donationId = searchParams.get('donationId');
+
+        if (donationId) {
+            const prefillTimer = setTimeout(() => {
+                setInitialFormValues({
+                    donationId: donationId,
+                    // We can pre-fill title or description if needed, e.g.:
+                    title: `Impact for ${searchParams.get('donorName') || 'Donor'}`,
+                    description: `Impact proof for donation ${donationId} of amount $${searchParams.get('amount')}`,
+                });
+                setShowForm(true);
+            }, 0);
+
+            return () => {
+                clearTimeout(timer);
+                clearTimeout(prefillTimer);
+            };
+        }
+
+        return () => clearTimeout(timer);
+    }, [location.search]);
 
     const handleImpactAdded = () => {
         setShowForm(false);

@@ -9,12 +9,14 @@ import { PAYMENT_METHODS, CRYPTO_CURRENCIES } from '../utils/constants';
 import Loader from '../components/Loader';
 import ImpactCard from '../components/ImpactCard';
 import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/Tabs';
 
 const TrackDonation = () => {
     const [searchParams] = useSearchParams();
     const { getById, getByName, loading: donationLoading } = useDonation();
-    const { getByDonation, loading: impactLoading } = useImpact();
+    const { getByDonation } = useImpact();
 
     const [searchType, setSearchType] = useState('id');
     const [searchValue, setSearchValue] = useState(searchParams.get('id') || '');
@@ -23,16 +25,7 @@ const TrackDonation = () => {
     const [error, setError] = useState('');
     const [searched, setSearched] = useState(false);
 
-    // Auto-search if ID is present in URL
-    React.useEffect(() => {
-        const id = searchParams.get('id');
-        if (id && !searched) {
-            setSearchValue(id);
-            handleSearch(id);
-        }
-    }, [searchParams]);
-
-    const handleSearch = async (overrideValue) => {
+    async function handleSearch(overrideValue) {
         const valueToSearch = overrideValue || searchValue;
         setError('');
         setDonation(null);
@@ -78,7 +71,16 @@ const TrackDonation = () => {
                 setError('No donations found with this name');
             }
         }
-    };
+    }
+
+    // Auto-search if ID is present in URL
+    React.useEffect(() => {
+        const id = searchParams.get('id');
+        if (id && !searched) {
+            setSearchValue(id);
+            handleSearch(id);
+        }
+    }, [searchParams]);
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -209,46 +211,37 @@ const TrackDonation = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="section-padding bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/60">
+            <section className="section-padding border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
                 <div className="container-custom">
-                    <div className="mx-auto max-w-4xl space-y-6">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="secondary" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                                Donation tracking
-                            </Badge>
-                            <Badge variant="outline" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                                Transparent updates
-                            </Badge>
-                        </div>
+                    <div className="mx-auto max-w-4xl text-center">
+                        <Badge variant="secondary" className="mb-5 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
+                            Donation tracking
+                        </Badge>
+                        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                            Track your donation.
+                            <span className="block text-primary">See the result clearly.</span>
+                        </h1>
+                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+                            Search by donation ID or donor name to view status, payment instructions, and published impact proofs connected to your contribution.
+                        </p>
 
-                        <div className="max-w-3xl">
-                            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-                                Track your donation with clarity.
-                            </h1>
-                            <p className="mt-5 text-lg leading-8 text-muted-foreground sm:text-xl">
-                                Search by donation ID or donor name to view status, payment instructions, and any published impact proofs connected to your contribution.
-                            </p>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-3">
+                        <div className="mt-8 flex flex-wrap justify-center gap-3">
                             {[
-                                { label: 'Search by ID or name', value: 'Fast lookup' },
-                                { label: 'Review payment instructions', value: 'Pending donations' },
-                                { label: 'See impact proofs', value: 'Completed donations' },
+                                'Fast lookup',
+                                'Payment guidance',
+                                'Impact proofs',
                             ].map((item) => (
-                                <Card key={item.label} className="border-border/70 shadow-sm">
-                                    <CardContent className="p-5">
-                                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.label}</p>
-                                        <p className="mt-2 text-lg font-semibold text-foreground">{item.value}</p>
-                                    </CardContent>
-                                </Card>
+                                <div key={item} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm">
+                                    <span className="h-2 w-2 rounded-full bg-primary" />
+                                    {item}
+                                </div>
                             ))}
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="section-padding bg-muted/30">
+            <section className="section-padding bg-muted/20">
                 <div className="container-custom">
                     <div className="mx-auto max-w-3xl">
                         <Card className="overflow-hidden border-border/70 shadow-xl">
@@ -259,57 +252,46 @@ const TrackDonation = () => {
                                 <CardTitle className="text-2xl">Look up a donation</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6 p-6 sm:p-8">
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                    <button
-                                        onClick={() => setSearchType('id')}
-                                        className={`rounded-2xl border px-4 py-3 text-left transition-all ${searchType === 'id'
-                                            ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
-                                            : 'border-border bg-background hover:border-primary/20 hover:bg-muted/50'
-                                            }`}
-                                    >
-                                        <span className="block text-sm font-semibold">Search by Donation ID</span>
-                                        <span className="mt-1 block text-xs text-muted-foreground">Best for receipt lookups and exact tracking.</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setSearchType('name')}
-                                        className={`rounded-2xl border px-4 py-3 text-left transition-all ${searchType === 'name'
-                                            ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
-                                            : 'border-border bg-background hover:border-primary/20 hover:bg-muted/50'
-                                            }`}
-                                    >
-                                        <span className="block text-sm font-semibold">Search by Name</span>
-                                        <span className="mt-1 block text-xs text-muted-foreground">Useful when the donation ID isn’t available.</span>
-                                    </button>
-                                </div>
+                                <Tabs value={searchType} onValueChange={setSearchType} className="w-full">
+                                    <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0">
+                                        <TabsTrigger value="id" className="rounded-xl border border-border py-2 data-[state=active]:border-primary/40">
+                                            Search by ID
+                                        </TabsTrigger>
+                                        <TabsTrigger value="name" className="rounded-xl border border-border py-2 data-[state=active]:border-primary/40">
+                                            Search by name
+                                        </TabsTrigger>
+                                    </TabsList>
 
-                                <div className="flex flex-col gap-3 sm:flex-row">
-                                    <div className="relative flex-1">
-                                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                        <input
-                                            type="text"
-                                            value={searchValue}
-                                            onChange={(e) => setSearchValue(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                            className="input-field h-12 pl-10"
-                                            placeholder={
-                                                searchType === 'id'
-                                                    ? 'Enter Donation ID (e.g., AFG-123456)'
-                                                    : 'Enter full name'
-                                            }
-                                        />
+                                    <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                                        <div className="relative flex-1">
+                                            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                            <input
+                                                type="text"
+                                                value={searchValue}
+                                                onChange={(e) => setSearchValue(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                                className="input-field h-12 pl-10"
+                                                placeholder={
+                                                    searchType === 'id'
+                                                        ? 'Enter Donation ID (e.g., AFG-123456)'
+                                                        : 'Enter full name'
+                                                }
+                                            />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            onClick={() => handleSearch()}
+                                            disabled={donationLoading}
+                                            className="h-12 rounded-xl px-6"
+                                        >
+                                            {donationLoading ? <Loader size="sm" color="white" /> : <Search className="h-4 w-4" />}
+                                            Track
+                                        </Button>
                                     </div>
-                                    <button
-                                        onClick={() => handleSearch()}
-                                        disabled={donationLoading}
-                                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 font-semibold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary/90 disabled:opacity-50"
-                                    >
-                                        {donationLoading ? <Loader size="sm" color="white" /> : <Search className="h-4 w-4" />}
-                                        Track
-                                    </button>
-                                </div>
+                                </Tabs>
 
                                 {error && (
-                                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
+                                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                                         {error}
                                     </div>
                                 )}
@@ -353,7 +335,7 @@ const TrackDonation = () => {
                                         ].map((item) => (
                                             <div key={item.label} className="rounded-2xl border border-border bg-muted/30 p-4">
                                                 <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.label}</div>
-                                                <div className="mt-2 text-base font-semibold text-foreground break-words">{item.value}</div>
+                                                <div className="mt-2 break-words text-base font-semibold text-foreground">{item.value}</div>
                                             </div>
                                         ))}
                                     </div>

@@ -2,25 +2,25 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatCurrency } from '../../../utils/formatters';
 
-const DonationsLineChart = ({ data, period = '30 days' }) => {
-    // Custom tooltip
-    const CustomTooltip = ({ active, payload }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-                    <p className="text-sm font-semibold text-gray-900">{payload[0].payload.date}</p>
-                    <p className="text-sm text-green-600">
-                        Amount: {formatCurrency(payload[0].value)}
-                    </p>
-                    <p className="text-sm text-blue-600">
-                        Count: {payload[1]?.value || 0}
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
+const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+                <p className="text-sm font-semibold text-gray-900">{payload[0].payload.date}</p>
+                <p className="text-sm text-green-600">
+                    Amount: {formatCurrency(payload[0].value)}
+                </p>
+                <p className="text-sm text-blue-600">
+                    Count: {payload[1]?.value || 0}
+                </p>
+            </div>
+        );
+    }
 
+    return null;
+};
+
+const DonationsLineChart = ({ data, period = '30 days' }) => {
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-6">

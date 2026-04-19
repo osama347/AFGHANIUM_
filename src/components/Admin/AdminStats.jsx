@@ -17,11 +17,7 @@ const AdminStats = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, [selectedPeriod]);
-
-    const fetchDashboardData = async () => {
+    async function fetchDashboardData() {
         setLoading(true);
         const result = await getDashboardData(selectedPeriod);
 
@@ -35,7 +31,15 @@ const AdminStats = () => {
         setTimeSeriesData(result.data.timeSeries);
         setPaymentMethodsData(result.data.paymentMethods);
         setLoading(false);
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchDashboardData();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, [selectedPeriod]);
 
     if (loading && !stats) {
         return (

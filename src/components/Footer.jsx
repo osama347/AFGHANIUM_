@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { CONTACT_INFO, SOCIAL_LINKS, LANGUAGES } from '../utils/constants';
+import { CONTACT_INFO, SOCIAL_LINKS } from '../utils/constants';
 
 const Footer = () => {
-    const { t, currentLanguage, changeLanguage } = useLanguage();
+    const { t } = useLanguage();
+    const phoneHref = CONTACT_INFO.phone.startsWith('00')
+        ? `+${CONTACT_INFO.phone.slice(2)}`
+        : CONTACT_INFO.phone;
 
     const quickLinks = [
         { to: '/', label: t('nav.home') },
@@ -31,9 +34,9 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="bg-primary-dark text-white mt-auto relative">
+        <footer className="relative mt-auto overflow-hidden bg-[linear-gradient(145deg,#173f28_0%,#1f5130_45%,#27683f_100%)] text-white">
             {/* Afghan Pattern Background */}
-            <div className="afghan-pattern-bg opacity-10 absolute w-full h-full" />
+            <div className="afghan-pattern-bg pointer-events-none absolute inset-0 opacity-10" />
 
             <div className="container-custom relative">
                 {/* Main Footer Content */}
@@ -51,28 +54,6 @@ const Footer = () => {
                         <p className="text-gray-300 mb-6">
                             Breaking barriers. Building bridges.
                         </p>
-
-                        {/* Language Switcher */}
-                        <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-gray-300 mb-2">
-                                <Globe className="w-5 h-5" />
-                                <span className="font-semibold">Language:</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {LANGUAGES.map((lang) => (
-                                    <button
-                                        key={lang.code}
-                                        onClick={() => changeLanguage(lang.code)}
-                                        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${currentLanguage === lang.code
-                                            ? 'bg-primary text-white'
-                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                                            }`}
-                                    >
-                                        {lang.nativeName}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
                     </div>
 
                     {/* Quick Links */}
@@ -107,7 +88,12 @@ const Footer = () => {
                             </li>
                             <li className="flex items-start space-x-3">
                                 <Phone className="w-5 h-5 text-primary mt-1" />
-                                <span className="text-gray-300">{CONTACT_INFO.phone}</span>
+                                <a
+                                    href={`tel:${phoneHref}`}
+                                    className="text-gray-300 hover:text-white transition-colors"
+                                >
+                                    {CONTACT_INFO.phone}
+                                </a>
                             </li>
                             <li className="flex items-start space-x-3">
                                 <MapPin className="w-5 h-5 text-primary mt-1" />
@@ -120,7 +106,9 @@ const Footer = () => {
                     <div>
                         <h3 className="text-xl font-bold mb-6">{t('footer.followUs')}</h3>
                         <div className="flex space-x-4">
-                            {socialMediaLinks.map(({ icon: Icon, href, label }) => (
+                            {socialMediaLinks.map(({ icon, href, label }) => {
+                                const SocialIcon = icon;
+                                return (
                                 <a
                                     key={label}
                                     href={href}
@@ -129,9 +117,10 @@ const Footer = () => {
                                     aria-label={label}
                                     className="w-10 h-10 bg-white/10 hover:bg-primary rounded-full flex items-center justify-center transition-colors"
                                 >
-                                    <Icon className="w-5 h-5" />
+                                    <SocialIcon className="w-5 h-5" />
                                 </a>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

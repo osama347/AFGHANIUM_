@@ -33,18 +33,22 @@ const AdminProducts = () => {
         return Math.max(...products.map((item) => Number(item.display_order) || 1)) + 1;
     }, [products]);
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    const fetchProducts = async () => {
+    async function fetchProducts() {
         const result = await getAll();
         if (result.success) {
             setProducts(result.data || []);
             return;
         }
         toast.error(`Failed to load products: ${result.error}`);
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchProducts();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const resetForm = () => {
         setForm({ ...getInitialForm(), display_order: nextDisplayOrder });

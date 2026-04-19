@@ -7,21 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Afghan charity branding colors
-        primary: {
-          DEFAULT: '#3A9D58',
-          dark: '#1F5130',
-          light: '#4DB86E',
-        },
-        secondary: {
-          DEFAULT: '#C4D7C4',
-          light: '#E5F0E5',
-          dark: '#A8C4A8',
-        },
-        accent: {
-          gold: '#D4AF37',
-          green: '#1F5130',
-        },
         // Shadcn/ui CSS Variables support
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -31,10 +16,14 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          dark: '#1F5130',
+          light: '#4DB86E',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          light: '#E5F0E5',
+          dark: '#A8C4A8',
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -47,6 +36,8 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          gold: '#D4AF37',
+          green: '#1F5130',
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -63,8 +54,8 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Poppins', 'sans-serif'],
+        sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        display: ['Montserrat', 'sans-serif'],
       },
       backgroundImage: {
         'afghan-pattern': "url('/patterns/afghan-pattern.svg')",

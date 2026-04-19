@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '../ui/Alert';
 import Loader from '../Loader';
 
 const AdminLogin = () => {
-  const { login, loading, error } = useAdminAuth();
+  const { login, error } = useAdminAuth();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

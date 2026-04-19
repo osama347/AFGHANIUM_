@@ -105,7 +105,7 @@ export const validateDonationId = (id) => {
  */
 export const validatePhone = (phone) => {
     if (!phone) return false;
-    const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{4,10}$/;
+    const phoneRegex = /^\+?\(?[0-9]{1,4}\)?[-\s.]?\(?[0-9]{1,4}\)?[-\s.]?[0-9]{4,10}$/;
     return phoneRegex.test(phone);
 };
 

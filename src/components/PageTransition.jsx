@@ -10,9 +10,13 @@ const PageTransition = ({ children }) => {
         window.scrollTo(0, 0);
 
         // Quick fade in
-        setIsVisible(false);
-        const timer = setTimeout(() => setIsVisible(true), 50);
-        return () => clearTimeout(timer);
+        const hideTimer = setTimeout(() => setIsVisible(false), 0);
+        const showTimer = setTimeout(() => setIsVisible(true), 50);
+
+        return () => {
+            clearTimeout(hideTimer);
+            clearTimeout(showTimer);
+        };
     }, [location]);
 
     return (

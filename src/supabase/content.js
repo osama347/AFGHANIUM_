@@ -84,7 +84,7 @@ export const getSlideshowImages = async () => {
  * @param {Array} images - Array of image URLs (ignored)
  * @returns {Promise<object>} Success result
  */
-export const updateSlideshowImages = async (images) => {
+export const updateSlideshowImages = async () => {
     // Since we fetch images directly from the bucket, we don't need to store them in DB
     // The images are automatically available when uploaded to the hero folder
     return { success: true };

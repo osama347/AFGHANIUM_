@@ -253,11 +253,7 @@ const AdminEmergency = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const { showToast } = useToast();
 
-    useEffect(() => {
-        fetchCampaigns();
-    }, []);
-
-    const fetchCampaigns = async () => {
+    async function fetchCampaigns() {
         const result = await getAll();
         if (result.success) {
             setCampaigns(result.data || []);
@@ -265,7 +261,15 @@ const AdminEmergency = () => {
         }
 
         showToast('Failed to load campaigns: ' + (result.error || 'Unknown error'), 'error');
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchCampaigns();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const now = new Date();
     const stats = useMemo(() => {
@@ -363,7 +367,6 @@ const AdminEmergency = () => {
             showToast('Failed to delete campaign', 'error');
         }
     };
-
     const handleCreateCampaign = async (payload) => {
         setIsSubmitting(true);
 

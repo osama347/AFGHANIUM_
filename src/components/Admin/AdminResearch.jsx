@@ -5,7 +5,7 @@ import Loader from '../Loader';
 import Toast from '../Toast';
 
 const AdminResearch = () => {
-    const { getAll, updateStatus, remove, getStats } = useResearch();
+    const { getAll, updateStatus, getStats } = useResearch();
     const [submissions, setSubmissions] = useState([]);
     const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0, published: 0 });
     const [loading, setLoading] = useState(true);
@@ -77,25 +77,6 @@ const AdminResearch = () => {
                 setAdminNotes('');
             } else {
                 setToast({ type: 'error', message: result.error || 'Failed to reject research' });
-            }
-        } catch (error) {
-            setToast({ type: 'error', message: error.message });
-        } finally {
-            setProcessing(false);
-        }
-    };
-
-    const handleDelete = async (researchId) => {
-        if (!window.confirm('Are you sure you want to delete this submission?')) return;
-        
-        setProcessing(true);
-        try {
-            const result = await remove(researchId);
-            if (result.success) {
-                setToast({ type: 'success', message: 'Research deleted successfully' });
-                loadResearchData();
-            } else {
-                setToast({ type: 'error', message: result.error || 'Failed to delete research' });
             }
         } catch (error) {
             setToast({ type: 'error', message: error.message });

@@ -19,9 +19,7 @@ const AdminDashboardPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchDashboardData(); }, [selectedPeriod]);
-
-  const fetchDashboardData = async () => {
+  async function fetchDashboardData() {
     setLoading(true);
     const result = await getDashboardData(selectedPeriod);
     if (!result.success) { setError(result.error); setLoading(false); return; }
@@ -29,7 +27,15 @@ const AdminDashboardPage = () => {
     setTimeSeriesData(result.data.timeSeries);
     setPaymentMethodsData(result.data.paymentMethods);
     setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchDashboardData();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [selectedPeriod]);
 
   if (loading && !stats) return <div className="flex justify-center items-center py-20"><Loader size="lg" /></div>;
   if (error) return <div className="rounded-lg border border-destructive/50 bg-destructive/5 p-4 text-destructive"><AlertTriangle className="inline-block w-5 h-5 mr-2" />Error: {error}</div>;

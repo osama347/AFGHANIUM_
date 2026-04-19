@@ -9,18 +9,22 @@ const DailyReport = () => {
     const [dailyData, setDailyData] = useState([]);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        fetchDailyStats();
-    }, []);
-
-    const fetchDailyStats = async () => {
+    async function fetchDailyStats() {
         const result = await getDailyStats();
         if (result.success) {
             setDailyData(result.data);
         } else {
             setError(result.error);
         }
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchDailyStats();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     if (loading) return <Loader />;
 
@@ -71,7 +75,7 @@ const DailyReport = () => {
                             </div>
                             <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
                                 <div
-                                    className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-out group-hover:bg-primary-dark"
+                                    className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-out group-hover:bg-primary/90"
                                     style={{ width: `${(day.amount / maxAmount) * 100}%` }}
                                 ></div>
                             </div>

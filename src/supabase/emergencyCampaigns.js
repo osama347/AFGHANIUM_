@@ -108,7 +108,7 @@ export const createEmergencyCampaign = async (campaignData) => {
  */
 export const updateEmergencyCampaign = async (id, updates) => {
     try {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('emergency_campaigns')
             .update(updates)
             .eq('id', id)
@@ -132,7 +132,7 @@ export const updateEmergencyCampaign = async (id, updates) => {
  */
 export const toggleCampaignVisibility = async (id, isActive) => {
     try {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('emergency_campaigns')
             .update({ is_active: isActive })
             .eq('id', id)
@@ -141,7 +141,7 @@ export const toggleCampaignVisibility = async (id, isActive) => {
 
         if (error) throw error;
 
-        return { success: true, data };
+        return await fetchCampaigns({ singleId: id });
     } catch (error) {
         console.error('Error toggling campaign visibility:', error);
         return { success: false, error: error.message };

@@ -9,11 +9,7 @@ const AdminInbox = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        fetchMessages();
-    }, []);
-
-    const fetchMessages = async () => {
+    async function fetchMessages() {
         setLoading(true);
         const result = await getMessages();
         if (result.success) {
@@ -22,7 +18,15 @@ const AdminInbox = () => {
             setError(result.error);
         }
         setLoading(false);
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchMessages();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleMarkAsRead = async (id) => {
         const result = await markMessageAsRead(id);

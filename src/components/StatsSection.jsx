@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { DollarSign, Heart, TrendingUp, Users } from 'lucide-react';
-import AnimatedCounter from './AnimatedCounter';
 import { supabase } from '../supabase/client';
 
 const StatsSection = () => {
@@ -11,11 +10,7 @@ const StatsSection = () => {
         activeProjects: 0,
     });
 
-    useEffect(() => {
-        fetchStats();
-    }, []);
-
-    const fetchStats = async () => {
+    async function fetchStats() {
         try {
             // Get total amount raised from valid donations (completed + pending)
             const { data: validDonations, error: donationsError } = await supabase
@@ -76,7 +71,15 @@ const StatsSection = () => {
                 activeProjects: 6,
             });
         }
-    };
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchStats();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const statCards = [
         {
@@ -108,6 +111,8 @@ const StatsSection = () => {
         },
     ];
 
+    const formatStatValue = (value) => value.toLocaleString();
+
     return (
         <section className="section-padding bg-gradient-to-br from-primary-dark to-primary">
             <div className="container-custom">
@@ -121,11 +126,9 @@ const StatsSection = () => {
                                 <stat.icon className="w-8 h-8 text-white" />
                             </div>
                             <div className="text-white">
-                                <AnimatedCounter
-                                    end={stat.value}
-                                    prefix={stat.prefix}
-                                    suffix={stat.suffix}
-                                />
+                                <div className="text-4xl md:text-5xl font-bold">
+                                    {stat.prefix || ''}{formatStatValue(stat.value)}{stat.suffix || ''}
+                                </div>
                             </div>
                             <p className="text-gray-200 mt-2 font-medium">{stat.label}</p>
                         </div>

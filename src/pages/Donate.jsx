@@ -17,7 +17,7 @@ import { Textarea } from '../components/ui/FormElements';
 const Donate = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { t, currentLanguage } = useLanguage();
+    const { t } = useLanguage();
     const { create, loading } = useDonation();
     const { getById } = useEmergencyCampaign();
 
@@ -35,20 +35,24 @@ const Donate = () => {
 
     const [errors, setErrors] = useState({});
 
-    useEffect(() => {
-        if (emergencyId) {
-            fetchEmergencyCampaign();
-        }
-    }, [emergencyId]);
-
-    const fetchEmergencyCampaign = async () => {
+    async function fetchEmergencyCampaign() {
         setFetchingCampaign(true);
         const result = await getById(emergencyId);
         if (result.success) {
             setEmergencyCampaign(result.data);
         }
         setFetchingCampaign(false);
-    };
+    }
+
+    useEffect(() => {
+        if (emergencyId) {
+            const timer = setTimeout(() => {
+                fetchEmergencyCampaign();
+            }, 0);
+
+            return () => clearTimeout(timer);
+        }
+    }, [emergencyId]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -93,7 +97,7 @@ const Donate = () => {
     };
 
     const campaignName = emergencyCampaign
-        ? (emergencyCampaign[`name_${currentLanguage}`] || emergencyCampaign.name_en)
+        ? emergencyCampaign.name_en
         : t('donation.form.title');
 
     const campaignSubtitle = emergencyCampaign
@@ -175,12 +179,12 @@ const Donate = () => {
                                         <AlertTitle className="flex items-center gap-2">
                                             <span className="text-xl leading-none">{emergencyCampaign.icon}</span>
                                             <span>
-                                                Donating to {emergencyCampaign[`name_${currentLanguage}`] || emergencyCampaign.name_en}
+                                                Donating to {emergencyCampaign.name_en}
                                             </span>
                                         </AlertTitle>
                                         <AlertDescription>
                                             <p className="mb-2">
-                                                {emergencyCampaign[`description_${currentLanguage}`] || emergencyCampaign.description_en}
+                                                {emergencyCampaign.description_en}
                                             </p>
                                             <p className="font-semibold">100% of this donation goes directly to this emergency cause.</p>
                                         </AlertDescription>
@@ -285,7 +289,8 @@ const Donate = () => {
                                     <div className="space-y-4">
                                         <h2 className="text-xl font-semibold text-foreground">Payment method *</h2>
                                         <div className="grid gap-4 md:grid-cols-2">
-                                            {paymentMethodOptions.map(({ value, label, icon: Icon, description }) => {
+                                            {paymentMethodOptions.map(({ value, label, icon, description }) => {
+                                                const PaymentIcon = icon;
                                                 const isSelected = formData.paymentMethod === value;
                                                 return (
                                                     <button
@@ -302,7 +307,7 @@ const Donate = () => {
                                                     >
                                                         <div className="flex items-center gap-3">
                                                             <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
-                                                                <Icon className="h-5 w-5" />
+                                                                <PaymentIcon className="h-5 w-5" />
                                                             </div>
                                                             <div>
                                                                 <p className="font-semibold text-foreground">{label}</p>
