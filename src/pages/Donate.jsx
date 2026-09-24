@@ -8,7 +8,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import Loader from '../components/Loader';
 import { AlertTriangle, Building2, CheckCircle2, Landmark, Smartphone } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/Alert';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -137,17 +136,8 @@ const Donate = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="section-padding bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/60">
+            <section className="section-padding border-b border-border">
                 <div className="container-custom space-y-8">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            Donate
-                        </Badge>
-                        <Badge variant="outline" className="rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            Direct and traceable impact
-                        </Badge>
-                    </div>
-
                     <div className="max-w-4xl space-y-4">
                         <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
                             {campaignName}

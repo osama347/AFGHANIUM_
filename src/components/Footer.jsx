@@ -34,11 +34,8 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="relative mt-auto overflow-hidden bg-[linear-gradient(145deg,#173f28_0%,#1f5130_45%,#27683f_100%)] text-white">
-            {/* Afghan Pattern Background */}
-            <div className="afghan-pattern-bg pointer-events-none absolute inset-0 opacity-10" />
-
-            <div className="container-custom relative">
+        <footer className="mt-auto bg-primary-dark text-white">
+            <div className="container-custom">
                 {/* Main Footer Content */}
                 <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* About Section */}
@@ -47,7 +44,7 @@ const Footer = () => {
                             <img
                                 src="/logo.jpg"
                                 alt="Afghanium logo"
-                                className="w-12 h-12 rounded-xl object-cover border border-white/15"
+                                className="w-12 h-12 rounded-lg object-cover border border-white/15"
                             />
                             <span className="font-display text-2xl font-bold tracking-tight">Afghanium</span>
                         </div>
@@ -115,7 +112,7 @@ const Footer = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={label}
-                                    className="w-10 h-10 bg-white/10 hover:bg-accent-gold hover:text-primary-dark rounded-xl flex items-center justify-center transition-colors"
+                                    className="w-10 h-10 bg-white/10 hover:bg-accent-gold hover:text-primary-dark rounded-lg flex items-center justify-center transition-colors"
                                 >
                                     <SocialIcon className="w-5 h-5" />
                                 </a>

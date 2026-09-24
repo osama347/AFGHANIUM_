@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, CheckCircle, Globe, Heart, ShieldCheck, Sparkles, Target, TrendingUp, Users } from 'lucide-react';
+import { BookOpen, CheckCircle, Globe, Heart, ShieldCheck, Target, TrendingUp, Users } from 'lucide-react';
 import { getContent } from '../supabase/content';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Badge } from '../components/ui/Badge';
@@ -78,18 +78,9 @@ const About = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
-                <div className="absolute -left-20 top-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
+            <section className="border-b border-border">
                 <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
                     <div className="mx-auto max-w-4xl text-center">
-                        <Badge variant="secondary" className="mb-5 inline-flex gap-2 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.22em]">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            About Afghanium
-                        </Badge>
-
                         <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                             Building a bridge from Afghan work
                             <span className="block text-primary">to global opportunity.</span>
@@ -259,31 +250,22 @@ const About = () => {
                 </div>
             </section>
 
-            <section className="section-padding bg-gradient-to-br from-primary-dark to-primary text-white relative overflow-hidden">
-                <div className="afghan-pattern-bg absolute inset-0 opacity-10" />
-                <div className="container-custom relative z-10">
-                    <Card className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border-white/15 bg-white/10 text-white shadow-2xl backdrop-blur-md">
-                        <CardContent className="p-8 text-center sm:p-12">
-                            <Badge variant="secondary" className="mb-5 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                                Join the mission
-                            </Badge>
-                            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                                Support the model that connects trade and care.
-                            </h2>
-                            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/85 sm:text-lg">
-                                If you want to support the work directly, or learn more about how the model fits together, these are the next steps.
-                            </p>
-
-                            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                                <Button asChild size="lg" className="rounded-full bg-white px-6 text-primary hover:bg-white/90">
-                                    <Link to="/donate">Make a donation</Link>
-                                </Button>
-                                <Button asChild variant="outline" size="lg" className="!bg-transparent rounded-full border-white px-6 text-white hover:bg-white hover:text-primary">
-                                    <Link to="/contact">Contact us</Link>
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+            <section className="bg-primary text-primary-foreground">
+                <div className="container-custom py-16 text-center sm:py-20">
+                    <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                        Support the model that connects trade and care.
+                    </h2>
+                    <p className="mx-auto mt-3 max-w-xl text-primary-foreground/85">
+                        Support the work directly, or get in touch to learn more.
+                    </p>
+                    <div className="mt-7 flex flex-wrap justify-center gap-3">
+                        <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+                            <Link to="/donate">Make a donation</Link>
+                        </Button>
+                        <Button asChild variant="outline" size="lg" className="!bg-transparent border-white text-white hover:bg-white hover:text-primary">
+                            <Link to="/contact">Contact us</Link>
+                        </Button>
+                    </div>
                 </div>
             </section>
         </div>

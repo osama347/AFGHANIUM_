@@ -49,7 +49,7 @@ const ImpactCard = ({ impact }) => {
     return (
         <>
             <div
-                className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm card-hover cursor-pointer group"
+                className="bg-card border border-border rounded-lg overflow-hidden shadow-sm card-hover cursor-pointer group"
                 onClick={() => setShowDetails(true)}
             >
                 {/* Media Carousel (Preview) */}

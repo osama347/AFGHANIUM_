@@ -119,9 +119,6 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
                 </div>
             )}
 
-            {/* Afghan Pattern Overlay */}
-            <div className="absolute inset-0 afghan-pattern-bg opacity-10" />
-
             {/* Navigation Arrows */}
             <button
                 onClick={prevSlide}

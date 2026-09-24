@@ -1,51 +1,41 @@
 import React from 'react';
-import { Quote } from 'lucide-react';
+import { MapPin, Quote } from 'lucide-react';
 import { getTestimonialImageUrl } from '../supabase/storage';
 
 const TestimonialCard = ({ testimonial }) => {
     return (
-        <div className="relative bg-card rounded-2xl p-8 shadow-sm hover:shadow-lifted transition-all duration-300 hover:-translate-y-2 border border-border group">
-            {/* Decorative top accent */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent-gold to-transparent rounded-t-2xl transition-all duration-300" />
+        <div className="bg-card rounded-lg p-8 border border-border">
+            <Quote className="mb-4 h-6 w-6 text-primary/40" />
 
-            <div className="flex items-center justify-center mb-6">
-                <Quote className="w-10 h-10 text-primary opacity-30" />
-            </div>
-
-            <p className="text-foreground/80 text-base mb-6 text-center leading-relaxed">
+            <p className="text-foreground/80 text-base leading-relaxed">
                 "{testimonial.message}"
             </p>
 
-            <div className="text-center">
+            <div className="mt-6 flex items-center gap-3">
                 {testimonial.image_url && (
-                    <div className="mb-4 inline-block">
-                        <div className="relative inline-block">
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-light rounded-full blur-md opacity-30" />
-                            <img
-                                src={getTestimonialImageUrl(testimonial.image_url)}
-                                alt={testimonial.name}
-                                className="relative w-16 h-16 rounded-full object-cover border-2 border-white"
-                            />
-                        </div>
-                    </div>
+                    <img
+                        src={getTestimonialImageUrl(testimonial.image_url)}
+                        alt={testimonial.name}
+                        className="h-11 w-11 rounded-full object-cover"
+                    />
                 )}
-                <p className="font-display font-semibold text-foreground text-lg">
-                    {testimonial.name}
-                </p>
-                {testimonial.location && (
-                    <p className="text-muted-foreground text-sm mt-1 flex items-center justify-center gap-1">
-                        📍 {testimonial.location}
+                <div>
+                    <p className="font-semibold text-foreground text-sm">
+                        {testimonial.name}
                     </p>
+                    {testimonial.location && (
+                        <p className="text-muted-foreground text-xs mt-0.5 flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {testimonial.location}
+                        </p>
+                    )}
+                </div>
+                {testimonial.amount && (
+                    <span className="ml-auto shrink-0 text-xs font-medium text-muted-foreground">
+                        ${testimonial.amount}
+                    </span>
                 )}
             </div>
-
-            {testimonial.amount && (
-                <div className="mt-6 pt-4 border-t border-border text-center">
-                    <span className="inline-block bg-secondary/15 px-3 py-1 rounded-full text-secondary-foreground font-semibold text-sm">
-                        Donated ${testimonial.amount}
-                    </span>
-                </div>
-            )}
         </div>
     );
 };

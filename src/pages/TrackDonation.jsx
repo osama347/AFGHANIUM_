@@ -211,12 +211,9 @@ const TrackDonation = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="section-padding border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
+            <section className="section-padding border-b border-border">
                 <div className="container-custom">
                     <div className="mx-auto max-w-4xl text-center">
-                        <Badge variant="secondary" className="mb-5 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            Donation tracking
-                        </Badge>
                         <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                             Track your donation.
                             <span className="block text-primary">See the result clearly.</span>

@@ -61,10 +61,10 @@ export default {
         'afghan-pattern': "url('/patterns/afghan-pattern.svg')",
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(58, 157, 88, 0.1), 0 4px 6px -2px rgba(58, 157, 88, 0.05)',
+        'soft': '0 1px 3px rgba(16, 24, 32, 0.06), 0 1px 2px rgba(16, 24, 32, 0.04)',
         'md-green': '0 4px 6px -1px rgba(58, 157, 88, 0.1), 0 2px 4px -1px rgba(58, 157, 88, 0.06)',
-        'lifted': '0 30px 60px -25px rgba(31, 81, 48, 0.35), 0 10px 20px -12px rgba(31, 81, 48, 0.18)',
-        'gold': '0 10px 30px -10px rgba(212, 175, 55, 0.45)',
+        'lifted': '0 4px 12px rgba(16, 24, 32, 0.08)',
+        'gold': '0 4px 12px -4px rgba(212, 175, 55, 0.35)',
       },
     },
   },

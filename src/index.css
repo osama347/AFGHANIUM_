@@ -4,51 +4,51 @@
 
 @layer base {
   :root {
-    /* Warm ivory canvas instead of stark white */
-    --background: 38 35% 97%;
-    --foreground: 20 18% 13%;
-    --card: 40 40% 99%;
-    --card-foreground: 20 18% 13%;
-    --popover: 40 40% 99%;
-    --popover-foreground: 20 18% 13%;
-    --muted: 36 24% 93%;
-    --muted-foreground: 25 10% 42%;
-    --accent: 142.1 55% 28%;
+    /* Plain, neutral canvas — the green does the talking, not the background */
+    --background: 0 0% 100%;
+    --foreground: 220 14% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 14% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 14% 14%;
+    --muted: 220 16% 96%;
+    --muted-foreground: 220 9% 45%;
+    --accent: 142.1 50.6% 35%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 5 72% 48%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 32 18% 87%;
-    --input: 32 18% 85%;
+    --border: 220 14% 90%;
+    --input: 220 14% 88%;
     --ring: 142.1 50.6% 35%;
-    --radius: 0.9rem;
+    --radius: 0.5rem;
 
-    /* Afghan charity color overrides — primary green is untouched */
+    /* Primary green is untouched */
     --primary: 142.1 50.6% 35%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary reworked as a warm saffron/gold, echoing Afghan craft & the accent-gold token */
-    --secondary: 40 62% 54%;
-    --secondary-foreground: 22 45% 14%;
+    /* Secondary is a quiet neutral, not a second loud color */
+    --secondary: 220 16% 96%;
+    --secondary-foreground: 220 14% 20%;
   }
 
   .dark {
-    --background: 22 18% 8%;
-    --foreground: 38 25% 95%;
-    --card: 22 16% 11%;
-    --card-foreground: 38 25% 95%;
-    --popover: 22 16% 11%;
-    --popover-foreground: 38 25% 95%;
-    --muted: 22 12% 16%;
-    --muted-foreground: 32 10% 65%;
+    --background: 220 18% 9%;
+    --foreground: 220 10% 95%;
+    --card: 220 16% 12%;
+    --card-foreground: 220 10% 95%;
+    --popover: 220 16% 12%;
+    --popover-foreground: 220 10% 95%;
+    --muted: 220 12% 17%;
+    --muted-foreground: 220 8% 65%;
     --accent: 142.1 55% 55%;
     --accent-foreground: 0 0% 0%;
-    --destructive: 5 62% 42%;
+    --destructive: 0 62% 42%;
     --destructive-foreground: 0 0% 98%;
-    --border: 22 12% 20%;
-    --input: 22 12% 22%;
+    --border: 220 12% 20%;
+    --input: 220 12% 22%;
     --ring: 142.1 55% 55%;
-    --secondary: 40 50% 48%;
-    --secondary-foreground: 22 40% 12%;
+    --secondary: 220 12% 18%;
+    --secondary-foreground: 220 10% 92%;
   }
 
   html,
@@ -62,15 +62,6 @@
     font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-display;
-  }
-
   ::selection {
     background-color: hsl(var(--primary) / 0.18);
     color: hsl(var(--primary));
@@ -79,7 +70,7 @@
 
 @layer components {
 
-  /* Afghan-inspired geometric pattern, now diamond-based to feel more crafted */
+  /* Afghan-inspired geometric pattern — used sparingly, never as a loud overlay */
   .afghan-pattern-bg {
     background-image:
       linear-gradient(45deg, rgba(31, 81, 48, 0.05) 25%, transparent 25%),
@@ -95,19 +86,19 @@
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-lifted hover:-translate-y-1;
+    @apply transition-colors duration-200 hover:border-primary/30;
   }
 
   .btn-primary {
     background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    @apply hover:opacity-90 font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg;
+    @apply hover:opacity-90 font-semibold py-3 px-8 rounded-lg transition-all duration-200;
   }
 
   .btn-secondary {
     background-color: hsl(var(--secondary));
     color: hsl(var(--secondary-foreground));
-    @apply hover:opacity-85 font-semibold py-3 px-8 rounded-xl transition-all duration-200;
+    @apply hover:opacity-85 font-semibold py-3 px-8 rounded-lg transition-all duration-200;
   }
 
   .input-field {
@@ -134,14 +125,9 @@
     @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
   }
 
-  /* Small uppercase label used above headings for an editorial eyebrow */
+  /* Small uppercase label used sparingly above a heading — plain text, no pill/icon */
   .eyebrow {
-    @apply inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.28em] text-accent-gold;
-  }
-
-  .eyebrow::before {
-    content: '';
-    @apply h-1.5 w-1.5 rounded-full bg-accent-gold;
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground;
   }
 }
 
@@ -277,7 +263,7 @@
 }
 
 .card-glass {
-  @apply bg-card/90 backdrop-blur-md rounded-2xl shadow-lg border border-border;
+  @apply bg-card rounded-lg shadow-sm border border-border;
 }
 
 /* Shimmer Loading Animation for Hero Images */

@@ -20,17 +20,10 @@ const FAQ = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
-                <div className="absolute -left-20 top-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            <section className="border-b border-border">
 
                 <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
                     <div className="mx-auto max-w-4xl text-center">
-                        <Badge variant="secondary" className="mb-5 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                            FAQ
-                        </Badge>
-
                         <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                             {t('faqPage.title')}
                         </h1>

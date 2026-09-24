@@ -7,7 +7,6 @@ import {
     Heart,
     HeartHandshake,
     ShieldCheck,
-    Sparkles,
     Target,
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
@@ -87,18 +86,10 @@ const ImpactStories = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
-                <div className="absolute -left-20 top-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            <section className="border-b border-border">
 
                 <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
                     <div className="mx-auto max-w-4xl text-center">
-                        <Badge variant="secondary" className="mb-5 inline-flex gap-2 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.22em]">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            Mission and model
-                        </Badge>
-
                         <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                             Why this project exists.
                             <span className="block text-primary">Trade that also creates care.</span>
@@ -250,36 +241,27 @@ const ImpactStories = () => {
                 </div>
             </section>
 
-            <section className="section-padding bg-gradient-to-br from-primary-dark to-primary text-white">
-                <div className="container-custom">
-                    <Card className="overflow-hidden rounded-[2rem] border-white/15 bg-white/10 text-white shadow-2xl backdrop-blur">
-                        <CardContent className="p-8 sm:p-10">
-                            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-                                <div>
-                                    <Badge variant="secondary" className="mb-4 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.24em]">
-                                        Join the mission
-                                    </Badge>
-                                    <h3 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                                        Support Afghan producers and women-focused healthcare.
-                                    </h3>
-                                    <p className="mt-4 max-w-2xl text-base leading-8 text-white/85 sm:text-lg">
-                                        Every purchase and donation strengthens the same bridge: better market access for Afghan work, and stronger direct support where it matters.
-                                    </p>
-                                </div>
+            <section className="bg-primary text-primary-foreground">
+                <div className="container-custom py-14 sm:py-16">
+                    <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+                        <div>
+                            <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                                Support Afghan producers and women-focused healthcare.
+                            </h3>
+                            <p className="mt-3 max-w-2xl text-primary-foreground/85">
+                                Every purchase and donation strengthens the same bridge: better market access for Afghan work, and stronger direct support where it matters.
+                            </p>
+                        </div>
 
-                                <div className="flex flex-col gap-3 sm:min-w-72">
-                                    <Button asChild size="lg" className="h-12 rounded-full bg-white text-primary hover:bg-white/90">
-                                        <Link to="/donate" className="inline-flex items-center justify-center gap-2">
-                                            Support our mission <ArrowRight className="h-4 w-4" />
-                                        </Link>
-                                    </Button>
-                                    <Button asChild size="lg" variant="outline" className="h-12 !bg-transparent rounded-full border-white text-white hover:bg-white hover:text-primary">
-                                        <Link to="/about">Learn more about us</Link>
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        <div className="flex flex-col gap-3 sm:min-w-64">
+                            <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+                                <Link to="/donate">Support our mission</Link>
+                            </Button>
+                            <Button asChild size="lg" variant="outline" className="!bg-transparent border-white text-white hover:bg-white hover:text-primary">
+                                <Link to="/about">Learn more about us</Link>
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
