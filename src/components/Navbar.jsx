@@ -6,7 +6,8 @@ import {
     ChevronDown,
     CircleHelp,
     Menu,
-    Sparkles,
+    Search,
+    Shield,
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Dialog, DialogContent, DialogTitle } from './ui/Dialog';
@@ -21,15 +22,15 @@ const Navbar = () => {
     const primaryLinks = [
         { path: '/', label: t('nav.home') },
         { path: '/impact', label: t('nav.impact') },
-        { path: '/track', label: t('nav.track') },
-        { path: '/research', label: t('nav.research') },
         { path: '/about', label: t('nav.about') },
         { path: '/contact', label: t('nav.contact') },
     ];
 
     const moreLinks = [
+        { path: '/track', label: t('nav.track'), icon: Search },
+        { path: '/research', label: t('nav.research'), icon: Shield },
         { path: '/faq', label: t('nav.faq'), icon: CircleHelp },
-        { path: '/privacy', label: t('footer.privacy'), icon: Sparkles },
+        { path: '/privacy', label: t('footer.privacy'), icon: BookOpen },
         { path: '/terms', label: t('footer.terms'), icon: BookOpen },
     ];
 
@@ -64,7 +65,7 @@ const Navbar = () => {
                 <div className="flex h-16 items-center justify-between gap-4">
                     <Link to="/" className="flex min-w-0 items-center gap-2.5">
                         <img src="/logo.jpg" alt="AFGHANIUM" className="h-8 w-8 shrink-0 rounded-md object-cover" />
-                        <p className="truncate font-display text-lg font-bold tracking-tight text-foreground">
+                        <p className="truncate font-display text-base font-bold uppercase tracking-[0.08em] text-foreground">
                             Afghanium
                         </p>
                     </Link>
@@ -145,7 +146,7 @@ const Navbar = () => {
                     <div className="flex h-full flex-col overflow-hidden bg-background">
                         <div className="flex items-center gap-2.5 border-b border-border px-5 py-4">
                             <img src="/logo.jpg" alt="AFGHANIUM" className="h-8 w-8 rounded-md object-cover" />
-                            <p className="font-display text-lg font-bold tracking-tight text-foreground">Afghanium</p>
+                            <p className="font-display text-base font-bold uppercase tracking-[0.08em] text-foreground">Afghanium</p>
                         </div>
 
                         <div className="flex-1 overflow-y-auto px-5 py-5">

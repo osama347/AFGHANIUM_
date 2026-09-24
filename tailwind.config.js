@@ -47,6 +47,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        ink: '#0A0A0A',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -55,7 +56,7 @@ export default {
       },
       fontFamily: {
         sans: ['Montserrat', 'system-ui', 'sans-serif'],
-        display: ['"Fraunces"', 'Georgia', 'serif'],
+        display: ['"Space Grotesk"', 'Montserrat', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
         'afghan-pattern': "url('/patterns/afghan-pattern.svg')",
