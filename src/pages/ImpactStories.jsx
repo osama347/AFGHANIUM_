@@ -9,10 +9,11 @@ import {
     ShieldCheck,
     Target,
 } from 'lucide-react';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
+import PageHero from '../components/PageHero';
+import SectionHeading from '../components/SectionHeading';
 
 const ImpactStories = () => {
     const roadmapSections = [
@@ -86,156 +87,93 @@ const ImpactStories = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="border-b border-border">
+            <PageHero
+                eyebrow="Impact roadmap"
+                title="Why this project exists. Trade that also creates care."
+                subtitle="Afghanium is built around one clear approach: unlock fair market access for Afghan producers, then reinvest part of the success into direct humanitarian support."
+            >
+                <div className="mt-8 flex flex-wrap gap-3">
+                    <Button asChild size="lg">
+                        <Link to="/shop">Explore products</Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline">
+                        <Link to="/donate">Support the mission</Link>
+                    </Button>
+                </div>
+            </PageHero>
 
-                <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
-                    <div className="mx-auto max-w-4xl text-center">
-                        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                            Why this project exists.
-                            <span className="block text-primary">Trade that also creates care.</span>
-                        </h1>
+            <section className="section-padding">
+                <div className="container-custom">
+                    <SectionHeading index="01" title="A model designed to stay understandable" />
 
-                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-                            Afghanium is built around one clear approach: unlock fair market access for Afghan producers, then reinvest part of the success into direct humanitarian support.
-                        </p>
-
-                        <div className="mt-8 flex flex-wrap justify-center gap-3">
-                            <Button asChild size="lg" className="h-12 rounded-full px-6">
-                                <Link to="/shop">Explore products</Link>
-                            </Button>
-                            <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-6">
-                                <Link to="/donate">Support the mission</Link>
-                            </Button>
-                        </div>
-
-                        <div className="mt-8 flex flex-wrap justify-center gap-3">
-                            {['Trade access', 'Women-focused healthcare', 'Transparent impact'].map((item) => (
-                                <div
-                                    key={item}
-                                    className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm"
-                                >
-                                    <span className="h-2 w-2 rounded-full bg-primary" />
-                                    {item}
-                                </div>
-                            ))}
-                        </div>
+                    <div className="grid divide-y divide-border border-t border-border sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+                        {keyPrinciples.map((principle) => (
+                            <div key={principle.title} className="p-6">
+                                <h3 className="font-semibold text-foreground">{principle.title}</h3>
+                                <p className="mt-2 text-sm text-muted-foreground">{principle.description}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            <section className="section-padding bg-background">
+            <section className="section-padding border-t border-border bg-muted/30">
                 <div className="container-custom">
-                    <div className="mb-8 text-center">
-                        <Badge variant="secondary" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
-                            Core principles
-                        </Badge>
-                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                            A model designed to stay understandable
-                        </h2>
-                    </div>
+                    <SectionHeading index="02" title="The story in four checkpoints" subtitle="Read this page quickly with tabs instead of long blocks." />
 
-                    <div className="grid gap-4 md:grid-cols-3">
-                        {keyPrinciples.map((principle) => {
-                            const Icon = principle.icon;
-
-                            return (
-                                <Card key={principle.title} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                                    <CardHeader className="pb-3">
-                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                            <Icon className="h-5 w-5" />
-                                        </div>
-                                        <CardTitle className="text-lg">{principle.title}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="pt-0">
-                                        <CardDescription>{principle.description}</CardDescription>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            <section className="section-padding bg-muted/20">
-                <div className="container-custom">
-                    <div className="mb-8 text-center">
-                        <Badge variant="secondary" className="mb-3 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
-                            Roadmap
-                        </Badge>
-                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                            The story in four checkpoints
-                        </h2>
-                        <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-                            Read this page quickly with tabs instead of long blocks.
-                        </p>
-                    </div>
-
-                    <Tabs defaultValue="exist" className="mx-auto w-full max-w-5xl">
+                    <Tabs defaultValue="exist" className="w-full">
                         <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 md:grid-cols-4">
                             {roadmapSections.map((section) => (
                                 <TabsTrigger
                                     key={section.id}
                                     value={section.id}
-                                    className="rounded-xl border border-border bg-background py-2 text-xs data-[state=active]:border-primary/40"
+                                    className="rounded-md border border-border bg-background py-2 text-xs data-[state=active]:border-primary/40"
                                 >
                                     {section.title}
                                 </TabsTrigger>
                             ))}
                         </TabsList>
 
-                        {roadmapSections.map((section) => {
-                            const Icon = section.icon;
-
-                            return (
-                                <TabsContent key={section.id} value={section.id} className="mt-5">
-                                    <Card className="border-border/70 shadow-sm">
-                                        <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                            <div className="flex items-start gap-3">
-                                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-                                                    <Icon className="h-5 w-5" />
-                                                </div>
-                                                <div>
-                                                    <CardDescription className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                                                        Checkpoint
-                                                    </CardDescription>
-                                                    <CardTitle className="mt-1 text-2xl">{section.title}</CardTitle>
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent className="space-y-5 p-6">
-                                            <p className="text-base leading-8 text-muted-foreground">{section.summary}</p>
-                                            <ul className="space-y-2">
-                                                {section.points.map((point) => (
-                                                    <li key={point} className="flex items-start gap-2 text-sm leading-7 text-muted-foreground">
-                                                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                                        <span>{point}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </CardContent>
-                                    </Card>
-                                </TabsContent>
-                            );
-                        })}
+                        {roadmapSections.map((section) => (
+                            <TabsContent key={section.id} value={section.id} className="mt-5">
+                                <Card>
+                                    <CardHeader className="border-b border-border">
+                                        <CardDescription className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                                            Checkpoint
+                                        </CardDescription>
+                                        <CardTitle className="mt-1 text-2xl">{section.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-5 p-6">
+                                        <p className="text-base leading-8 text-muted-foreground">{section.summary}</p>
+                                        <ul className="space-y-2">
+                                            {section.points.map((point) => (
+                                                <li key={point} className="flex items-start gap-2 text-sm leading-7 text-muted-foreground">
+                                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                                                    <span>{point}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        ))}
                     </Tabs>
                 </div>
             </section>
 
-            <section className="section-padding bg-background">
+            <section className="section-padding border-t border-border">
                 <div className="container-custom">
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="grid grid-cols-2 divide-y divide-border border-t border-border lg:grid-cols-4 lg:divide-y-0 lg:divide-x">
                         {[
                             { label: 'Trade model', value: 'Product-first' },
                             { label: 'Support channel', value: 'Direct donations' },
                             { label: 'Impact focus', value: 'Women and healthcare' },
                             { label: 'Operating style', value: 'Transparent and traceable' },
                         ].map((item) => (
-                            <Card key={item.label} className="border-border/70 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                                <CardHeader className="pb-3">
-                                    <CardDescription className="text-xs font-semibold uppercase tracking-[0.22em]">{item.label}</CardDescription>
-                                    <CardTitle className="text-xl">{item.value}</CardTitle>
-                                </CardHeader>
-                            </Card>
+                            <div key={item.label} className="p-6">
+                                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{item.label}</p>
+                                <p className="mt-2 text-lg font-semibold text-foreground">{item.value}</p>
+                            </div>
                         ))}
                     </div>
                 </div>

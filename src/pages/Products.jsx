@@ -233,10 +233,10 @@ const Products = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur-xl">
+            <header className="sticky top-0 z-50 border-b border-border/60 bg-background">
                 <div className="container-custom flex h-16 items-center justify-between">
                     <Link to="/shop" className="group flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-muted/40 transition-colors group-hover:border-primary/40">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted/40 transition-colors group-hover:border-primary/40">
                             <img src="/logo.jpg" alt="AFGHANIUM" className="h-8 w-8 rounded-lg object-cover" />
                         </div>
                         <div className="flex flex-col leading-tight">
@@ -263,7 +263,7 @@ const Products = () => {
             </header>
 
             <main className="container-custom py-8 md:py-10">
-                <section className="mb-8 rounded-3xl border border-border/70 bg-gradient-to-b from-muted/40 to-background p-6 md:p-8">
+                <section className="mb-8 rounded-md border border-border/70 p-6 md:p-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-2xl space-y-3">
                             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Curated Export Shop</p>
@@ -275,15 +275,15 @@ const Products = () => {
                             </p>
                         </div>
                         <div className="grid w-full max-w-md grid-cols-3 gap-3">
-                            <div className="rounded-2xl border border-border bg-background p-3 text-center">
+                            <div className="rounded-md border border-border bg-background p-3 text-center">
                                 <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Products</p>
                                 <p className="mt-1 text-xl font-semibold">{products.length}</p>
                             </div>
-                            <div className="rounded-2xl border border-border bg-background p-3 text-center">
+                            <div className="rounded-md border border-border bg-background p-3 text-center">
                                 <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Categories</p>
                                 <p className="mt-1 text-xl font-semibold">{Math.max(categories.length - 1, 0)}</p>
                             </div>
-                            <div className="rounded-2xl border border-border bg-background p-3 text-center">
+                            <div className="rounded-md border border-border bg-background p-3 text-center">
                                 <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">In cart</p>
                                 <p className="mt-1 text-xl font-semibold">{cartItemCount}</p>
                             </div>
@@ -291,7 +291,7 @@ const Products = () => {
                     </div>
                 </section>
 
-                <section className="mb-8 space-y-5 rounded-3xl border border-border/70 bg-card p-4 md:p-5">
+                <section className="mb-8 space-y-5 rounded-md border border-border/70 bg-card p-4 md:p-5">
                     <div className="grid grid-cols-1 items-end gap-3 md:grid-cols-12">
                         <div className="relative md:col-span-5">
                             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -299,14 +299,14 @@ const Products = () => {
                                 value={searchTerm}
                                 onChange={(event) => setSearchTerm(event.target.value)}
                                 placeholder="Search by product, region, or category"
-                                className="h-11 rounded-xl border-border/70 pl-11"
+                                className="h-11 rounded-md border-border/70 pl-11"
                             />
                         </div>
 
                         <div className="relative md:col-span-3">
                             <Filter className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                                <SelectTrigger className="h-11 rounded-xl border-border/70 pl-11 text-sm">
+                                <SelectTrigger className="h-11 rounded-md border-border/70 pl-11 text-sm">
                                     <SelectValue placeholder="All categories" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -322,7 +322,7 @@ const Products = () => {
                         <div className="relative md:col-span-2">
                             <SortAsc className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Select value={sortBy} onValueChange={setSortBy}>
-                                <SelectTrigger className="h-11 rounded-xl border-border/70 pl-11 text-sm">
+                                <SelectTrigger className="h-11 rounded-md border-border/70 pl-11 text-sm">
                                     <SelectValue placeholder="Featured" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -336,7 +336,7 @@ const Products = () => {
 
                         <div className="flex items-center gap-2 md:col-span-2 md:justify-end">
                             <Tabs value={viewMode} onValueChange={setViewMode}>
-                                <TabsList className="h-10 rounded-xl border border-border/70 bg-muted/40 p-1">
+                                <TabsList className="h-10 rounded-md border border-border/70 bg-muted/40 p-1">
                                     <TabsTrigger value="grid" className="h-8 w-9 px-0" aria-label="Grid view">
                                         <Grid3X3 className="h-4 w-4" />
                                     </TabsTrigger>
@@ -424,7 +424,7 @@ const Products = () => {
                             <Card key={product.id} className="overflow-hidden border-border/70">
                                 <CardContent className="p-0">
                                     <div className="grid gap-4 p-4 sm:grid-cols-[180px_1fr_auto] sm:items-center sm:p-5">
-                                        <div className="h-40 overflow-hidden rounded-xl bg-muted/40 sm:h-28">
+                                        <div className="h-40 overflow-hidden rounded-md bg-muted/40 sm:h-28">
                                             {product.image_url ? (
                                                 <img
                                                     src={product.image_url}
@@ -542,7 +542,7 @@ const Products = () => {
             </main>
 
             <Dialog open={Boolean(quickViewProduct)} onOpenChange={(open) => !open && setQuickViewProduct(null)}>
-                <DialogContent className="max-h-[92vh] w-[94vw] max-w-3xl overflow-y-auto rounded-2xl border-border/70 p-0">
+                <DialogContent className="max-h-[92vh] w-[94vw] max-w-3xl overflow-y-auto rounded-md border-border/70 p-0">
                     {quickViewProduct && (
                         <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                             <div className="h-72 bg-muted/40 md:h-full">
@@ -571,7 +571,7 @@ const Products = () => {
                                     {quickViewProduct.description_en || 'Authentic Afghan product available for global wholesale and retail buyers.'}
                                 </p>
 
-                                <div className="rounded-2xl border border-border bg-muted/20 p-4">
+                                <div className="rounded-md border border-border bg-muted/20 p-4">
                                     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Order model</p>
                                     <p className="mt-2 text-sm leading-6 text-foreground">
                                         This store works on quote-based checkout. Add products to your cart and submit one order request.
@@ -602,11 +602,11 @@ const Products = () => {
             </Dialog>
 
             <Dialog open={cartOpen} onOpenChange={setCartOpen}>
-                <DialogContent className="max-h-[95vh] w-[95vw] max-w-2xl overflow-y-auto rounded-2xl border-border/70 p-0">
-                    <div className="sticky top-0 z-10 border-b border-border/60 bg-background/95 p-5 backdrop-blur-xl">
+                <DialogContent className="max-h-[95vh] w-[95vw] max-w-2xl overflow-y-auto rounded-md border-border/70 p-0">
+                    <div className="sticky top-0 z-10 border-b border-border/60 bg-background p-5">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
                                     <ShoppingCart className="h-5 w-5 text-primary" />
                                 </div>
                                 <div>
@@ -626,7 +626,7 @@ const Products = () => {
 
                     <div className="space-y-6 p-5 md:p-6">
                         {status.success && (
-                            <Alert className="rounded-xl border-green-200 bg-green-50/80 text-green-900">
+                            <Alert className="rounded-md border-green-200 bg-green-50/80 text-green-900">
                                 <CheckCircle className="h-5 w-5 shrink-0" />
                                 <div className="ml-2">
                                     <AlertTitle className="font-semibold">Order request sent!</AlertTitle>
@@ -638,7 +638,7 @@ const Products = () => {
                         )}
 
                         {status.error && (
-                            <Alert className="rounded-xl border-red-200 bg-red-50/80 text-red-900">
+                            <Alert className="rounded-md border-red-200 bg-red-50/80 text-red-900">
                                 <AlertCircle className="h-5 w-5 shrink-0" />
                                 <div className="ml-2">
                                     <AlertTitle className="font-semibold">Unable to submit</AlertTitle>
@@ -648,7 +648,7 @@ const Products = () => {
                         )}
 
                         {cartItems.length === 0 ? (
-                            <div className="rounded-2xl border-2 border-dashed border-border/70 p-10 text-center">
+                            <div className="rounded-md border-2 border-dashed border-border/70 p-10 text-center">
                                 <ShoppingBag className="mx-auto mb-3 h-11 w-11 text-muted-foreground/50" />
                                 <p className="font-medium text-muted-foreground">Your cart is empty</p>
                                 <p className="mt-1 text-sm text-muted-foreground/70">Add products to prepare a request</p>
@@ -659,7 +659,7 @@ const Products = () => {
                                 {cartItems.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="rounded-xl border border-border/70 bg-muted/20 p-4"
+                                        className="rounded-md border border-border/70 bg-muted/20 p-4"
                                     >
                                         <div className="mb-3 flex items-start justify-between gap-3">
                                             <div className="flex-1">
@@ -725,7 +725,7 @@ const Products = () => {
                                             value={checkoutData.name}
                                             onChange={handleCheckoutChange}
                                             placeholder="Your name"
-                                            className="h-10 rounded-xl"
+                                            className="h-10 rounded-md"
                                             required
                                         />
                                     </div>
@@ -741,7 +741,7 @@ const Products = () => {
                                             value={checkoutData.email}
                                             onChange={handleCheckoutChange}
                                             placeholder="your@email.com"
-                                            className="h-10 rounded-xl"
+                                            className="h-10 rounded-md"
                                             required
                                         />
                                     </div>
@@ -756,7 +756,7 @@ const Products = () => {
                                             value={checkoutData.country}
                                             onChange={handleCheckoutChange}
                                             placeholder="Afghanistan"
-                                            className="h-10 rounded-xl"
+                                            className="h-10 rounded-md"
                                             required
                                         />
                                     </div>
@@ -771,7 +771,7 @@ const Products = () => {
                                             value={checkoutData.company}
                                             onChange={handleCheckoutChange}
                                             placeholder="Company name"
-                                            className="h-10 rounded-xl"
+                                            className="h-10 rounded-md"
                                         />
                                     </div>
                                 </div>
@@ -786,7 +786,7 @@ const Products = () => {
                                         value={checkoutData.message}
                                         onChange={handleCheckoutChange}
                                         rows={3}
-                                        className="resize-none rounded-xl"
+                                        className="resize-none rounded-md"
                                         placeholder="Packaging, delivery instructions, special requests..."
                                     />
                                 </div>

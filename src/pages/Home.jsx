@@ -9,16 +9,7 @@ import { getContent } from '../supabase/content';
 import { getTestimonialImageUrl } from '../supabase/storage';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-
-const SectionHeading = ({ index, title, cta }) => (
-    <div className="mb-12 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
-        <div className="flex items-baseline gap-3">
-            <span className="font-display text-sm font-bold text-primary">{index}</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{title}</h2>
-        </div>
-        {cta}
-    </div>
-);
+import SectionHeading from '../components/SectionHeading';
 
 const Home = () => {
     const { t } = useLanguage();

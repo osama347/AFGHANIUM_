@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock3, Mail, MessageSquareText, Sparkles } from 'lucide-react';
+import { CheckCircle2, Mail } from 'lucide-react';
 import { createMessage } from '../supabase/messages';
 import Loader from '../components/Loader';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/Alert';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Label } from '../components/ui/Label';
 import { Textarea } from '../components/ui/FormElements';
+import PageHero from '../components/PageHero';
+import { CONTACT_INFO } from '../utils/constants';
 
 const Contact = () => {
     const { t } = useLanguage();
@@ -41,124 +41,110 @@ const Contact = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="border-b border-border">
+            <PageHero eyebrow="Contact" title={t('contact.title')} subtitle={t('contact.subtitle')} />
 
-                <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
-                    <div className="mx-auto max-w-4xl text-center">
-                        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                            {t('contact.title')}
-                        </h1>
-                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-                            {t('contact.subtitle')}
-                        </p>
-
-                        <div className="mt-8 flex flex-wrap justify-center gap-3">
-                            {['Fast response', 'Clear communication', 'Dedicated support'].map((item) => (
-                                <div key={item} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm">
-                                    <span className="h-2 w-2 rounded-full bg-primary" />
-                                    {item}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section className="section-padding bg-background">
+            <section className="section-padding">
                 <div className="container-custom">
-                    <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_1.1fr]">
-                        
+                    <div className="grid gap-10 border border-border lg:grid-cols-[1fr_1.5fr]">
+                        <div className="border-b border-border p-8 lg:border-b-0 lg:border-r">
+                            <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
+                                Get in touch
+                            </h2>
+                            <ul className="mt-6 space-y-5">
+                                <li>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Email</p>
+                                    <a href={`mailto:${CONTACT_INFO.email}`} className="mt-1 block text-foreground hover:text-primary">
+                                        {CONTACT_INFO.email}
+                                    </a>
+                                </li>
+                                <li>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Phone</p>
+                                    <p className="mt-1 text-foreground">{CONTACT_INFO.phone}</p>
+                                </li>
+                                <li>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Address</p>
+                                    <p className="mt-1 text-foreground">{CONTACT_INFO.address}</p>
+                                </li>
+                            </ul>
+                        </div>
 
-                        <Card className="overflow-hidden border-border/70 shadow-xl">
-                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                                    {t('contact.formTitle')}
-                                </CardDescription>
-                                <CardTitle className="text-2xl">Send a direct message</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6 p-6 sm:p-8">
-                                {status.success && (
-                                    <Alert className="border-green-200 bg-green-50 text-green-800">
-                                        <CheckCircle2 className="h-4 w-4" />
-                                        <AlertTitle>Success</AlertTitle>
-                                        <AlertDescription>{t('contact.messageSent')}</AlertDescription>
-                                    </Alert>
-                                )}
+                        <div className="p-8">
+                            {status.success && (
+                                <Alert className="mb-6 border-green-200 bg-green-50 text-green-800">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{t('contact.messageSent')}</AlertDescription>
+                                </Alert>
+                            )}
 
-                                {status.error && (
-                                    <Alert className="border-red-200 bg-red-50 text-red-800">
-                                        <Mail className="h-4 w-4" />
-                                        <AlertTitle>{t('common.error')}</AlertTitle>
-                                        <AlertDescription>{status.error}</AlertDescription>
-                                    </Alert>
-                                )}
+                            {status.error && (
+                                <Alert className="mb-6 border-red-200 bg-red-50 text-red-800">
+                                    <Mail className="h-4 w-4" />
+                                    <AlertTitle>{t('common.error')}</AlertTitle>
+                                    <AlertDescription>{status.error}</AlertDescription>
+                                </Alert>
+                            )}
 
-                                <form onSubmit={handleSubmit} className="space-y-5">
-                                    <div className="grid gap-5 sm:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="name">{t('contact.namePlaceholder')}</Label>
-                                            <Input
-                                                id="name"
-                                                type="text"
-                                                name="name"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                placeholder={t('contact.namePlaceholder')}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="email">{t('contact.emailPlaceholder')}</Label>
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleChange}
-                                                placeholder={t('contact.emailPlaceholder')}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <div className="grid gap-5 sm:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="subject">{t('contact.subjectPlaceholder')}</Label>
+                                        <Label htmlFor="name">{t('contact.namePlaceholder')}</Label>
                                         <Input
-                                            id="subject"
+                                            id="name"
                                             type="text"
-                                            name="subject"
-                                            value={formData.subject}
+                                            name="name"
+                                            value={formData.name}
                                             onChange={handleChange}
-                                            placeholder={t('contact.subjectPlaceholder')}
+                                            placeholder={t('contact.namePlaceholder')}
                                             required
                                         />
                                     </div>
-
                                     <div className="space-y-2">
-                                        <Label htmlFor="message">{t('contact.messagePlaceholder')}</Label>
-                                        <Textarea
-                                            id="message"
-                                            name="message"
-                                            value={formData.message}
+                                        <Label htmlFor="email">{t('contact.emailPlaceholder')}</Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
                                             onChange={handleChange}
-                                            rows={7}
-                                            placeholder={t('contact.messagePlaceholder')}
-                                            className="resize-none"
+                                            placeholder={t('contact.emailPlaceholder')}
                                             required
                                         />
                                     </div>
+                                </div>
 
-                                    <Button
-                                        type="submit"
-                                        size="lg"
-                                        className="w-full rounded-full shadow-lg shadow-primary/20"
-                                        disabled={status.loading}
-                                    >
-                                        {status.loading ? <Loader size="sm" color="white" /> : t('contact.sendMessage')}
-                                    </Button>
-                                </form>
-                            </CardContent>
-                        </Card>
+                                <div className="space-y-2">
+                                    <Label htmlFor="subject">{t('contact.subjectPlaceholder')}</Label>
+                                    <Input
+                                        id="subject"
+                                        type="text"
+                                        name="subject"
+                                        value={formData.subject}
+                                        onChange={handleChange}
+                                        placeholder={t('contact.subjectPlaceholder')}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="message">{t('contact.messagePlaceholder')}</Label>
+                                    <Textarea
+                                        id="message"
+                                        name="message"
+                                        value={formData.message}
+                                        onChange={handleChange}
+                                        rows={7}
+                                        placeholder={t('contact.messagePlaceholder')}
+                                        className="resize-none"
+                                        required
+                                    />
+                                </div>
+
+                                <Button type="submit" size="lg" disabled={status.loading}>
+                                    {status.loading ? <Loader size="sm" color="white" /> : t('contact.sendMessage')}
+                                </Button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </section>

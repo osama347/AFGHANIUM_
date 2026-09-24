@@ -46,7 +46,7 @@ const Footer = () => {
                                 alt="Afghanium logo"
                                 className="w-12 h-12 rounded-lg object-cover border border-white/15"
                             />
-                            <span className="font-display text-2xl font-bold tracking-tight">Afghanium</span>
+                            <span className="font-display text-xl font-bold uppercase tracking-[0.08em]">Afghanium</span>
                         </div>
                         <p className="text-white/70 mb-6 leading-relaxed">
                             Made in Afghanistan, Meant for the world.

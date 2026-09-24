@@ -8,10 +8,10 @@ import { validateDonationId } from '../utils/validators';
 import { PAYMENT_METHODS, CRYPTO_CURRENCIES } from '../utils/constants';
 import Loader from '../components/Loader';
 import ImpactCard from '../components/ImpactCard';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/Tabs';
+import PageHero from '../components/PageHero';
 
 const TrackDonation = () => {
     const [searchParams] = useSearchParams();
@@ -211,39 +211,18 @@ const TrackDonation = () => {
 
     return (
         <div className="bg-background text-foreground">
-            <section className="section-padding border-b border-border">
-                <div className="container-custom">
-                    <div className="mx-auto max-w-4xl text-center">
-                        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                            Track your donation.
-                            <span className="block text-primary">See the result clearly.</span>
-                        </h1>
-                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-                            Search by donation ID or donor name to view status, payment instructions, and published impact proofs connected to your contribution.
-                        </p>
+            <PageHero
+                eyebrow="Track donation"
+                title="Track your donation. See the result clearly."
+                subtitle="Search by donation ID or donor name to view status, payment instructions, and published impact proofs connected to your contribution."
+            />
 
-                        <div className="mt-8 flex flex-wrap justify-center gap-3">
-                            {[
-                                'Fast lookup',
-                                'Payment guidance',
-                                'Impact proofs',
-                            ].map((item) => (
-                                <div key={item} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm">
-                                    <span className="h-2 w-2 rounded-full bg-primary" />
-                                    {item}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section className="section-padding bg-muted/20">
+            <section className="section-padding border-t border-border bg-muted/30">
                 <div className="container-custom">
-                    <div className="mx-auto max-w-3xl">
-                        <Card className="overflow-hidden border-border/70 shadow-xl">
-                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    <div className="max-w-2xl">
+                        <Card>
+                            <CardHeader className="border-b border-border">
+                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                                     Search panel
                                 </CardDescription>
                                 <CardTitle className="text-2xl">Look up a donation</CardTitle>
@@ -251,10 +230,10 @@ const TrackDonation = () => {
                             <CardContent className="space-y-6 p-6 sm:p-8">
                                 <Tabs value={searchType} onValueChange={setSearchType} className="w-full">
                                     <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0">
-                                        <TabsTrigger value="id" className="rounded-xl border border-border py-2 data-[state=active]:border-primary/40">
+                                        <TabsTrigger value="id" className="rounded-md border border-border py-2 data-[state=active]:border-primary/40">
                                             Search by ID
                                         </TabsTrigger>
-                                        <TabsTrigger value="name" className="rounded-xl border border-border py-2 data-[state=active]:border-primary/40">
+                                        <TabsTrigger value="name" className="rounded-md border border-border py-2 data-[state=active]:border-primary/40">
                                             Search by name
                                         </TabsTrigger>
                                     </TabsList>
@@ -279,7 +258,7 @@ const TrackDonation = () => {
                                             type="button"
                                             onClick={() => handleSearch()}
                                             disabled={donationLoading}
-                                            className="h-12 rounded-xl px-6"
+                                            className="h-12 px-6"
                                         >
                                             {donationLoading ? <Loader size="sm" color="white" /> : <Search className="h-4 w-4" />}
                                             Track
@@ -288,7 +267,7 @@ const TrackDonation = () => {
                                 </Tabs>
 
                                 {error && (
-                                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                                    <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                                         {error}
                                     </div>
                                 )}
@@ -303,11 +282,11 @@ const TrackDonation = () => {
                 <section className="section-padding bg-background">
                     <div className="container-custom">
                         <div className="mx-auto max-w-5xl space-y-6">
-                            <Card className="overflow-hidden border-border/70 shadow-xl">
-                                <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
+                            <Card className="overflow-hidden">
+                                <CardHeader className="border-b border-border">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
-                                            <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                            <CardDescription className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                                                 Donation details
                                             </CardDescription>
                                             <CardTitle className="mt-2 text-3xl">{formatDonationId(donation.donation_id)}</CardTitle>
@@ -330,7 +309,7 @@ const TrackDonation = () => {
                                             { label: 'Payment method', value: donation.payment_method.replace('_', ' ').toUpperCase() },
                                             { label: 'Date', value: formatDateTime(donation.created_at) },
                                         ].map((item) => (
-                                            <div key={item.label} className="rounded-2xl border border-border bg-muted/30 p-4">
+                                            <div key={item.label} className="rounded-md border border-border bg-muted/30 p-4">
                                                 <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.label}</div>
                                                 <div className="mt-2 break-words text-base font-semibold text-foreground">{item.value}</div>
                                             </div>
@@ -338,7 +317,7 @@ const TrackDonation = () => {
                                     </div>
 
                                     {donation.message && (
-                                        <div className="rounded-2xl border border-border bg-background p-5">
+                                        <div className="rounded-md border border-border bg-background p-5">
                                             <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Message</div>
                                             <div className="mt-2 text-base italic leading-7 text-foreground">"{donation.message}"</div>
                                         </div>
@@ -349,9 +328,9 @@ const TrackDonation = () => {
                             </Card>
 
                             {impacts.length > 0 && (
-                                <Card className="border-border/70 shadow-xl">
-                                    <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                        <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                <Card>
+                                    <CardHeader className="border-b border-border">
+                                        <CardDescription className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                                             Impact proofs
                                         </CardDescription>
                                         <CardTitle className="text-2xl">Your impact</CardTitle>
@@ -367,7 +346,7 @@ const TrackDonation = () => {
                             )}
 
                             {impacts.length === 0 && donation.status === 'completed' && (
-                                <Card className="border-border/70 shadow-xl">
+                                <Card>
                                     <CardContent className="p-8 text-center">
                                         <p className="text-muted-foreground">
                                             Impact proofs will be added soon. Thank you for your patience!
@@ -383,7 +362,7 @@ const TrackDonation = () => {
             {searched && !donation && !donationLoading && !error && (
                 <section className="section-padding bg-background">
                     <div className="container-custom">
-                        <Card className="mx-auto max-w-3xl border-border/70 shadow-xl">
+                        <Card className="mx-auto max-w-2xl">
                             <CardContent className="p-10 text-center">
                                 <p className="text-lg text-muted-foreground">No donation found. Please check your search criteria.</p>
                             </CardContent>

@@ -148,15 +148,15 @@ const Donate = () => {
                     </div>
 
                     {fetchingCampaign ? (
-                        <Card className="rounded-[2rem] border-border/70 shadow-sm">
+                        <Card>
                             <CardContent className="flex justify-center py-14">
                                 <Loader size="lg" />
                             </CardContent>
                         </Card>
                     ) : (
-                        <Card className="rounded-[2rem] border-border/70 shadow-xl">
-                            <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/10 to-primary/5">
-                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                        <Card className="max-w-3xl">
+                            <CardHeader className="border-b border-border">
+                                <CardDescription className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                                     {t('donation.form.title')}
                                 </CardDescription>
                                 <CardTitle className="text-2xl sm:text-3xl">Secure donation details</CardTitle>
@@ -241,7 +241,6 @@ const Donate = () => {
                                                         type="button"
                                                         variant={formData.amount === amount.toString() ? 'default' : 'outline'}
                                                         onClick={() => handlePresetAmount(amount)}
-                                                        className="rounded-xl"
                                                     >
                                                         ${amount}
                                                     </Button>
@@ -290,13 +289,13 @@ const Donate = () => {
                                                             setFormData((prev) => ({ ...prev, paymentMethod: value }));
                                                             setErrors((prev) => ({ ...prev, paymentMethod: '' }));
                                                         }}
-                                                        className={`rounded-2xl border p-4 text-left transition-all ${isSelected
-                                                            ? 'border-primary bg-primary/5 shadow-md'
+                                                        className={`rounded-md border p-4 text-left transition-colors ${isSelected
+                                                            ? 'border-primary bg-primary/5'
                                                             : 'border-border bg-card hover:border-primary/60'
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`flex h-11 w-11 items-center justify-center rounded-md ${isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
                                                                 <PaymentIcon className="h-5 w-5" />
                                                             </div>
                                                             <div>
@@ -328,7 +327,7 @@ const Donate = () => {
                                                         <span className="ml-2 break-all">{value}</span>
                                                     </div>
                                                 ))}
-                                                <div className="sm:col-span-2 rounded-xl border border-blue-200 bg-blue-100/80 p-3">
+                                                <div className="sm:col-span-2 rounded-md border border-blue-200 bg-blue-100/80 p-3">
                                                     <p>
                                                         <strong>Important:</strong> Include your donation ID once generated on the success page so we can match your transfer quickly.
                                                     </p>
@@ -341,7 +340,7 @@ const Donate = () => {
                                         type="submit"
                                         disabled={loading}
                                         size="lg"
-                                        className="w-full rounded-full text-base shadow-lg shadow-primary/20"
+                                        className="w-full text-base"
                                     >
                                         {loading ? (
                                             <span className="flex items-center justify-center gap-2">

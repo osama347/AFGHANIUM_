@@ -36,75 +36,69 @@ const DonationSuccess = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4 py-8">
-            <div className="max-w-2xl w-full bg-card border border-border rounded-2xl shadow-2xl p-6 md:p-12 text-center">
-                {/* Success Icon */}
-                <div className="mb-6">
-                    <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
-                        <CheckCircle className="w-16 h-16 text-white" />
-                    </div>
+        <div className="flex min-h-[80vh] items-center justify-center bg-background px-4 py-12">
+            <div className="w-full max-w-2xl border border-border p-6 md:p-10">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <CheckCircle className="h-7 w-7" />
                 </div>
 
-                {/* Thank You Message */}
-                <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
-                    Donation Information Submitted! 📋
+                <h1 className="mt-6 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                    Donation information submitted
                 </h1>
 
-                <p className="text-xl text-muted-foreground mb-8">
+                <p className="mt-3 text-lg text-muted-foreground">
                     Thank you for your generous donation. Please provide your transaction reference number below so we can verify your payment.
                 </p>
 
                 {/* Donation Details */}
-                <div className="bg-green-50 rounded-lg p-6 mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                        {donationId && (
-                            <div>
-                                <p className="text-sm text-muted-foreground">Donation ID</p>
-                                <p className="text-lg font-bold text-foreground">{donationId}</p>
-                            </div>
-                        )}
-                        {amount && (
-                            <div>
-                                <p className="text-sm text-muted-foreground">Amount</p>
-                                <p className="text-lg font-bold text-primary">${amount}</p>
-                            </div>
-                        )}
-                        {paymentMethod && (
-                            <div>
-                                <p className="text-sm text-muted-foreground">Payment Method</p>
-                                <p className="text-lg font-bold text-foreground capitalize">{paymentMethod.replace('_', ' ')}</p>
-                            </div>
-                        )}
-                    </div>
+                <div className="mt-8 grid grid-cols-1 divide-y divide-border border border-border text-left sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+                    {donationId && (
+                        <div className="p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Donation ID</p>
+                            <p className="mt-1 text-lg font-semibold text-foreground">{donationId}</p>
+                        </div>
+                    )}
+                    {amount && (
+                        <div className="p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Amount</p>
+                            <p className="mt-1 text-lg font-semibold text-primary">${amount}</p>
+                        </div>
+                    )}
+                    {paymentMethod && (
+                        <div className="p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Payment method</p>
+                            <p className="mt-1 text-lg font-semibold capitalize text-foreground">{paymentMethod.replace('_', ' ')}</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Transaction Reference Form */}
                 {!isSubmitted ? (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8">
-                        <div className="flex items-start mb-4">
-                            <AlertTriangle className="w-6 h-6 text-yellow-600 mr-3 mt-1 flex-shrink-0" />
+                    <div className="mt-8 border-l-2 border-amber-400 bg-amber-50 p-6">
+                        <div className="flex items-start gap-3">
+                            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
                             <div>
-                                <h3 className="text-xl font-bold text-yellow-800 mb-2">Submit Transaction Reference</h3>
-                                <p className="text-yellow-700 mb-4">
+                                <h3 className="font-semibold text-amber-900">Submit transaction reference</h3>
+                                <p className="mt-1 text-sm text-amber-800">
                                     After sending your donation via {paymentMethod?.replace('_', ' ')}, please enter the transaction reference number below.
                                 </p>
                             </div>
                         </div>
 
-                        <form onSubmit={handleSubmitReference} className="space-y-4">
+                        <form onSubmit={handleSubmitReference} className="mt-5 space-y-3 text-left">
                             <div>
-                                <label className="block text-foreground/80 font-medium mb-2">
-                                    Transaction Reference Number *
+                                <label className="mb-2 block text-sm font-medium text-foreground">
+                                    Transaction reference number *
                                 </label>
                                 <input
                                     type="text"
                                     value={transactionReference}
                                     onChange={(e) => setTransactionReference(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    className="input-field"
                                     placeholder={`Enter your ${paymentMethod?.replace('_', ' ')} reference number`}
                                     required
                                 />
-                                <p className="text-sm text-muted-foreground mt-1">
+                                <p className="mt-1 text-xs text-muted-foreground">
                                     This is usually found on your receipt or transaction confirmation
                                 </p>
                             </div>
@@ -112,51 +106,53 @@ const DonationSuccess = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full rounded-md bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {isSubmitting ? 'Submitting...' : 'Submit Transaction Reference'}
+                                {isSubmitting ? 'Submitting...' : 'Submit transaction reference'}
                             </button>
                         </form>
                     </div>
                 ) : (
-                    <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-8">
-                        <div className="flex items-center mb-2">
-                            <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                            <h3 className="text-xl font-bold text-green-800">Transaction Reference Submitted</h3>
+                    <div className="mt-8 border-l-2 border-primary bg-primary/5 p-6 text-left">
+                        <div className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-primary" />
+                            <h3 className="font-semibold text-foreground">Transaction reference submitted</h3>
                         </div>
-                        <p className="text-green-700">
+                        <p className="mt-2 text-sm text-muted-foreground">
                             Thank you! Your transaction reference has been recorded. Our admin team will verify your donation and update the status within 1-3 business days.
                         </p>
                     </div>
                 )}
 
                 {/* Important Notes */}
-                <div className="bg-blue-50 rounded-lg p-6 mb-8">
-                    <h3 className="text-lg font-bold text-blue-800 mb-3">Important Notes:</h3>
-                    <ul className="text-blue-700 text-left space-y-2">
-                        <li>• Submit your transaction reference number above for verification</li>
-                        <li>• Your donation will be confirmed once verified by our admin team</li>
-                        <li>• Processing may take 1-3 business days</li>
-                        <li>• You'll receive email confirmation once approved</li>
-                        <li>• Track your donation status using the button below</li>
+                <div className="mt-8 border border-border p-6 text-left">
+                    <h3 className="font-semibold text-foreground">Important notes</h3>
+                    <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                        <li>Submit your transaction reference number above for verification</li>
+                        <li>Your donation will be confirmed once verified by our admin team</li>
+                        <li>Processing may take 1-3 business days</li>
+                        <li>You'll receive email confirmation once approved</li>
+                        <li>Track your donation status using the button below</li>
                     </ul>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <CTAButton
                         to={`/track?id=${donationId}`}
                         variant="primary"
                         size="lg"
+                        fullWidth
                     >
-                        Track Your Donation <ArrowRight className="w-5 h-5 ml-2 inline" />
+                        Track your donation <ArrowRight className="ml-2 inline h-4 w-4" />
                     </CTAButton>
                     <CTAButton
                         to="/"
                         variant="outline"
                         size="lg"
+                        fullWidth
                     >
-                        Return to Home
+                        Return to home
                     </CTAButton>
                 </div>
             </div>
