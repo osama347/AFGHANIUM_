@@ -17,10 +17,12 @@ import {
     SortAsc,
     Rows3,
     Trash2,
+    X,
 } from 'lucide-react';
 import Loader from '../components/Loader';
 import { useProduct } from '../hooks/useProduct';
 import { createMessage } from '../supabase/messages';
+import { useToast } from '../contexts/ToastContext';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/Alert';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -32,8 +34,46 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { Textarea } from '../components/ui/FormElements';
 
+const ProductThumb = ({ src, alt, className = '' }) => (
+    <div className={`overflow-hidden bg-muted/40 ${className}`}>
+        {src ? (
+            <img src={src} alt={alt} className="h-full w-full object-cover" />
+        ) : (
+            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                <Package className="h-6 w-6 opacity-50" />
+            </div>
+        )}
+    </div>
+);
+
+const QuantityStepper = ({ value, onChange, size = 'default' }) => {
+    const dims = size === 'sm' ? 'h-7 w-7' : 'h-9 w-9';
+    return (
+        <div className="inline-flex items-center rounded-md border border-border">
+            <button
+                type="button"
+                onClick={() => onChange(value - 1)}
+                className={`flex items-center justify-center ${dims} text-muted-foreground transition-colors hover:bg-muted hover:text-foreground`}
+                aria-label="Decrease quantity"
+            >
+                <Minus className="h-3.5 w-3.5" />
+            </button>
+            <span className="min-w-9 text-center text-sm font-semibold text-foreground">{value}</span>
+            <button
+                type="button"
+                onClick={() => onChange(value + 1)}
+                className={`flex items-center justify-center ${dims} text-muted-foreground transition-colors hover:bg-muted hover:text-foreground`}
+                aria-label="Increase quantity"
+            >
+                <Plus className="h-3.5 w-3.5" />
+            </button>
+        </div>
+    );
+};
+
 const Products = () => {
     const { getActive, loading } = useProduct();
+    const toast = useToast();
 
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +82,7 @@ const Products = () => {
     const [viewMode, setViewMode] = useState('grid');
     const [cartOpen, setCartOpen] = useState(false);
     const [quickViewProduct, setQuickViewProduct] = useState(null);
+    const [quickViewQty, setQuickViewQty] = useState(1);
     const [cartItems, setCartItems] = useState([]);
     const [status, setStatus] = useState({ loading: false, error: null, success: false });
     const [checkoutData, setCheckoutData] = useState({
@@ -66,6 +107,10 @@ const Products = () => {
 
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        setQuickViewQty(1);
+    }, [quickViewProduct]);
 
     const categories = useMemo(() => {
         const categorySet = new Set(
@@ -131,13 +176,13 @@ const Products = () => {
         setCheckoutData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const addToCart = (product) => {
+    const addToCart = (product, quantity = 1) => {
         setCartItems((prev) => {
             const existing = prev.find((item) => item.id === product.id);
             if (existing) {
                 return prev.map((item) => (
                     item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
+                        ? { ...item, quantity: item.quantity + quantity }
                         : item
                 ));
             }
@@ -151,12 +196,13 @@ const Products = () => {
                     category: product.category || 'General',
                     origin: product.origin_region || 'Afghanistan',
                     image: product.image_url || '',
-                    quantity: 1,
+                    quantity,
                 },
             ];
         });
 
         setStatus({ loading: false, error: null, success: false });
+        toast.success(`${product.name_en} added to your request list`);
     };
 
     const clearCart = () => {
@@ -231,42 +277,45 @@ const Products = () => {
         setStatus({ loading: false, error: result.error, success: false });
     };
 
+    const resetFilters = () => {
+        setSearchTerm('');
+        setSelectedCategory('all');
+        setSortBy('featured');
+    };
+
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <header className="sticky top-0 z-50 border-b border-border/60 bg-background">
+            <header className="sticky top-0 z-40 border-b border-border bg-background">
                 <div className="container-custom flex h-16 items-center justify-between">
-                    <Link to="/shop" className="group flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted/40 transition-colors group-hover:border-primary/40">
-                            <img src="/logo.jpg" alt="AFGHANIUM" className="h-8 w-8 rounded-lg object-cover" />
-                        </div>
+                    <Link to="/shop" className="flex items-center gap-3">
+                        <img src="/logo.jpg" alt="AFGHANIUM" className="h-9 w-9 rounded-md object-cover" />
                         <div className="flex flex-col leading-tight">
-                            <span className="font-display text-base font-bold tracking-wide">AFGHANIUM MARKET</span>
+                            <span className="font-display text-base font-bold uppercase tracking-[0.08em]">Afghanium Market</span>
                             <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Direct from Afghanistan</span>
                         </div>
                     </Link>
 
-                    <Button
+                    <button
                         type="button"
-                        variant="outline"
-                        className="group relative h-10 rounded-full border-border/70 px-5"
                         onClick={() => setCartOpen(true)}
+                        className="relative flex h-10 items-center gap-2 rounded-md border border-border px-4 text-sm font-semibold transition-colors hover:border-primary/40"
                     >
-                        <ShoppingBag className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                        <span className="text-sm font-semibold">Cart</span>
+                        <ShoppingCart className="h-4 w-4" />
+                        Cart
                         {cartItemCount > 0 && (
-                            <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
                                 {cartItemCount}
                             </span>
                         )}
-                    </Button>
+                    </button>
                 </div>
             </header>
 
             <main className="container-custom py-8 md:py-10">
-                <section className="mb-8 rounded-md border border-border/70 p-6 md:p-8">
+                <section className="mb-8 border border-border p-6 md:p-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-2xl space-y-3">
-                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Curated Export Shop</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Curated export shop</p>
                             <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
                                 A focused shop, not a donation catalog.
                             </h1>
@@ -274,24 +323,24 @@ const Products = () => {
                                 Browse authentic Afghan products, build your request list, and send one clean order inquiry to our team.
                             </p>
                         </div>
-                        <div className="grid w-full max-w-md grid-cols-3 gap-3">
-                            <div className="rounded-md border border-border bg-background p-3 text-center">
-                                <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Products</p>
+                        <div className="grid w-full max-w-md grid-cols-3 divide-x divide-border border border-border">
+                            <div className="p-3 text-center">
+                                <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Products</p>
                                 <p className="mt-1 text-xl font-semibold">{products.length}</p>
                             </div>
-                            <div className="rounded-md border border-border bg-background p-3 text-center">
-                                <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Categories</p>
+                            <div className="p-3 text-center">
+                                <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Categories</p>
                                 <p className="mt-1 text-xl font-semibold">{Math.max(categories.length - 1, 0)}</p>
                             </div>
-                            <div className="rounded-md border border-border bg-background p-3 text-center">
-                                <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">In cart</p>
+                            <div className="p-3 text-center">
+                                <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">In cart</p>
                                 <p className="mt-1 text-xl font-semibold">{cartItemCount}</p>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <section className="mb-8 space-y-5 rounded-md border border-border/70 bg-card p-4 md:p-5">
+                <section className="mb-8 space-y-5 border border-border bg-card p-4 md:p-5">
                     <div className="grid grid-cols-1 items-end gap-3 md:grid-cols-12">
                         <div className="relative md:col-span-5">
                             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -299,14 +348,14 @@ const Products = () => {
                                 value={searchTerm}
                                 onChange={(event) => setSearchTerm(event.target.value)}
                                 placeholder="Search by product, region, or category"
-                                className="h-11 rounded-md border-border/70 pl-11"
+                                className="h-11 pl-11"
                             />
                         </div>
 
                         <div className="relative md:col-span-3">
                             <Filter className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                                <SelectTrigger className="h-11 rounded-md border-border/70 pl-11 text-sm">
+                                <SelectTrigger className="h-11 pl-11 text-sm">
                                     <SelectValue placeholder="All categories" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -322,7 +371,7 @@ const Products = () => {
                         <div className="relative md:col-span-2">
                             <SortAsc className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Select value={sortBy} onValueChange={setSortBy}>
-                                <SelectTrigger className="h-11 rounded-md border-border/70 pl-11 text-sm">
+                                <SelectTrigger className="h-11 pl-11 text-sm">
                                     <SelectValue placeholder="Featured" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -336,11 +385,11 @@ const Products = () => {
 
                         <div className="flex items-center gap-2 md:col-span-2 md:justify-end">
                             <Tabs value={viewMode} onValueChange={setViewMode}>
-                                <TabsList className="h-10 rounded-md border border-border/70 bg-muted/40 p-1">
-                                    <TabsTrigger value="grid" className="h-8 w-9 px-0" aria-label="Grid view">
+                                <TabsList className="h-11 rounded-md border border-border bg-muted/40 p-1">
+                                    <TabsTrigger value="grid" className="h-9 w-9 px-0" aria-label="Grid view">
                                         <Grid3X3 className="h-4 w-4" />
                                     </TabsTrigger>
-                                    <TabsTrigger value="list" className="h-8 w-9 px-0" aria-label="List view">
+                                    <TabsTrigger value="list" className="h-9 w-9 px-0" aria-label="List view">
                                         <Rows3 className="h-4 w-4" />
                                     </TabsTrigger>
                                 </TabsList>
@@ -349,43 +398,34 @@ const Products = () => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
+                        <Badge variant="secondary" className="text-xs font-semibold">
                             {filteredProducts.length} products
                         </Badge>
-                        <Badge variant="secondary" className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
+                        <Badge variant="secondary" className="text-xs font-semibold">
                             {distinctItemCount} cart items
                         </Badge>
                         {cartItemCount > 0 && (
-                            <Badge className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+                            <Badge className="text-xs font-semibold">
                                 {cartItemCount} total units
                             </Badge>
                         )}
                         {(searchTerm || selectedCategory !== 'all' || sortBy !== 'featured') && (
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                className="h-8 rounded-full px-3 text-xs"
-                                onClick={() => {
-                                    setSearchTerm('');
-                                    setSelectedCategory('all');
-                                    setSortBy('featured');
-                                }}
-                            >
+                            <Button type="button" variant="ghost" size="sm" onClick={resetFilters}>
                                 <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
                                 Reset filters
                             </Button>
                         )}
                     </div>
 
-                    <div className="flex flex-wrap gap-2 border-t border-border/60 pt-4">
+                    <div className="flex flex-wrap gap-2 border-t border-border pt-4">
                         {categories.map((category) => {
                             const isActive = selectedCategory === category;
                             return (
                                 <Button
                                     key={category}
                                     type="button"
+                                    size="sm"
                                     variant={isActive ? 'default' : 'outline'}
-                                    className="h-8 rounded-full px-3 text-xs"
                                     onClick={() => setSelectedCategory(category)}
                                 >
                                     {category === 'all' ? 'All' : category}
@@ -400,7 +440,7 @@ const Products = () => {
                         <Loader size="lg" />
                     </div>
                 ) : filteredProducts.length === 0 ? (
-                    <Card className="border-border/70 bg-muted/20 shadow-none">
+                    <Card className="bg-muted/20">
                         <CardContent className="p-14 text-center">
                             <div className="mb-4 flex justify-center">
                                 <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
@@ -409,76 +449,48 @@ const Products = () => {
                             <p className="mb-6 text-muted-foreground">
                                 {searchTerm ? `No results for "${searchTerm}".` : 'Try adjusting your filters.'}
                             </p>
-                            <Button variant="outline" onClick={() => {
-                                setSearchTerm('');
-                                setSelectedCategory('all');
-                                setSortBy('featured');
-                            }}>
+                            <Button variant="outline" onClick={resetFilters}>
                                 Clear filters
                             </Button>
                         </CardContent>
                     </Card>
                 ) : viewMode === 'list' ? (
-                    <div className="space-y-4">
+                    <div className="divide-y divide-border border border-border">
                         {filteredProducts.map((product) => (
-                            <Card key={product.id} className="overflow-hidden border-border/70">
-                                <CardContent className="p-0">
-                                    <div className="grid gap-4 p-4 sm:grid-cols-[180px_1fr_auto] sm:items-center sm:p-5">
-                                        <div className="h-40 overflow-hidden rounded-md bg-muted/40 sm:h-28">
-                                            {product.image_url ? (
-                                                <img
-                                                    src={product.image_url}
-                                                    alt={product.name_en}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                                                    <Package className="h-8 w-8" />
-                                                </div>
-                                            )}
-                                        </div>
+                            <div key={product.id} className="grid gap-4 p-4 sm:grid-cols-[140px_1fr_auto] sm:items-center sm:p-5">
+                                <ProductThumb src={product.image_url} alt={product.name_en} className="h-32 rounded-md sm:h-24" />
 
-                                        <div className="space-y-2">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <h2 className="text-lg font-semibold">{product.name_en}</h2>
-                                                <Badge variant="secondary" className="rounded-full text-[11px]">
-                                                    {product.category || 'General'}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground">From {product.origin_region || 'Afghanistan'}</p>
-                                            <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
-                                                {product.description_en || 'Authentic Afghan product available for global buyers.'}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex flex-row gap-2 sm:flex-col sm:items-end">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                className="rounded-full"
-                                                onClick={() => setQuickViewProduct(product)}
-                                            >
-                                                <Eye className="mr-2 h-4 w-4" />
-                                                Quick view
-                                            </Button>
-                                            <Button type="button" className="rounded-full" onClick={() => addToCart(product)}>
-                                                <Plus className="mr-2 h-4 w-4" />
-                                                Add
-                                            </Button>
-                                        </div>
+                                <div className="space-y-1.5">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <h2 className="text-lg font-semibold">{product.name_en}</h2>
+                                        <span className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+                                            {product.category || 'General'}
+                                        </span>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                    <p className="text-sm text-muted-foreground">From {product.origin_region || 'Afghanistan'}</p>
+                                    <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
+                                        {product.description_en || 'Authentic Afghan product available for global buyers.'}
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-row gap-2 sm:flex-col sm:items-stretch">
+                                    <Button type="button" variant="outline" onClick={() => setQuickViewProduct(product)}>
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        Quick view
+                                    </Button>
+                                    <Button type="button" onClick={() => addToCart(product)}>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add to cart
+                                    </Button>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 ) : (
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filteredProducts.map((product) => (
-                            <Card
-                                key={product.id}
-                                className="group overflow-hidden border-border/70 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
-                            >
-                                <div className="relative h-52 overflow-hidden bg-muted/40">
+                            <div key={product.id} className="group border border-border transition-colors hover:border-primary/40">
+                                <div className="relative aspect-square overflow-hidden bg-muted/40">
                                     {product.image_url ? (
                                         <img
                                             src={product.image_url}
@@ -490,25 +502,24 @@ const Products = () => {
                                             <Package className="h-10 w-10 opacity-50" />
                                         </div>
                                     )}
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setQuickViewProduct(product)}
+                                        className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+                                        aria-label="Quick view product"
+                                    >
+                                        <Eye className="h-4 w-4" />
+                                    </button>
                                 </div>
 
-                                <CardContent className="space-y-3 p-4">
-                                    <div className="flex items-center justify-between gap-2">
-                                        <Badge variant="secondary" className="rounded-full text-[11px] uppercase tracking-[0.08em]">
-                                            {product.category || 'General'}
-                                        </Badge>
-                                        <button
-                                            type="button"
-                                            onClick={() => setQuickViewProduct(product)}
-                                            className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                                            aria-label="Quick view product"
-                                        >
-                                            <Eye className="h-4 w-4" />
-                                        </button>
-                                    </div>
+                                <div className="space-y-2 p-4">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+                                        {product.category || 'General'}
+                                    </p>
 
                                     <div>
-                                        <h2 className="line-clamp-2 text-base font-semibold leading-tight transition-colors group-hover:text-primary">
+                                        <h2 className="line-clamp-1 text-base font-semibold leading-tight">
                                             {product.name_en}
                                         </h2>
                                         <p className="mt-1 text-xs text-muted-foreground">
@@ -516,53 +527,36 @@ const Products = () => {
                                         </p>
                                     </div>
 
-                                    <p className="line-clamp-2 text-sm text-muted-foreground leading-relaxed">
+                                    <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                                         {product.description_en || 'Authentic Afghan product available for international buyers.'}
                                     </p>
 
-                                    <div className="flex gap-2 pt-1">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="h-9 flex-1 rounded-full"
-                                            onClick={() => setQuickViewProduct(product)}
-                                        >
-                                            Details
-                                        </Button>
-                                        <Button type="button" className="h-9 flex-1 rounded-full" onClick={() => addToCart(product)}>
-                                            <Plus className="mr-1.5 h-4 w-4" />
-                                            Add
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    <Button type="button" className="w-full" onClick={() => addToCart(product)}>
+                                        <Plus className="mr-1.5 h-4 w-4" />
+                                        Add to cart
+                                    </Button>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}
             </main>
 
+            {/* Quick View Modal */}
             <Dialog open={Boolean(quickViewProduct)} onOpenChange={(open) => !open && setQuickViewProduct(null)}>
-                <DialogContent className="max-h-[92vh] w-[94vw] max-w-3xl overflow-y-auto rounded-md border-border/70 p-0">
+                <DialogContent className="max-h-[92vh] w-[94vw] max-w-3xl overflow-y-auto p-0">
                     {quickViewProduct && (
                         <div className="grid md:grid-cols-[1.05fr_0.95fr]">
-                            <div className="h-72 bg-muted/40 md:h-full">
-                                {quickViewProduct.image_url ? (
-                                    <img
-                                        src={quickViewProduct.image_url}
-                                        alt={quickViewProduct.name_en}
-                                        className="h-full w-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                                        <Package className="h-12 w-12" />
-                                    </div>
-                                )}
-                            </div>
+                            <ProductThumb
+                                src={quickViewProduct.image_url}
+                                alt={quickViewProduct.name_en}
+                                className="h-72 md:h-full"
+                            />
                             <div className="space-y-5 p-6">
                                 <div className="space-y-2">
-                                    <Badge variant="secondary" className="rounded-full text-[11px] uppercase tracking-[0.08em]">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                                         {quickViewProduct.category || 'General'}
-                                    </Badge>
+                                    </p>
                                     <DialogTitle className="text-2xl font-bold leading-tight">{quickViewProduct.name_en}</DialogTitle>
                                     <DialogDescription className="text-sm">From {quickViewProduct.origin_region || 'Afghanistan'}</DialogDescription>
                                 </div>
@@ -571,19 +565,23 @@ const Products = () => {
                                     {quickViewProduct.description_en || 'Authentic Afghan product available for global wholesale and retail buyers.'}
                                 </p>
 
-                                <div className="rounded-md border border-border bg-muted/20 p-4">
-                                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Order model</p>
+                                <div className="border border-border bg-muted/20 p-4">
+                                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Order model</p>
                                     <p className="mt-2 text-sm leading-6 text-foreground">
                                         This store works on quote-based checkout. Add products to your cart and submit one order request.
                                     </p>
                                 </div>
 
+                                <div className="flex items-center gap-3">
+                                    <p className="text-sm font-medium text-foreground">Quantity</p>
+                                    <QuantityStepper value={quickViewQty} onChange={(v) => setQuickViewQty(Math.max(1, v))} />
+                                </div>
+
                                 <div className="flex flex-wrap gap-2">
                                     <Button
                                         type="button"
-                                        className="rounded-full px-6"
                                         onClick={() => {
-                                            addToCart(quickViewProduct);
+                                            addToCart(quickViewProduct, quickViewQty);
                                             setQuickViewProduct(null);
                                             setCartOpen(true);
                                         }}
@@ -591,7 +589,7 @@ const Products = () => {
                                         <Plus className="mr-2 h-4 w-4" />
                                         Add to cart
                                     </Button>
-                                    <Button type="button" variant="outline" className="rounded-full" onClick={() => setQuickViewProduct(null)}>
+                                    <Button type="button" variant="outline" onClick={() => setQuickViewProduct(null)}>
                                         Continue browsing
                                     </Button>
                                 </div>
@@ -601,32 +599,38 @@ const Products = () => {
                 </DialogContent>
             </Dialog>
 
+            {/* Cart Drawer */}
             <Dialog open={cartOpen} onOpenChange={setCartOpen}>
-                <DialogContent className="max-h-[95vh] w-[95vw] max-w-2xl overflow-y-auto rounded-md border-border/70 p-0">
-                    <div className="sticky top-0 z-10 border-b border-border/60 bg-background p-5">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-                                    <ShoppingCart className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                    <DialogTitle className="text-xl font-bold">Cart checkout</DialogTitle>
-                                    <DialogDescription className="text-xs uppercase tracking-[0.12em]">
-                                        {distinctItemCount} {distinctItemCount === 1 ? 'item' : 'items'} • {cartItemCount} units
-                                    </DialogDescription>
-                                </div>
-                            </div>
-                            {cartItems.length > 0 ? (
-                                <Button type="button" variant="ghost" className="h-8 rounded-full px-3 text-xs" onClick={clearCart}>
-                                    Clear cart
+                <DialogContent
+                    className="!inset-y-0 !left-auto !right-0 !top-0 !h-dvh !max-h-dvh !w-full !max-w-md !translate-x-0 !translate-y-0 !grid-rows-[auto_1fr_auto] !gap-0 !rounded-none !border-y-0 !border-r-0 !p-0 !duration-300 data-[state=closed]:!slide-out-to-right data-[state=open]:!slide-in-from-right data-[state=closed]:!slide-out-to-top-0 data-[state=open]:!slide-in-from-top-0 [&>button]:hidden"
+                >
+                    <div className="flex items-center justify-between border-b border-border px-5 py-4">
+                        <div>
+                            <DialogTitle className="text-lg font-bold">Your cart</DialogTitle>
+                            <DialogDescription className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
+                                {distinctItemCount} {distinctItemCount === 1 ? 'item' : 'items'} &middot; {cartItemCount} units
+                            </DialogDescription>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            {cartItems.length > 0 && (
+                                <Button type="button" variant="ghost" size="sm" onClick={clearCart}>
+                                    Clear
                                 </Button>
-                            ) : null}
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setCartOpen(false)}
+                                className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                aria-label="Close cart"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
                         </div>
                     </div>
 
-                    <div className="space-y-6 p-5 md:p-6">
+                    <div className="overflow-y-auto px-5 py-5">
                         {status.success && (
-                            <Alert className="rounded-md border-green-200 bg-green-50/80 text-green-900">
+                            <Alert className="mb-5 border-green-200 bg-green-50/80 text-green-900">
                                 <CheckCircle className="h-5 w-5 shrink-0" />
                                 <div className="ml-2">
                                     <AlertTitle className="font-semibold">Order request sent!</AlertTitle>
@@ -638,7 +642,7 @@ const Products = () => {
                         )}
 
                         {status.error && (
-                            <Alert className="rounded-md border-red-200 bg-red-50/80 text-red-900">
+                            <Alert className="mb-5 border-red-200 bg-red-50/80 text-red-900">
                                 <AlertCircle className="h-5 w-5 shrink-0" />
                                 <div className="ml-2">
                                     <AlertTitle className="font-semibold">Unable to submit</AlertTitle>
@@ -648,62 +652,40 @@ const Products = () => {
                         )}
 
                         {cartItems.length === 0 ? (
-                            <div className="rounded-md border-2 border-dashed border-border/70 p-10 text-center">
-                                <ShoppingBag className="mx-auto mb-3 h-11 w-11 text-muted-foreground/50" />
+                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-border py-16 text-center">
+                                <ShoppingBag className="mb-3 h-10 w-10 text-muted-foreground/50" />
                                 <p className="font-medium text-muted-foreground">Your cart is empty</p>
                                 <p className="mt-1 text-sm text-muted-foreground/70">Add products to prepare a request</p>
+                                <Button type="button" variant="outline" className="mt-5" onClick={() => setCartOpen(false)}>
+                                    Continue browsing
+                                </Button>
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-foreground/80">Items</p>
                                 {cartItems.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className="rounded-md border border-border/70 bg-muted/20 p-4"
-                                    >
-                                        <div className="mb-3 flex items-start justify-between gap-3">
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-foreground">{item.name}</p>
-                                                <div className="mt-1 flex items-center gap-2">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="rounded-full border-primary/30 bg-primary/5 px-2 py-0.5 text-[11px] text-primary"
-                                                    >
-                                                        {item.category}
-                                                    </Badge>
-                                                    <span className="text-xs text-muted-foreground">{item.origin}</span>
-                                                </div>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => removeFromCart(item.id)}
-                                                className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                                aria-label="Remove item"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
+                                    <div key={item.id} className="flex gap-3 border border-border p-3">
+                                        <ProductThumb src={item.image} alt={item.name} className="h-16 w-16 shrink-0 rounded-md" />
 
-                                        <div className="flex w-fit items-center gap-2 rounded-full border border-border bg-background p-1">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="icon"
-                                                className="h-7 w-7 rounded-full border-0"
-                                                onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
-                                            >
-                                                <Minus className="h-3.5 w-3.5" />
-                                            </Button>
-                                            <span className="min-w-7 text-center text-sm font-semibold">{item.quantity}</span>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="icon"
-                                                className="h-7 w-7 rounded-full border-0"
-                                                onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
-                                            >
-                                                <Plus className="h-3.5 w-3.5" />
-                                            </Button>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <p className="truncate font-semibold text-foreground">{item.name}</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeFromCart(item.id)}
+                                                    className="shrink-0 text-muted-foreground transition-colors hover:text-destructive"
+                                                    aria-label="Remove item"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">{item.category} &middot; {item.origin}</p>
+                                            <div className="mt-2">
+                                                <QuantityStepper
+                                                    value={item.quantity}
+                                                    onChange={(v) => updateCartQuantity(item.id, v)}
+                                                    size="sm"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -711,12 +693,12 @@ const Products = () => {
                         )}
 
                         {cartItems.length > 0 && (
-                            <form onSubmit={handleSubmit} className="space-y-4 border-t border-border/60 pt-6">
-                                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-foreground/80">Buyer information</p>
+                            <form id="cart-checkout-form" onSubmit={handleSubmit} className="mt-8 space-y-4 border-t border-border pt-6">
+                                <p className="text-sm font-semibold uppercase tracking-[0.1em] text-foreground/80">Your details</p>
 
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <div className="space-y-2 sm:col-span-2">
-                                        <Label className="text-sm font-medium text-foreground" htmlFor="name">
+                                <div className="grid gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name">
                                             Full name <span className="text-destructive">*</span>
                                         </Label>
                                         <Input
@@ -725,13 +707,12 @@ const Products = () => {
                                             value={checkoutData.name}
                                             onChange={handleCheckoutChange}
                                             placeholder="Your name"
-                                            className="h-10 rounded-md"
                                             required
                                         />
                                     </div>
 
-                                    <div className="space-y-2 sm:col-span-2">
-                                        <Label className="text-sm font-medium text-foreground" htmlFor="email">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">
                                             Email <span className="text-destructive">*</span>
                                         </Label>
                                         <Input
@@ -741,71 +722,74 @@ const Products = () => {
                                             value={checkoutData.email}
                                             onChange={handleCheckoutChange}
                                             placeholder="your@email.com"
-                                            className="h-10 rounded-md"
                                             required
                                         />
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-foreground" htmlFor="country">
-                                            Country <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Input
-                                            id="country"
-                                            name="country"
-                                            value={checkoutData.country}
-                                            onChange={handleCheckoutChange}
-                                            placeholder="Afghanistan"
-                                            className="h-10 rounded-md"
-                                            required
-                                        />
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="country">
+                                                Country <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Input
+                                                id="country"
+                                                name="country"
+                                                value={checkoutData.country}
+                                                onChange={handleCheckoutChange}
+                                                placeholder="Afghanistan"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="company">
+                                                Company <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                                            </Label>
+                                            <Input
+                                                id="company"
+                                                name="company"
+                                                value={checkoutData.company}
+                                                onChange={handleCheckoutChange}
+                                                placeholder="Company name"
+                                            />
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-foreground" htmlFor="company">
-                                            Company <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                                        <Label htmlFor="message">
+                                            Order notes <span className="text-xs font-normal text-muted-foreground">(optional)</span>
                                         </Label>
-                                        <Input
-                                            id="company"
-                                            name="company"
-                                            value={checkoutData.company}
+                                        <Textarea
+                                            id="message"
+                                            name="message"
+                                            value={checkoutData.message}
                                             onChange={handleCheckoutChange}
-                                            placeholder="Company name"
-                                            className="h-10 rounded-md"
+                                            rows={3}
+                                            className="resize-none"
+                                            placeholder="Packaging, delivery instructions, special requests..."
                                         />
                                     </div>
                                 </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-foreground" htmlFor="message">
-                                        Order notes <span className="text-xs font-normal text-muted-foreground">(optional)</span>
-                                    </Label>
-                                    <Textarea
-                                        id="message"
-                                        name="message"
-                                        value={checkoutData.message}
-                                        onChange={handleCheckoutChange}
-                                        rows={3}
-                                        className="resize-none rounded-md"
-                                        placeholder="Packaging, delivery instructions, special requests..."
-                                    />
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    disabled={status.loading || cartItems.length === 0}
-                                    className="h-11 w-full rounded-full text-sm font-semibold"
-                                >
-                                    <Send className="mr-2 h-4 w-4" />
-                                    {status.loading ? 'Submitting request...' : 'Place order request'}
-                                </Button>
-
-                                <p className="text-center text-xs text-muted-foreground">
-                                    Payment is handled after order confirmation. Our team will contact you with details.
-                                </p>
                             </form>
                         )}
                     </div>
+
+                    {cartItems.length > 0 && (
+                        <div className="border-t border-border p-5">
+                            <Button
+                                type="submit"
+                                form="cart-checkout-form"
+                                disabled={status.loading}
+                                className="h-11 w-full text-sm font-semibold"
+                            >
+                                <Send className="mr-2 h-4 w-4" />
+                                {status.loading ? 'Submitting request...' : `Place order request (${cartItemCount} units)`}
+                            </Button>
+                            <p className="mt-3 text-center text-xs text-muted-foreground">
+                                Payment is handled after order confirmation. Our team will contact you with details.
+                            </p>
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

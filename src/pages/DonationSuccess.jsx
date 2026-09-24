@@ -7,7 +7,7 @@ import { useToast } from '../contexts/ToastContext';
 
 const DonationSuccess = () => {
     const [searchParams] = useSearchParams();
-    const { toast } = useToast();
+    const toast = useToast();
     const donationId = searchParams.get('id');
     const amount = searchParams.get('amount');
     const paymentMethod = searchParams.get('method');
