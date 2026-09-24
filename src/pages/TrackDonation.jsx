@@ -91,9 +91,9 @@ const TrackDonation = () => {
             case 'failed':
                 return <XCircle className="w-6 h-6 text-red-500" />;
             case 'cancelled':
-                return <AlertCircle className="w-6 h-6 text-gray-500" />;
+                return <AlertCircle className="w-6 h-6 text-muted-foreground" />;
             default:
-                return <Clock className="w-6 h-6 text-gray-500" />;
+                return <Clock className="w-6 h-6 text-muted-foreground" />;
         }
     };
 
@@ -106,9 +106,9 @@ const TrackDonation = () => {
             case 'failed':
                 return 'bg-red-100 text-red-800';
             case 'cancelled':
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-100 text-foreground';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-100 text-foreground';
         }
     };
 
@@ -123,25 +123,25 @@ const TrackDonation = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span className="block text-blue-600 font-medium">Bank Name</span>
-                                <span className="block text-gray-900 font-semibold">{import.meta.env.VITE_BANK_NAME || 'Afghan National Bank'}</span>
+                                <span className="block text-foreground font-semibold">{import.meta.env.VITE_BANK_NAME || 'Afghan National Bank'}</span>
                             </div>
                             <div>
                                 <span className="block text-blue-600 font-medium">Account Name</span>
-                                <span className="block text-gray-900 font-semibold">{import.meta.env.VITE_BANK_ACCOUNT_NAME || 'Afghanium Charity'}</span>
+                                <span className="block text-foreground font-semibold">{import.meta.env.VITE_BANK_ACCOUNT_NAME || 'Afghanium Charity'}</span>
                             </div>
                             <div>
                                 <span className="block text-blue-600 font-medium">IBAN</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="block text-gray-900 font-semibold">{import.meta.env.VITE_BANK_IBAN || 'AF00 0000 0000 0000 0000 0000'}</span>
+                                    <span className="block text-foreground font-semibold">{import.meta.env.VITE_BANK_IBAN || 'AF00 0000 0000 0000 0000 0000'}</span>
                                     <Copy className="w-4 h-4 text-blue-400 cursor-pointer hover:text-blue-600" />
                                 </div>
                             </div>
                             <div>
                                 <span className="block text-blue-600 font-medium">SWIFT Code</span>
-                                <span className="block text-gray-900 font-semibold">{import.meta.env.VITE_BANK_SWIFT || 'AFG123'}</span>
+                                <span className="block text-foreground font-semibold">{import.meta.env.VITE_BANK_SWIFT || 'AFG123'}</span>
                             </div>
                         </div>
-                        <div className="mt-4 p-3 bg-white rounded border border-blue-100">
+                        <div className="mt-4 p-3 bg-card rounded-lg border border-blue-200/60">
                             <p className="text-blue-800 text-sm">
                                 <strong>Reference:</strong> Please use <span className="font-mono font-bold">{donation.donation_id}</span> as your payment reference.
                             </p>
@@ -155,13 +155,13 @@ const TrackDonation = () => {
                         <h3 className="text-lg font-bold text-purple-900 mb-4">Complete Your Crypto Transfer</h3>
                         <div className="space-y-4">
                             {CRYPTO_CURRENCIES.map((crypto) => (
-                                <div key={crypto.code} className="flex items-center justify-between p-3 bg-white rounded border border-purple-100">
+                                <div key={crypto.code} className="flex items-center justify-between p-3 bg-card rounded-lg border border-purple-200/60">
                                     <div className="flex items-center gap-2">
                                         <span className="text-xl">{crypto.icon}</span>
-                                        <span className="font-medium text-gray-900">{crypto.name}</span>
+                                        <span className="font-medium text-foreground">{crypto.name}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <code className="text-xs sm:text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                        <code className="text-xs sm:text-sm text-muted-foreground bg-gray-100 px-2 py-1 rounded">
                                             {import.meta.env[`VITE_CRYPTO_WALLET_${crypto.code}`] || `0x...${crypto.code}`}
                                         </code>
                                         <Copy className="w-4 h-4 text-purple-400 cursor-pointer hover:text-purple-600" />
@@ -193,9 +193,9 @@ const TrackDonation = () => {
 
             case PAYMENT_METHODS.STRIPE:
                 return (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mt-6 text-center">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Pay with Card</h3>
-                        <p className="text-gray-600 mb-4">Complete your secure credit/debit card payment.</p>
+                    <div className="bg-gray-50 border border-border rounded-lg p-6 mt-6 text-center">
+                        <h3 className="text-lg font-bold text-foreground mb-2">Pay with Card</h3>
+                        <p className="text-muted-foreground mb-4">Complete your secure credit/debit card payment.</p>
                         <button
                             className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 transition-colors"
                         >

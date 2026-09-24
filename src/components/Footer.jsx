@@ -47,24 +47,24 @@ const Footer = () => {
                             <img
                                 src="/logo.jpg"
                                 alt="Afghanium logo"
-                                className="w-12 h-12 rounded-lg object-cover"
+                                className="w-12 h-12 rounded-xl object-cover border border-white/15"
                             />
-                            <span className="text-2xl font-bold">AFGHANIUM</span>
+                            <span className="font-display text-2xl font-bold tracking-tight">Afghanium</span>
                         </div>
-                        <p className="text-gray-300 mb-6">
-                            Breaking barriers. Building bridges.
+                        <p className="text-white/70 mb-6 leading-relaxed">
+                            Made in Afghanistan, Meant for the world.
                         </p>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-xl font-bold mb-6">{t('footer.quickLinks')}</h3>
+                        <h3 className="mb-5 text-xs font-bold uppercase tracking-[0.24em] text-accent-gold">{t('footer.quickLinks')}</h3>
                         <ul className="space-y-3">
                             {quickLinks.map((link) => (
                                 <li key={link.to}>
                                     <Link
                                         to={link.to}
-                                        className="text-gray-300 hover:text-white transition-colors hover:underline"
+                                        className="text-white/70 hover:text-white transition-colors"
                                     >
                                         {link.label}
                                     </Link>
@@ -75,37 +75,37 @@ const Footer = () => {
 
                     {/* Contact Information */}
                     <div>
-                        <h3 className="text-xl font-bold mb-6">{t('footer.contact')}</h3>
+                        <h3 className="mb-5 text-xs font-bold uppercase tracking-[0.24em] text-accent-gold">{t('footer.contact')}</h3>
                         <ul className="space-y-4">
                             <li className="flex items-start space-x-3">
-                                <Mail className="w-5 h-5 text-primary mt-1" />
+                                <Mail className="w-5 h-5 text-accent-gold mt-1 shrink-0" />
                                 <a
                                     href={`mailto:${CONTACT_INFO.email}`}
-                                    className="text-gray-300 hover:text-white transition-colors"
+                                    className="text-white/70 hover:text-white transition-colors"
                                 >
                                     {CONTACT_INFO.email}
                                 </a>
                             </li>
                             <li className="flex items-start space-x-3">
-                                <Phone className="w-5 h-5 text-primary mt-1" />
+                                <Phone className="w-5 h-5 text-accent-gold mt-1 shrink-0" />
                                 <a
                                     href={`tel:${phoneHref}`}
-                                    className="text-gray-300 hover:text-white transition-colors"
+                                    className="text-white/70 hover:text-white transition-colors"
                                 >
                                     {CONTACT_INFO.phone}
                                 </a>
                             </li>
                             <li className="flex items-start space-x-3">
-                                <MapPin className="w-5 h-5 text-primary mt-1" />
-                                <span className="text-gray-300">{CONTACT_INFO.address}</span>
+                                <MapPin className="w-5 h-5 text-accent-gold mt-1 shrink-0" />
+                                <span className="text-white/70">{CONTACT_INFO.address}</span>
                             </li>
                         </ul>
                     </div>
 
                     {/* Social Media */}
                     <div>
-                        <h3 className="text-xl font-bold mb-6">{t('footer.followUs')}</h3>
-                        <div className="flex space-x-4">
+                        <h3 className="mb-5 text-xs font-bold uppercase tracking-[0.24em] text-accent-gold">{t('footer.followUs')}</h3>
+                        <div className="flex space-x-3">
                             {socialMediaLinks.map(({ icon, href, label }) => {
                                 const SocialIcon = icon;
                                 return (
@@ -115,7 +115,7 @@ const Footer = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={label}
-                                    className="w-10 h-10 bg-white/10 hover:bg-primary rounded-full flex items-center justify-center transition-colors"
+                                    className="w-10 h-10 bg-white/10 hover:bg-accent-gold hover:text-primary-dark rounded-xl flex items-center justify-center transition-colors"
                                 >
                                     <SocialIcon className="w-5 h-5" />
                                 </a>
@@ -128,7 +128,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <p className="text-gray-300 text-sm">
+                        <p className="text-white/60 text-sm">
                             {t('footer.copyright')}
                         </p>
                         <div className="flex space-x-6">
@@ -136,7 +136,7 @@ const Footer = () => {
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className="text-gray-300 hover:text-white text-sm transition-colors"
+                                    className="text-white/60 hover:text-white text-sm transition-colors"
                                 >
                                     {link.label}
                                 </Link>

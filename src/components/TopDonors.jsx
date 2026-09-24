@@ -40,23 +40,24 @@ const TopDonors = () => {
 
     const getRankColor = (index) => {
         switch (index) {
-            case 0: return 'bg-yellow-50 border-yellow-200';
-            case 1: return 'bg-gray-50 border-gray-200';
-            case 2: return 'bg-orange-50 border-orange-200';
-            default: return 'bg-white';
+            case 0: return 'bg-accent-gold/10 border-accent-gold/30';
+            case 1: return 'bg-muted/60 border-border';
+            case 2: return 'bg-orange-500/5 border-orange-500/20';
+            default: return 'bg-card border-border';
         }
     };
 
     if (loading || donors.length === 0) return null;
 
     return (
-        <section className="section-padding bg-white">
+        <section className="section-padding bg-background">
             <div className="container-custom">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Our Top Supporters 🏆
+                    <span className="eyebrow mb-3 justify-center">Top supporters</span>
+                    <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                        Our Top Supporters
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                         We are deeply grateful to our most generous contributors who are leading the way in making a difference.
                     </p>
                 </div>
@@ -65,22 +66,22 @@ const TopDonors = () => {
                     {donors.map((donor, index) => (
                         <div
                             key={index}
-                            className={`${getRankColor(index)} border-2 rounded-2xl p-8 text-center transform hover:-translate-y-2 transition-transform duration-300 shadow-lg relative overflow-hidden`}
+                            className={`${getRankColor(index)} border-2 rounded-2xl p-8 text-center transform hover:-translate-y-2 transition-transform duration-300 shadow-sm hover:shadow-lifted relative overflow-hidden`}
                         >
                             {/* Rank Badge */}
                             <div className="absolute top-4 right-4">
-                                <span className="text-4xl font-black opacity-10">#{index + 1}</span>
+                                <span className="font-display text-4xl font-black opacity-10">#{index + 1}</span>
                             </div>
 
                             {/* Icon */}
                             <div className="flex justify-center mb-6">
-                                <div className="bg-white p-4 rounded-full shadow-md">
+                                <div className="bg-card p-4 rounded-xl shadow-sm">
                                     {getMedal(index)}
                                 </div>
                             </div>
 
                             {/* Name */}
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            <h3 className="font-display text-xl font-bold text-foreground mb-2">
                                 {donor.full_name}
                             </h3>
 
@@ -90,12 +91,12 @@ const TopDonors = () => {
                             </div>
 
                             {/* Date */}
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-muted-foreground">
                                 Donated on {new Date(donor.created_at).toLocaleDateString()}
                             </p>
 
                             {index === 0 && (
-                                <div className="mt-4 inline-block bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                <div className="mt-4 inline-block bg-accent-gold/15 text-accent-gold text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                                     Gold Donor
                                 </div>
                             )}

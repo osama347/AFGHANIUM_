@@ -55,7 +55,7 @@ export default {
       },
       fontFamily: {
         sans: ['Montserrat', 'system-ui', 'sans-serif'],
-        display: ['Montserrat', 'sans-serif'],
+        display: ['"Fraunces"', 'Georgia', 'serif'],
       },
       backgroundImage: {
         'afghan-pattern': "url('/patterns/afghan-pattern.svg')",
@@ -63,6 +63,8 @@ export default {
       boxShadow: {
         'soft': '0 2px 15px -3px rgba(58, 157, 88, 0.1), 0 4px 6px -2px rgba(58, 157, 88, 0.05)',
         'md-green': '0 4px 6px -1px rgba(58, 157, 88, 0.1), 0 2px 4px -1px rgba(58, 157, 88, 0.06)',
+        'lifted': '0 30px 60px -25px rgba(31, 81, 48, 0.35), 0 10px 20px -12px rgba(31, 81, 48, 0.18)',
+        'gold': '0 10px 30px -10px rgba(212, 175, 55, 0.45)',
       },
     },
   },

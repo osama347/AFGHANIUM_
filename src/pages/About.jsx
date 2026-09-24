@@ -278,7 +278,7 @@ const About = () => {
                                 <Button asChild size="lg" className="rounded-full bg-white px-6 text-primary hover:bg-white/90">
                                     <Link to="/donate">Make a donation</Link>
                                 </Button>
-                                <Button asChild variant="outline" size="lg" className="rounded-full border-white px-6 text-white hover:bg-white hover:text-primary">
+                                <Button asChild variant="outline" size="lg" className="!bg-transparent rounded-full border-white px-6 text-white hover:bg-white hover:text-primary">
                                     <Link to="/contact">Contact us</Link>
                                 </Button>
                             </div>

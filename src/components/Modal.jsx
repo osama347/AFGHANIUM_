@@ -27,27 +27,27 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+                className="fixed inset-0 bg-black/55 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
             {/* Modal */}
             <div className="flex min-h-screen items-center justify-center p-4">
                 <div
-                    className={`relative w-full ${sizeClasses[size]} bg-white rounded-lg shadow-2xl transform transition-all`}
+                    className={`relative w-full ${sizeClasses[size]} bg-card rounded-2xl shadow-2xl border border-border transform transition-all`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between p-6 border-b border-border">
                         {title && (
-                            <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
+                            <h3 className="font-display text-2xl font-bold text-foreground">{title}</h3>
                         )}
                         <button
                             onClick={onClose}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-muted rounded-xl transition-colors"
                             aria-label="Close modal"
                         >
-                            <X className="w-5 h-5 text-gray-500" />
+                            <X className="w-5 h-5 text-muted-foreground" />
                         </button>
                     </div>
 

@@ -4,15 +4,15 @@ import { getTestimonialImageUrl } from '../supabase/storage';
 
 const TestimonialCard = ({ testimonial }) => {
     return (
-        <div className="relative bg-white rounded-xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 group">
+        <div className="relative bg-card rounded-2xl p-8 shadow-sm hover:shadow-lifted transition-all duration-300 hover:-translate-y-2 border border-border group">
             {/* Decorative top accent */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-transparent rounded-t-xl group-hover:via-primary transition-all duration-300" />
-            
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent-gold to-transparent rounded-t-2xl transition-all duration-300" />
+
             <div className="flex items-center justify-center mb-6">
                 <Quote className="w-10 h-10 text-primary opacity-30" />
             </div>
 
-            <p className="text-gray-700 text-base mb-6 text-center leading-relaxed">
+            <p className="text-foreground/80 text-base mb-6 text-center leading-relaxed">
                 "{testimonial.message}"
             </p>
 
@@ -29,19 +29,19 @@ const TestimonialCard = ({ testimonial }) => {
                         </div>
                     </div>
                 )}
-                <p className="font-semibold text-gray-900 text-lg">
+                <p className="font-display font-semibold text-foreground text-lg">
                     {testimonial.name}
                 </p>
                 {testimonial.location && (
-                    <p className="text-gray-500 text-sm mt-1 flex items-center justify-center gap-1">
+                    <p className="text-muted-foreground text-sm mt-1 flex items-center justify-center gap-1">
                         📍 {testimonial.location}
                     </p>
                 )}
             </div>
 
             {testimonial.amount && (
-                <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-                    <span className="inline-block bg-gradient-to-r from-primary/10 to-transparent px-3 py-1 rounded-full text-primary font-semibold text-sm">
+                <div className="mt-6 pt-4 border-t border-border text-center">
+                    <span className="inline-block bg-secondary/15 px-3 py-1 rounded-full text-secondary-foreground font-semibold text-sm">
                         Donated ${testimonial.amount}
                     </span>
                 </div>

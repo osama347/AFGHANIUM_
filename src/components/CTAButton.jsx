@@ -12,13 +12,13 @@ const CTAButton = ({
     className = '',
     ...props
 }) => {
-    const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 shadow hover:shadow-lg';
+    const baseClasses = 'inline-flex items-center justify-center font-semibold tracking-tight rounded-xl transition-all duration-200 shadow hover:shadow-lg';
 
     const variantClasses = {
         primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/85',
         outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
-        gold: 'bg-accent-gold text-white hover:bg-accent-gold/90',
+        gold: 'bg-accent-gold text-white hover:bg-accent-gold/90 shadow-gold',
     };
 
     const sizeClasses = {

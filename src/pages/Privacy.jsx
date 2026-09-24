@@ -6,7 +6,7 @@ const Privacy = () => {
         <div>
             <Hero title="Privacy Policy" subtitle="How we protect your data" />
 
-            <section className="section-padding bg-white">
+            <section className="section-padding bg-background">
                 <div className="container-custom max-w-4xl prose prose-lg">
                     <h2>Privacy Policy</h2>
                     <p>Last updated: {new Date().toLocaleDateString()}</p>

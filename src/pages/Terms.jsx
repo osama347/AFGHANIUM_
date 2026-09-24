@@ -6,7 +6,7 @@ const Terms = () => {
         <div>
             <Hero title="Terms & Conditions" subtitle="Please read these terms carefully" />
 
-            <section className="section-padding bg-white">
+            <section className="section-padding bg-background">
                 <div className="container-custom max-w-4xl prose prose-lg">
                     <h2>Terms and Conditions</h2>
                     <p>Last updated: {new Date().toLocaleDateString()}</p>

@@ -37,7 +37,7 @@ const DonationSuccess = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4 py-8">
-            <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-6 md:p-12 text-center">
+            <div className="max-w-2xl w-full bg-card border border-border rounded-2xl shadow-2xl p-6 md:p-12 text-center">
                 {/* Success Icon */}
                 <div className="mb-6">
                     <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
@@ -46,11 +46,11 @@ const DonationSuccess = () => {
                 </div>
 
                 {/* Thank You Message */}
-                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
                     Donation Information Submitted! 📋
                 </h1>
 
-                <p className="text-xl text-gray-600 mb-8">
+                <p className="text-xl text-muted-foreground mb-8">
                     Thank you for your generous donation. Please provide your transaction reference number below so we can verify your payment.
                 </p>
 
@@ -59,20 +59,20 @@ const DonationSuccess = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                         {donationId && (
                             <div>
-                                <p className="text-sm text-gray-600">Donation ID</p>
-                                <p className="text-lg font-bold text-gray-900">{donationId}</p>
+                                <p className="text-sm text-muted-foreground">Donation ID</p>
+                                <p className="text-lg font-bold text-foreground">{donationId}</p>
                             </div>
                         )}
                         {amount && (
                             <div>
-                                <p className="text-sm text-gray-600">Amount</p>
+                                <p className="text-sm text-muted-foreground">Amount</p>
                                 <p className="text-lg font-bold text-primary">${amount}</p>
                             </div>
                         )}
                         {paymentMethod && (
                             <div>
-                                <p className="text-sm text-gray-600">Payment Method</p>
-                                <p className="text-lg font-bold text-gray-900 capitalize">{paymentMethod.replace('_', ' ')}</p>
+                                <p className="text-sm text-muted-foreground">Payment Method</p>
+                                <p className="text-lg font-bold text-foreground capitalize">{paymentMethod.replace('_', ' ')}</p>
                             </div>
                         )}
                     </div>
@@ -93,7 +93,7 @@ const DonationSuccess = () => {
 
                         <form onSubmit={handleSubmitReference} className="space-y-4">
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-foreground/80 font-medium mb-2">
                                     Transaction Reference Number *
                                 </label>
                                 <input
@@ -104,7 +104,7 @@ const DonationSuccess = () => {
                                     placeholder={`Enter your ${paymentMethod?.replace('_', ' ')} reference number`}
                                     required
                                 />
-                                <p className="text-sm text-gray-500 mt-1">
+                                <p className="text-sm text-muted-foreground mt-1">
                                     This is usually found on your receipt or transaction confirmation
                                 </p>
                             </div>
