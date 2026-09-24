@@ -52,7 +52,7 @@ const Footer = () => {
                             <span className="text-2xl font-bold">AFGHANIUM</span>
                         </div>
                         <p className="text-gray-300 mb-6">
-                            Breaking barriers. Building bridges.
+                            Made in Afghanistan, Meant for the world.
                         </p>
                     </div>
 
