@@ -87,50 +87,47 @@ const StatsSection = () => {
             value: stats.totalRaised,
             label: 'Total Raised',
             prefix: '$',
-            color: 'bg-green-500',
         },
         {
             icon: Heart,
             value: stats.totalDonations,
             label: 'Total Donations',
             suffix: '+',
-            color: 'bg-red-500',
         },
         {
             icon: Users,
             value: stats.livesImpacted,
             label: 'Lives Impacted',
             suffix: '+',
-            color: 'bg-blue-500',
         },
         {
             icon: TrendingUp,
             value: stats.activeProjects,
             label: 'Active Projects',
-            color: 'bg-purple-500',
         },
     ];
 
     const formatStatValue = (value) => value.toLocaleString();
 
     return (
-        <section className="section-padding bg-gradient-to-br from-primary-dark to-primary">
-            <div className="container-custom">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section className="section-padding relative overflow-hidden bg-gradient-to-br from-primary-dark to-primary">
+            <div className="afghan-pattern-bg absolute inset-0 opacity-10" />
+            <div className="container-custom relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {statCards.map((stat, index) => (
                         <div
                             key={index}
-                            className="bg-white/10 backdrop-blur-sm rounded-xl p-8 text-center transform hover:scale-105 transition-transform duration-300"
+                            className="rounded-2xl border border-white/10 bg-white/8 backdrop-blur-sm p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:bg-white/12"
                         >
-                            <div className={`${stat.color} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}>
-                                <stat.icon className="w-8 h-8 text-white" />
+                            <div className="w-14 h-14 rounded-xl bg-accent-gold/20 border border-accent-gold/30 flex items-center justify-center mx-auto mb-5">
+                                <stat.icon className="w-7 h-7 text-accent-gold" />
                             </div>
                             <div className="text-white">
-                                <div className="text-4xl md:text-5xl font-bold">
+                                <div className="font-display text-4xl md:text-5xl font-bold">
                                     {stat.prefix || ''}{formatStatValue(stat.value)}{stat.suffix || ''}
                                 </div>
                             </div>
-                            <p className="text-gray-200 mt-2 font-medium">{stat.label}</p>
+                            <p className="text-white/70 mt-2 font-medium">{stat.label}</p>
                         </div>
                     ))}
                 </div>

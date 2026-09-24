@@ -49,12 +49,12 @@ const ImpactCard = ({ impact }) => {
     return (
         <>
             <div
-                className="bg-white rounded-lg overflow-hidden shadow-md card-hover cursor-pointer group"
+                className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm card-hover cursor-pointer group"
                 onClick={() => setShowDetails(true)}
             >
                 {/* Media Carousel (Preview) */}
                 {mediaItems.length > 0 && (
-                    <div className="relative h-64 bg-gray-100">
+                    <div className="relative h-64 bg-muted">
                         {isVideo(mediaItems[currentIndex]) ? (
                             <video
                                 src={mediaItems[currentIndex]}
@@ -117,17 +117,17 @@ const ImpactCard = ({ impact }) => {
 
                 {/* Content */}
                 <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    <h3 className="font-display text-xl font-bold text-foreground mb-3">
                         {impact.title}
                     </h3>
 
-                    <p className="text-gray-600 mb-4 line-clamp-3">
+                    <p className="text-muted-foreground mb-4 line-clamp-3">
                         {impact.description}
                     </p>
 
                     {impact.admin_comment && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                            <p className="text-sm text-gray-500 italic truncate">
+                        <div className="mt-4 pt-4 border-t border-border">
+                            <p className="text-sm text-muted-foreground italic truncate">
                                 "{impact.admin_comment}"
                             </p>
                         </div>
@@ -230,21 +230,21 @@ const ImpactCard = ({ impact }) => {
                                     {formatCurrency(impact.cost)}
                                 </span>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                            <h2 className="font-display text-3xl font-bold text-foreground mb-4">
                                 {impact.title}
                             </h2>
-                            <div className="prose prose-lg text-gray-600 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="prose prose-lg text-muted-foreground max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 <p className="whitespace-pre-wrap">{impact.description}</p>
                             </div>
                         </div>
 
                         {impact.admin_comment && (
-                            <div className="bg-gray-50 border-l-4 border-primary p-6 rounded-r-lg">
-                                <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            <div className="bg-muted/50 border-l-4 border-primary p-6 rounded-r-xl">
+                                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
                                     <span className="w-2 h-2 bg-primary rounded-full"></span>
                                     Admin Comment
                                 </h4>
-                                <p className="text-gray-700 italic text-lg">
+                                <p className="text-foreground/80 italic text-lg">
                                     "{impact.admin_comment}"
                                 </p>
                             </div>

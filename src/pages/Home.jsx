@@ -123,33 +123,34 @@ const Home = () => {
         <div className="bg-background text-foreground">
             <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-primary/5 to-background">
                 <div className="absolute -left-20 top-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+                <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-accent-gold/10 blur-3xl" />
+                <div className="afghan-pattern-bg absolute inset-0 opacity-[0.15]" />
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-                <div className="container-custom relative z-10 py-16 md:py-22 lg:py-28">
+                <div className="container-custom relative z-10 py-16 md:py-24 lg:py-32">
                     <div className="mx-auto max-w-4xl text-center">
-                        <Badge variant="secondary" className="mb-5 inline-flex gap-2 rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.22em]">
+                        <span className="eyebrow justify-center">
                             <Sparkles className="h-3.5 w-3.5" />
                             One clear platform
-                        </Badge>
+                        </span>
 
-                        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                        <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-7xl">
                             Buy with purpose.
                             <span className="block text-primary">Support with confidence.</span>
                         </h1>
 
-                        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+                        <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
                             Afghanium combines trade and humanitarian support without confusion: shop, donate, then track outcomes.
                         </p>
 
-                        <div className="mt-8 flex flex-wrap justify-center gap-3">
-                            <Button asChild size="lg" className="h-12 rounded-full px-6">
+                        <div className="mt-9 flex flex-wrap justify-center gap-3">
+                            <Button asChild size="lg">
                                 <Link to="/shop">Explore products</Link>
                             </Button>
-                            <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-6">
+                            <Button asChild size="lg" variant="outline">
                                 <Link to="/donate">Donate now</Link>
                             </Button>
-                            <Button asChild size="lg" variant="ghost" className="h-12 rounded-full px-4">
+                            <Button asChild size="lg" variant="ghost">
                                 <Link to="/track" className="inline-flex items-center gap-2">
                                     Track donation
                                     <ArrowRight className="h-4 w-4" />
@@ -157,13 +158,15 @@ const Home = () => {
                             </Button>
                         </div>
 
-                        <div className="mt-8 flex flex-wrap justify-center gap-3">
+                        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-border/60 pt-8">
                             {pillars.map((pillar) => {
                                 const Icon = pillar.icon;
                                 return (
-                                    <div key={pillar.title} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm text-muted-foreground shadow-sm">
-                                        <Icon className="h-4 w-4 text-primary" />
-                                        <span>{pillar.title}</span>
+                                    <div key={pillar.title} className="inline-flex items-center gap-2.5 text-sm text-muted-foreground">
+                                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                            <Icon className="h-4 w-4" />
+                                        </span>
+                                        <span className="font-medium text-foreground">{pillar.title}</span>
                                     </div>
                                 );
                             })}
@@ -214,10 +217,10 @@ const Home = () => {
                             </CardDescription>
                         </CardHeader>
                         <CardFooter className="flex flex-wrap gap-3 pt-0">
-                                <Button asChild className="rounded-full px-6">
+                                <Button asChild className="px-6">
                                     <Link to="/about">Learn our story</Link>
                                 </Button>
-                                <Button asChild variant="outline" className="rounded-full px-6">
+                                <Button asChild variant="outline" className="px-6">
                                     <Link to="/contact">Talk to us</Link>
                                 </Button>
                         </CardFooter>
@@ -352,10 +355,10 @@ const Home = () => {
                             Buy with purpose, donate with clarity, and follow the impact.
                         </p>
                         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                            <Button asChild size="lg" className="h-12 rounded-full bg-white px-8 text-primary hover:bg-white/90">
+                            <Button asChild size="lg" className="h-12 bg-white px-8 text-primary hover:bg-white/90">
                                 <Link to="/donate">{t('nav.donate')}</Link>
                             </Button>
-                            <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white px-8 text-white hover:bg-white hover:text-primary">
+                            <Button asChild size="lg" variant="outline" className="h-12 !bg-transparent border-white px-8 text-white hover:bg-white hover:text-primary">
                                 <Link to="/impact">{t('nav.impact')}</Link>
                             </Button>
                         </div>

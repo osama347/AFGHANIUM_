@@ -273,7 +273,7 @@ const ImpactStories = () => {
                                             Support our mission <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </Button>
-                                    <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white text-white hover:bg-white hover:text-primary">
+                                    <Button asChild size="lg" variant="outline" className="h-12 !bg-transparent rounded-full border-white text-white hover:bg-white hover:text-primary">
                                         <Link to="/about">Learn more about us</Link>
                                     </Button>
                                 </div>

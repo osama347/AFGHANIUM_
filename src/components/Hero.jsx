@@ -105,7 +105,7 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
 
             {/* Overlay */}
             {overlay && (
-                <div className="absolute inset-0 bg-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
             )}
 
             {/* Loading Indicator */}
@@ -125,7 +125,7 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
             {/* Navigation Arrows */}
             <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-3 text-white backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-white/20"
                 aria-label="Previous slide"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
 
             <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-3 text-white backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-white/20"
                 aria-label="Next slide"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,12 +163,12 @@ const Hero = ({ title, subtitle, ctaText, ctaLink, backgroundImages = [], overla
 
             {/* Content */}
             <div className="container-custom relative z-10 text-center text-white px-4">
-                <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 drop-shadow-lg leading-tight">
+                <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4 md:mb-6 drop-shadow-lg leading-[1.05]">
                     {title}
                 </h1>
 
                 {subtitle && (
-                    <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto drop-shadow-md">
+                    <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-white/90 drop-shadow-md">
                         {subtitle}
                     </p>
                 )}
